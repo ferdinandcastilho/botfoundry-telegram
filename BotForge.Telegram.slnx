@@ -1,10 +1,10 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="BotForge.Telegram/BotForge.Telegram.csproj" />
+    <Project Path="src/BotForge.Telegram/BotForge.Telegram.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="BotForge.Telegram.UnitTests/BotForge.Telegram.UnitTests.csproj" Id="ff3beebc-ca04-4b80-9860-afba2814b6ce" />
-    <Project Path="BotForge.Tests.FunctionalTests/BotForge.Tests.FunctionalTests.csproj" Id="7b45e914-23eb-45a5-a638-1b9cd03f7844" />
-    <Project Path="BotForge.Tests.IntegrationTests/BotForge.Tests.IntegrationTests.csproj" Id="8b215b4b-c46c-4dac-8c0d-1359e4245dbf" />
+    <Project Path="tests/BotForge.Telegram.UnitTests/BotForge.Telegram.UnitTests.csproj" />
+    <Project Path="tests/BotForge.Tests.FunctionalTests/BotForge.Tests.FunctionalTests.csproj" />
+    <Project Path="tests/BotForge.Tests.IntegrationTests/BotForge.Tests.IntegrationTests.csproj" Id="a76fd87a-37fc-4ede-bcdc-d27c24022b77" />
   </Folder>
 </Solution>
