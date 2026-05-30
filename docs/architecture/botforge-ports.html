@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BotForge — Ports & Adapters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="light"]{
+  --color-bg:#f7f6f2;--color-surface:#f9f8f5;--color-surface-2:#fbfbf9;
+  --color-surface-offset:#f3f0ec;--color-border:#d4d1ca;--color-divider:#dcd9d5;
+  --color-text:#28251d;--color-text-muted:#7a7974;--color-text-faint:#bab9b4;
+  --color-primary:#01696f;--color-primary-hover:#0c4e54;--color-primary-highlight:#cedcd8;
+  --color-success:#437a22;--color-success-highlight:#d4dfcc;
+  --color-orange:#da7101;--color-orange-highlight:#e7d7c4;
+  --color-purple:#7a39bb;--color-purple-highlight:#dacfde;
+  --color-blue:#006494;--color-blue-highlight:#c6d8e4;
+  --color-error:#a12c7b;--color-error-highlight:#e0ced7;
+  --shadow-sm:0 1px 3px oklch(0.2 0.01 80/0.08);
+  --shadow-md:0 4px 16px oklch(0.2 0.01 80/0.10);
+  --shadow-lg:0 12px 40px oklch(0.2 0.01 80/0.14);
+  --radius-sm:0.375rem;--radius-md:0.5rem;--radius-lg:0.75rem;--radius-xl:1rem;--radius-full:9999px;
+  --font-body:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --text-xs:clamp(0.75rem,0.7rem + 0.25vw,0.875rem);
+  --text-sm:clamp(0.875rem,0.8rem + 0.35vw,1rem);
+  --text-base:clamp(1rem,0.95rem + 0.25vw,1.125rem);
+  --text-lg:clamp(1.125rem,1rem + 0.75vw,1.5rem);
+  --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
+  --space-1:0.25rem;--space-2:0.5rem;--space-3:0.75rem;--space-4:1rem;
+  --space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;
+  --space-12:3rem;--space-16:4rem;
+  --transition:180ms cubic-bezier(0.16,1,0.3,1);
+}
+[data-theme="dark"]{
+  --color-bg:#171614;--color-surface:#1c1b19;--color-surface-2:#201f1d;
+  --color-surface-offset:#1d1c1a;--color-border:#393836;--color-divider:#262523;
+  --color-text:#cdccca;--color-text-muted:#797876;--color-text-faint:#5a5957;
+  --color-primary:#4f98a3;--color-primary-hover:#227f8b;--color-primary-highlight:#313b3b;
+  --color-success:#6daa45;--color-success-highlight:#3a4435;
+  --color-orange:#fdab43;--color-orange-highlight:#564b3e;
+  --color-purple:#a86fdf;--color-purple-highlight:#4e4652;
+  --color-blue:#5591c7;--color-blue-highlight:#3a4550;
+  --color-error:#d163a7;--color-error-highlight:#4c3d46;
+  --shadow-sm:0 1px 3px oklch(0 0 0/0.25);
+  --shadow-md:0 4px 16px oklch(0 0 0/0.35);
+  --shadow-lg:0 12px 40px oklch(0 0 0/0.45);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);color:var(--color-text);background:var(--color-bg);line-height:1.6}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
+
+/* HEADER */
+.header{position:sticky;top:0;z-index:100;background:var(--color-bg);border-bottom:1px solid var(--color-border);padding:var(--space-3) var(--space-6);display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(8px)}
+.logo{display:flex;align-items:center;gap:var(--space-3)}
+.logo-icon{width:32px;height:32px;flex-shrink:0}
+.logo-text{font-size:var(--text-sm);font-weight:600;letter-spacing:-0.01em}
+.logo-sub{font-size:var(--text-xs);color:var(--color-text-muted);font-weight:400}
+.theme-btn{width:36px;height:36px;display:grid;place-items:center;border-radius:var(--radius-md);border:1px solid var(--color-border);transition:background var(--transition);color:var(--color-text-muted)}
+.theme-btn:hover{background:var(--color-surface);color:var(--color-text)}
+
+/* LAYOUT */
+.page{max-width:1100px;margin:0 auto;padding:var(--space-10) var(--space-6) var(--space-16)}
+.section-header{margin-bottom:var(--space-8)}
+.section-header h1{font-size:var(--text-xl);font-weight:700;letter-spacing:-0.02em;line-height:1.2;margin-bottom:var(--space-3)}
+.section-header p{font-size:var(--text-base);color:var(--color-text-muted);max-width:60ch}
+.badge{display:inline-flex;align-items:center;gap:var(--space-1);padding:2px var(--space-2);border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:500;letter-spacing:0.02em;text-transform:uppercase}
+.badge-primary{background:var(--color-primary-highlight);color:var(--color-primary)}
+.badge-success{background:var(--color-success-highlight);color:var(--color-success)}
+.badge-orange{background:var(--color-orange-highlight);color:var(--color-orange)}
+.badge-purple{background:var(--color-purple-highlight);color:var(--color-purple)}
+.badge-blue{background:var(--color-blue-highlight);color:var(--color-blue)}
+.badge-error{background:var(--color-error-highlight);color:var(--color-error)}
+
+/* CONCEPT STRIP */
+.concept-strip{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-bottom:var(--space-8);padding:var(--space-4);background:var(--color-surface);border-radius:var(--radius-lg);border:1px solid var(--color-border)}
+.concept-item{flex:1;min-width:160px;padding:var(--space-3) var(--space-4);background:var(--color-surface-2);border-radius:var(--radius-md);border:1px solid var(--color-border)}
+.concept-item .label{font-size:var(--text-xs);color:var(--color-text-faint);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--space-1)}
+.concept-item .value{font-size:var(--text-sm);font-weight:500;color:var(--color-text)}
+
+/* SECTION DIVIDER */
+.section-divider{margin:var(--space-12) 0 var(--space-8);display:flex;align-items:center;gap:var(--space-4)}
+.section-divider h2{font-size:var(--text-lg);font-weight:700;white-space:nowrap;letter-spacing:-0.01em}
+.section-divider::after{content:'';flex:1;height:1px;background:var(--color-border)}
+
+/* PORT CARD */
+.ports-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(480px,100%),1fr));gap:var(--space-5)}
+.port-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);overflow:hidden;transition:box-shadow var(--transition)}
+.port-card:hover{box-shadow:var(--shadow-md)}
+.port-header{padding:var(--space-5) var(--space-5) var(--space-4);border-bottom:1px solid var(--color-divider)}
+.port-header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-3);margin-bottom:var(--space-2)}
+.port-name{font-size:var(--text-base);font-weight:700;font-family:var(--font-mono);letter-spacing:-0.01em}
+.port-desc{font-size:var(--text-sm);color:var(--color-text-muted)}
+.port-body{padding:var(--space-5)}
+
+/* CODE BLOCK */
+.code-block{background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden}
+.code-label{padding:var(--space-2) var(--space-3);background:var(--color-surface-offset);border-bottom:1px solid var(--color-border);font-size:var(--text-xs);color:var(--color-text-faint);font-family:var(--font-mono);display:flex;align-items:center;justify-content:space-between}
+.code-label span{display:flex;align-items:center;gap:var(--space-2)}
+.code-dot{width:6px;height:6px;border-radius:50%}
+pre{padding:var(--space-4);overflow-x:auto;font-family:var(--font-mono);font-size:var(--text-xs);line-height:1.7;tab-size:2}
+.kw{color:#4f98a3}.tp{color:#a86fdf}.fn{color:#6daa45}.cm{color:#5a5957;font-style:italic}.st{color:#fdab43}.pn{color:#cdccca}
+
+/* IMPLEMENTATIONS */
+.impl-section{margin-top:var(--space-5)}
+.impl-label{font-size:var(--text-xs);color:var(--color-text-faint);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--space-3)}
+.impl-grid{display:grid;gap:var(--space-3)}
+.impl-card{border-radius:var(--radius-md);border:1px solid var(--color-border);overflow:hidden}
+.impl-header{padding:var(--space-2) var(--space-3);display:flex;align-items:center;justify-content:space-between;gap:var(--space-2)}
+.impl-name{font-family:var(--font-mono);font-size:var(--text-xs);font-weight:500}
+.impl-who{font-size:var(--text-xs);color:var(--color-text-muted)}
+.impl-card pre{padding:var(--space-3);font-size:0.72rem}
+
+/* CONCEPT BOX */
+.concept-box{margin-top:var(--space-4);padding:var(--space-4);border-radius:var(--radius-md);border-left:2px solid}
+.concept-box.primary{background:var(--color-primary-highlight);border-color:var(--color-primary)}
+.concept-box.success{background:var(--color-success-highlight);border-color:var(--color-success)}
+.concept-box.orange{background:var(--color-orange-highlight);border-color:var(--color-orange)}
+.concept-box.purple{background:var(--color-purple-highlight);border-color:var(--color-purple)}
+.concept-box.blue{background:var(--color-blue-highlight);border-color:var(--color-blue)}
+.concept-box.error{background:var(--color-error-highlight);border-color:var(--color-error)}
+.concept-box .cb-label{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--space-1)}
+.concept-box .cb-text{font-size:var(--text-sm);color:var(--color-text-muted)}
+
+/* DIAGRAM */
+.diagram-container{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--space-8);margin-bottom:var(--space-8);overflow-x:auto}
+.diagram{display:flex;flex-direction:column;align-items:center;gap:var(--space-4);min-width:560px}
+.diag-row{display:flex;align-items:center;gap:var(--space-3);width:100%;justify-content:center}
+.diag-box{padding:var(--space-3) var(--space-5);border-radius:var(--radius-md);font-family:var(--font-mono);font-size:var(--text-xs);font-weight:500;text-align:center;border:1px solid transparent;min-width:160px}
+.diag-box.ext{background:var(--color-surface-offset);border-color:var(--color-border);color:var(--color-text-muted)}
+.diag-box.adapter{background:var(--color-orange-highlight);border-color:var(--color-orange);color:var(--color-orange)}
+.diag-box.port{background:var(--color-primary-highlight);border-color:var(--color-primary);color:var(--color-primary)}
+.diag-box.core{background:var(--color-purple-highlight);border-color:var(--color-purple);color:var(--color-purple);min-width:220px;padding:var(--space-4) var(--space-6)}
+.diag-box.consumer{background:var(--color-success-highlight);border-color:var(--color-success);color:var(--color-success)}
+.diag-arrow{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--color-text-faint);font-size:var(--text-xs)}
+.arrow-line{width:1px;height:20px;background:var(--color-border)}
+.diag-legend{display:flex;gap:var(--space-4);flex-wrap:wrap;margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid var(--color-divider)}
+.legend-item{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);color:var(--color-text-muted)}
+.legend-dot{width:10px;height:10px;border-radius:var(--radius-sm);flex-shrink:0}
+.ld-adapter{background:var(--color-orange);opacity:0.7}
+.ld-port{background:var(--color-primary);opacity:0.7}
+.ld-core{background:var(--color-purple);opacity:0.7}
+.ld-consumer{background:var(--color-success);opacity:0.7}
+.ld-ext{background:var(--color-text-faint)}
+
+/* RULE CARD */
+.rules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));gap:var(--space-4);margin-top:var(--space-6)}
+.rule-card{padding:var(--space-5);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg)}
+.rule-number{font-size:var(--text-xs);color:var(--color-text-faint);font-family:var(--font-mono);margin-bottom:var(--space-2)}
+.rule-title{font-size:var(--text-sm);font-weight:600;margin-bottom:var(--space-2)}
+.rule-desc{font-size:var(--text-sm);color:var(--color-text-muted)}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <svg class="logo-icon" viewBox="0 0 32 32" fill="none" aria-label="BotForge logo">
+      <rect width="32" height="32" rx="8" fill="var(--color-primary)" opacity="0.15"/>
+      <rect x="6" y="6" width="8" height="8" rx="2" fill="var(--color-primary)"/>
+      <rect x="18" y="6" width="8" height="8" rx="2" fill="var(--color-primary)" opacity="0.5"/>
+      <rect x="6" y="18" width="8" height="8" rx="2" fill="var(--color-primary)" opacity="0.5"/>
+      <rect x="18" y="18" width="8" height="8" rx="2" fill="var(--color-primary)"/>
+      <line x1="14" y1="10" x2="18" y2="10" stroke="var(--color-primary)" stroke-width="1.5"/>
+      <line x1="10" y1="14" x2="10" y2="18" stroke="var(--color-primary)" stroke-width="1.5"/>
+      <line x1="22" y1="14" x2="22" y2="18" stroke="var(--color-primary)" stroke-width="1.5"/>
+      <line x1="14" y1="22" x2="18" y2="22" stroke="var(--color-primary)" stroke-width="1.5"/>
+    </svg>
+    <div>
+      <div class="logo-text">BotForge.Telegram</div>
+      <div class="logo-sub">Ports &amp; Adapters — Referência de Interfaces</div>
+    </div>
+  </div>
+  <button class="theme-btn" data-theme-toggle aria-label="Alternar tema">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</header>
+
+<main class="page">
+
+  <div class="section-header">
+    <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4)">
+      <span class="badge badge-primary">Ports &amp; Adapters</span>
+      <span class="badge badge-purple">Hexagonal Architecture</span>
+    </div>
+    <h1>Projeto Abstractions —<br>Os Contratos da Lib</h1>
+    <p>Cada interface abaixo é um <strong>Port</strong>: um contrato que o núcleo define sem saber quem vai implementar. Para cada Port, veja a assinatura C#, quem implementa e o conceito arquitetural aplicado.</p>
+  </div>
+
+  <div class="concept-strip">
+    <div class="concept-item"><div class="label">Projeto</div><div class="value">BotForge.Telegram.Abstractions</div></div>
+    <div class="concept-item"><div class="label">Tipo</div><div class="value">Interfaces + Modelos — sem lógica</div></div>
+    <div class="concept-item"><div class="label">Dependências</div><div class="value">Nenhuma — núcleo do sistema</div></div>
+    <div class="concept-item"><div class="label">Quem referencia</div><div class="value">Core, Adapters, Consumidor</div></div>
+  </div>
+
+  <!-- DIAGRAM -->
+  <div class="section-divider"><h2>Visão do Hexágono</h2></div>
+
+  <div class="diagram-container">
+    <div class="diagram">
+      <div class="diag-row">
+        <div class="diag-box ext">Telegram API</div>
+        <div style="width:var(--space-8)"></div>
+        <div class="diag-box ext">Test / Fake</div>
+        <div style="width:var(--space-8)"></div>
+        <div class="diag-box consumer">Consumidor<br><span style="font-size:0.65rem;opacity:0.8">(seu bot)</span></div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-arrow"><div class="arrow-line"></div><span>▼</span></div>
+        <div style="width:var(--space-8)"></div>
+        <div class="diag-arrow"><div class="arrow-line"></div><span>▼</span></div>
+        <div style="width:var(--space-8)"></div>
+        <div class="diag-arrow"><div class="arrow-line"></div><span>▼</span></div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-box adapter">TelegramPollingAdapter<br><span style="font-size:0.65rem;opacity:0.8">Driving Adapter</span></div>
+        <div style="width:var(--space-8)"></div>
+        <div class="diag-box adapter">FakeMessageSender<br><span style="font-size:0.65rem;opacity:0.8">Driven Adapter (teste)</span></div>
+        <div style="width:var(--space-8)"></div>
+        <div class="diag-box consumer">ITopicHandler impl<br><span style="font-size:0.65rem;opacity:0.8">Driven Adapter (domínio)</span></div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-arrow"><div class="arrow-line"></div><span>▼</span></div>
+        <div style="width:var(--space-8)"></div>
+        <div class="diag-arrow" style="transform:rotate(180deg)"><div class="arrow-line"></div><span>▼</span></div>
+        <div style="width:var(--space-8)"></div>
+        <div class="diag-arrow" style="transform:rotate(180deg)"><div class="arrow-line"></div><span>▼</span></div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-box port">IBotPipeline<br><span style="font-size:0.65rem;opacity:0.8">Driving Port</span></div>
+        <div style="width:var(--space-8)"></div>
+        <div class="diag-box port">IMessageSender<br><span style="font-size:0.65rem;opacity:0.8">Driven Port</span></div>
+        <div style="width:var(--space-8)"></div>
+        <div class="diag-box port">ITopicHandler<br><span style="font-size:0.65rem;opacity:0.8">Driven Port (domínio)</span></div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-arrow"><div class="arrow-line"></div><span>▼</span></div>
+      </div>
+      <div class="diag-box core">NÚCLEO (Core)<br><span style="font-size:0.65rem;opacity:0.8">Pipeline · Routing · Session · StepRunner</span></div>
+    </div>
+    <div class="diag-legend">
+      <div class="legend-item"><div class="legend-dot ld-adapter"></div>Adapter (casca externa)</div>
+      <div class="legend-item"><div class="legend-dot ld-port"></div>Port (interface em Abstractions)</div>
+      <div class="legend-item"><div class="legend-dot ld-core"></div>Core (núcleo do hexágono)</div>
+      <div class="legend-item"><div class="legend-dot ld-consumer"></div>Consumidor (implementa domínio)</div>
+      <div class="legend-item"><div class="legend-dot ld-ext"></div>Mundo externo</div>
+    </div>
+  </div>
+
+  <!-- PORTS -->
+  <div class="section-divider"><h2>Os Ports — Interfaces C#</h2></div>
+
+  <div class="ports-grid">
+
+    <!-- ISessionStore -->
+    <div class="port-card">
+      <div class="port-header">
+        <div class="port-header-top">
+          <div class="port-name">ISessionStore</div>
+          <span class="badge badge-orange">Driven Port</span>
+        </div>
+        <div class="port-desc">Define onde e como a sessão de cada usuário é persistida entre mensagens.</div>
+      </div>
+      <div class="port-body">
+        <div class="code-block">
+          <div class="code-label">
+            <span><div class="code-dot" style="background:#fdab43"></div> ISessionStore.cs</span>
+            <span>Abstractions</span>
+          </div>
+          <pre><span class="kw">public interface</span> <span class="tp">ISessionStore</span>
+{
+    <span class="tp">Task</span>&lt;<span class="tp">UserSession</span>?&gt; <span class="fn">GetAsync</span>(
+        <span class="kw">long</span> chatId,
+        <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
+
+    <span class="tp">Task</span> <span class="fn">SaveAsync</span>(
+        <span class="tp">UserSession</span> session,
+        <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
+
+    <span class="tp">Task</span> <span class="fn">DeleteAsync</span>(
+        <span class="kw">long</span> chatId,
+        <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
+}</pre>
+        </div>
+
+        <div class="impl-section">
+          <div class="impl-label">Implementações</div>
+          <div class="impl-grid">
+            <div class="impl-card">
+              <div class="impl-header" style="background:var(--color-surface-offset)">
+                <span class="impl-name">InMemorySessionStore</span>
+                <div style="display:flex;align-items:center;gap:var(--space-2)">
+                  <span class="impl-who">fornecida pela lib</span>
+                  <span class="badge badge-primary">padrão</span>
+                </div>
+              </div>
+              <pre style="background:var(--color-bg);padding:var(--space-3);font-size:0.72rem"><span class="cm">// BotForge.Telegram/Adapters/</span>
+<span class="cm">// Registrada automaticamente no DI</span>
+<span class="cm">// se nenhuma outra for registrada (ADR-002)</span>
+<span class="kw">internal class</span> <span class="tp">InMemorySessionStore</span> : <span class="tp">ISessionStore</span> { ... }</pre>
+            </div>
+            <div class="impl-card">
+              <div class="impl-header" style="background:var(--color-surface-offset)">
+                <span class="impl-name">RedisSessionStore</span>
+                <div style="display:flex;align-items:center;gap:var(--space-2)">
+                  <span class="impl-who">implementada pelo consumidor</span>
+                  <span class="badge badge-success">opcional</span>
+                </div>
+              </div>
+              <pre style="background:var(--color-bg);padding:var(--space-3);font-size:0.72rem"><span class="cm">// No projeto do bot — registra antes do AddBotForge</span>
+services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore</span>, <span class="tp">RedisSessionStore</span>&gt;();</pre>
+            </div>
+          </div>
+        </div>
+        <div class="concept-box orange">
+          <div class="cb-label" style="color:var(--color-orange)">Conceito — ADR-002</div>
+          <div class="cb-text">A lib registra <code>InMemorySessionStore</code> como fallback via convenção DI. Se o consumidor já registrou outro <code>ISessionStore</code>, o fallback é ignorado — sem sobrescrever a escolha do consumidor.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMessageSender -->
+    <div class="port-card">
+      <div class="port-header">
+        <div class="port-header-top">
+          <div class="port-name">IMessageSender</div>
+          <span class="badge badge-orange">Driven Port</span>
+        </div>
+        <div class="port-desc">Abstrai o envio de respostas ao usuário, isolando o SDK Telegram.Bot do núcleo.</div>
+      </div>
+      <div class="port-body">
+        <div class="code-block">
+          <div class="code-label">
+            <span><div class="code-dot" style="background:#fdab43"></div> IMessageSender.cs</span>
+            <span>Abstractions</span>
+          </div>
+          <pre><span class="kw">public interface</span> <span class="tp">IMessageSender</span>
+{
+    <span class="tp">Task</span> <span class="fn">SendTextAsync</span>(
+        <span class="kw">long</span> chatId,
+        <span class="kw">string</span> text,
+        <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
+
+    <span class="tp">Task</span> <span class="fn">SendTextAsync</span>(
+        <span class="kw">long</span> chatId,
+        <span class="kw">string</span> text,
+        <span class="tp">ReplyMarkup</span>? markup,
+        <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
+}</pre>
+        </div>
+
+        <div class="impl-section">
+          <div class="impl-label">Implementações</div>
+          <div class="impl-grid">
+            <div class="impl-card">
+              <div class="impl-header" style="background:var(--color-surface-offset)">
+                <span class="impl-name">TelegramMessageSender</span>
+                <div style="display:flex;align-items:center;gap:var(--space-2)">
+                  <span class="impl-who">fornecida pela lib</span>
+                  <span class="badge badge-primary">produção</span>
+                </div>
+              </div>
+              <pre style="background:var(--color-bg);padding:var(--space-3);font-size:0.72rem"><span class="cm">// ÚNICO ponto que usa Telegram.Bot SDK</span>
+<span class="cm">// BotForge.Telegram/Adapters/ (ADR-003)</span>
+<span class="kw">internal class</span> <span class="tp">TelegramMessageSender</span> : <span class="tp">IMessageSender</span> { ... }</pre>
+            </div>
+            <div class="impl-card">
+              <div class="impl-header" style="background:var(--color-surface-offset)">
+                <span class="impl-name">FakeMessageSender</span>
+                <div style="display:flex;align-items:center;gap:var(--space-2)">
+                  <span class="impl-who">criada nos testes</span>
+                  <span class="badge badge-blue">testes</span>
+                </div>
+              </div>
+              <pre style="background:var(--color-bg);padding:var(--space-3);font-size:0.72rem"><span class="cm">// Core.Tests — sem Telegram, sem rede</span>
+<span class="kw">public class</span> <span class="tp">FakeMessageSender</span> : <span class="tp">IMessageSender</span>
+{
+    <span class="kw">public</span> <span class="tp">List</span>&lt;<span class="kw">string</span>&gt; SentMessages { <span class="kw">get</span>; } = [];
+}</pre>
+            </div>
+          </div>
+        </div>
+        <div class="concept-box primary">
+          <div class="cb-label" style="color:var(--color-primary)">Conceito — ADR-003</div>
+          <div class="cb-text">O SDK <code>Telegram.Bot</code> só é referenciado em <code>TelegramMessageSender</code>. O núcleo chama <code>IMessageSender</code> — não sabe que existe um Telegram. Em teste, <code>FakeMessageSender</code> coleta as mensagens sem abrir conexão.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ITopicHandler -->
+    <div class="port-card">
+      <div class="port-header">
+        <div class="port-header-top">
+          <div class="port-name">ITopicHandler</div>
+          <span class="badge badge-success">Driven Port — Domínio</span>
+        </div>
+        <div class="port-desc">Contrato que o consumidor implementa para responder a um comando específico (<code>/start</code>, <code>/help</code>…).</div>
+      </div>
+      <div class="port-body">
+        <div class="code-block">
+          <div class="code-label">
+            <span><div class="code-dot" style="background:#6daa45"></div> ITopicHandler.cs</span>
+            <span>Abstractions</span>
+          </div>
+          <pre><span class="kw">public interface</span> <span class="tp">ITopicHandler</span>
+{
+    <span class="cm">/// Comando que este handler atende, ex: "start"</span>
+    <span class="kw">string</span> Command { <span class="kw">get</span>; }
+
+    <span class="tp">Task</span>&lt;<span class="tp">FlowResult</span>&gt; <span class="fn">HandleAsync</span>(
+        <span class="tp">BotContext</span> context,
+        <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
+}</pre>
+        </div>
+
+        <div class="impl-section">
+          <div class="impl-label">Exemplo — implementação pelo consumidor</div>
+          <div class="impl-grid">
+            <div class="impl-card">
+              <div class="impl-header" style="background:var(--color-surface-offset)">
+                <span class="impl-name">StartHandler</span>
+                <span class="impl-who">no projeto do bot</span>
+              </div>
+              <pre style="background:var(--color-bg);padding:var(--space-3);font-size:0.72rem"><span class="kw">public class</span> <span class="tp">StartHandler</span> : <span class="tp">ITopicHandler</span>
+{
+    <span class="kw">public string</span> Command => <span class="st">"start"</span>;
+
+    <span class="kw">public async</span> <span class="tp">Task</span>&lt;<span class="tp">FlowResult</span>&gt; <span class="fn">HandleAsync</span>(
+        <span class="tp">BotContext</span> ctx, <span class="tp">CancellationToken</span> ct)
+    {
+        <span class="kw">await</span> ctx.<span class="fn">SendAsync</span>(<span class="st">"Olá! Qual é o seu nome?"</span>, ct);
+        <span class="kw">return</span> <span class="tp">FlowResult</span>.<span class="fn">Continue</span>();
+    }
+}</pre>
+            </div>
+          </div>
+        </div>
+        <div class="concept-box success">
+          <div class="cb-label" style="color:var(--color-success)">Conceito — Port de Domínio</div>
+          <div class="cb-text">A lib não conhece <code>StartHandler</code> — ela chama <code>ITopicHandler</code>. O consumidor registra os handlers via DI e o <code>Routing</code> os descobre em runtime. O núcleo nunca precisa ser modificado para suportar novos comandos.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IConversationStep -->
+    <div class="port-card">
+      <div class="port-header">
+        <div class="port-header-top">
+          <div class="port-name">IConversationStep</div>
+          <span class="badge badge-success">Driven Port — Domínio</span>
+        </div>
+        <div class="port-desc">Define uma etapa de um fluxo multi-step: o que perguntar, como validar e como processar a resposta.</div>
+      </div>
+      <div class="port-body">
+        <div class="code-block">
+          <div class="code-label">
+            <span><div class="code-dot" style="background:#6daa45"></div> IConversationStep.cs</span>
+            <span>Abstractions</span>
+          </div>
+          <pre><span class="kw">public interface</span> <span class="tp">IConversationStep</span>
+{
+    <span class="kw">string</span> StepId { <span class="kw">get</span>; }
+
+    <span class="cm">/// Envia a pergunta ao usuário</span>
+    <span class="tp">Task</span> <span class="fn">AskAsync</span>(
+        <span class="tp">BotContext</span> context,
+        <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
+
+    <span class="cm">/// Valida a resposta do usuário</span>
+    <span class="tp">Task</span>&lt;<span class="kw">bool</span>&gt; <span class="fn">ValidateAsync</span>(
+        <span class="tp">BotContext</span> context,
+        <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
+
+    <span class="cm">/// Processa e decide próximo passo</span>
+    <span class="tp">Task</span>&lt;<span class="tp">StepResult</span>&gt; <span class="fn">ProcessAsync</span>(
+        <span class="tp">BotContext</span> context,
+        <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
+}</pre>
+        </div>
+        <div class="concept-box success">
+          <div class="cb-label" style="color:var(--color-success)">Conceito — StepRunner (Fluxo 2)</div>
+          <div class="cb-text">O <code>StepRunner</code> do núcleo invoca <code>ValidateAsync → ProcessAsync</code> em loop. <code>StepResult</code> pode ser <code>Continue</code>, <code>Complete</code> ou <code>JumpTo(stepId)</code> — o consumidor decide o fluxo; o núcleo executa a mecânica.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IAuthMiddleware -->
+    <div class="port-card">
+      <div class="port-header">
+        <div class="port-header-top">
+          <div class="port-name">IAuthMiddleware</div>
+          <span class="badge badge-purple">Driven Port — Opcional</span>
+        </div>
+        <div class="port-desc">Decide se um usuário tem permissão para continuar no pipeline. Opcional — se não registrado, todos os usuários passam.</div>
+      </div>
+      <div class="port-body">
+        <div class="code-block">
+          <div class="code-label">
+            <span><div class="code-dot" style="background:#a86fdf"></div> IAuthMiddleware.cs</span>
+            <span>Abstractions</span>
+          </div>
+          <pre><span class="kw">public interface</span> <span class="tp">IAuthMiddleware</span>
+{
+    <span class="tp">Task</span>&lt;<span class="kw">bool</span>&gt; <span class="fn">IsAllowedAsync</span>(
+        <span class="tp">BotContext</span> context,
+        <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
+}</pre>
+        </div>
+
+        <div class="impl-section">
+          <div class="impl-label">Exemplo — admin list</div>
+          <div class="impl-grid">
+            <div class="impl-card">
+              <div class="impl-header" style="background:var(--color-surface-offset)">
+                <span class="impl-name">AdminOnlyMiddleware</span>
+                <span class="impl-who">no projeto do bot</span>
+              </div>
+              <pre style="background:var(--color-bg);padding:var(--space-3);font-size:0.72rem"><span class="kw">public class</span> <span class="tp">AdminOnlyMiddleware</span> : <span class="tp">IAuthMiddleware</span>
+{
+    <span class="kw">private readonly long</span>[] _admins = [123456, 654321];
+
+    <span class="kw">public</span> <span class="tp">Task</span>&lt;<span class="kw">bool</span>&gt; <span class="fn">IsAllowedAsync</span>(
+        <span class="tp">BotContext</span> ctx, <span class="tp">CancellationToken</span> ct)
+        => <span class="tp">Task</span>.<span class="fn">FromResult</span>(_admins.<span class="fn">Contains</span>(ctx.ChatId));
+}</pre>
+            </div>
+          </div>
+        </div>
+        <div class="concept-box purple">
+          <div class="cb-label" style="color:var(--color-purple)">Conceito — Port Opcional</div>
+          <div class="cb-text">O núcleo verifica <code>IAuthMiddleware</code> se ele foi registrado. Caso contrário, pula a verificação. A lib nunca força autenticação — expõe o gancho, o consumidor decide a regra.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ILlmBridge -->
+    <div class="port-card">
+      <div class="port-header">
+        <div class="port-header-top">
+          <div class="port-name">ILlmBridge</div>
+          <span class="badge badge-blue">Driven Port — Extensão</span>
+        </div>
+        <div class="port-desc">Repassa mensagens de texto livre (sem comando ativo) a um agente de linguagem externo.</div>
+      </div>
+      <div class="port-body">
+        <div class="code-block">
+          <div class="code-label">
+            <span><div class="code-dot" style="background:#5591c7"></div> ILlmBridge.cs</span>
+            <span>Abstractions</span>
+          </div>
+          <pre><span class="kw">public interface</span> <span class="tp">ILlmBridge</span>
+{
+    <span class="tp">Task</span>&lt;<span class="kw">string</span>&gt; <span class="fn">ProcessAsync</span>(
+        <span class="kw">string</span> userMessage,
+        <span class="tp">BotContext</span> context,
+        <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
+}</pre>
+        </div>
+        <div class="concept-box blue">
+          <div class="cb-label" style="color:var(--color-blue)">Conceito — Ponto de Extensão (Fluxo 3)</div>
+          <div class="cb-text">Quando o <code>Routing</code> não encontra comando nem fluxo ativo, verifica se <code>ILlmBridge</code> foi registrado. Se sim, repassa a mensagem. A integração real com OpenAI, Gemini ou outro agente é 100% responsabilidade do consumidor.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /ports-grid -->
+
+  <!-- MODELOS -->
+  <div class="section-divider"><h2>Modelos de Suporte</h2></div>
+
+  <div class="ports-grid">
+    <div class="port-card">
+      <div class="port-header">
+        <div class="port-header-top">
+          <div class="port-name">BotContext</div>
+          <span class="badge badge-primary">Modelo Agnóstico</span>
+        </div>
+        <div class="port-desc">Objeto que trafega pelo pipeline, carregando mensagem e sessão do usuário. Não contém tipos do SDK.</div>
+      </div>
+      <div class="port-body">
+        <div class="code-block">
+          <div class="code-label">
+            <span><div class="code-dot" style="background:#4f98a3"></div> BotContext.cs</span>
+            <span>Abstractions</span>
+          </div>
+          <pre><span class="kw">public sealed class</span> <span class="tp">BotContext</span>
+{
+    <span class="kw">public long</span>        ChatId    { <span class="kw">get</span>; <span class="kw">init</span>; }
+    <span class="kw">public string</span>      Text      { <span class="kw">get</span>; <span class="kw">init</span>; }
+    <span class="kw">public</span> <span class="tp">UserSession</span> Session   { <span class="kw">get</span>; <span class="kw">init</span>; }
+    <span class="kw">public</span> <span class="tp">IMessageSender</span> Sender { <span class="kw">get</span>; <span class="kw">init</span>; }
+
+    <span class="cm">// Atalho para o consumidor enviar respostas</span>
+    <span class="kw">public</span> <span class="tp">Task</span> <span class="fn">SendAsync</span>(<span class="kw">string</span> text, <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>)
+        => Sender.<span class="fn">SendTextAsync</span>(ChatId, text, ct);
+}</pre>
+        </div>
+        <div class="concept-box primary">
+          <div class="cb-label" style="color:var(--color-primary)">Conceito — Modelo de Fronteira</div>
+          <div class="cb-text"><code>BotContext</code> é criado pelo <code>TelegramPollingAdapter</code> a partir do objeto do SDK, mas não carrega nenhum tipo do SDK. É a "tradução" do mundo externo para o vocabulário interno da lib.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="port-card">
+      <div class="port-header">
+        <div class="port-header-top">
+          <div class="port-name">UserSession</div>
+          <span class="badge badge-orange">Modelo de Estado</span>
+        </div>
+        <div class="port-desc">Estado do usuário persistido entre mensagens — topic ativo, step atual e dados de conversa.</div>
+      </div>
+      <div class="port-body">
+        <div class="code-block">
+          <div class="code-label">
+            <span><div class="code-dot" style="background:#fdab43"></div> UserSession.cs</span>
+            <span>Abstractions</span>
+          </div>
+          <pre><span class="kw">public sealed class</span> <span class="tp">UserSession</span>
+{
+    <span class="kw">public long</span>    ChatId       { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public string</span>? ActiveTopic  { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public string</span>? ActiveStepId { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="tp">DateTimeOffset</span> ExpiresAt { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="kw">public</span> <span class="tp">Dictionary</span>&lt;<span class="kw">string</span>, <span class="kw">string</span>&gt; Data { <span class="kw">get</span>; }
+        = <span class="kw">new</span>();
+
+    <span class="kw">public bool</span> IsExpired
+        => <span class="tp">DateTimeOffset</span>.UtcNow > ExpiresAt;
+}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGRAS -->
+  <div class="section-divider"><h2>Regras de Dependência</h2></div>
+  <p style="color:var(--color-text-muted);font-size:var(--text-sm);margin-bottom:var(--space-2)">Violações dessas regras indicam um erro arquitetural — o núcleo nunca pode "olhar para fora".</p>
+
+  <div class="rules-grid">
+    <div class="rule-card">
+      <div class="rule-number">REGRA 01</div>
+      <div class="rule-title">Core só depende de Abstractions</div>
+      <div class="rule-desc"><code>BotForge.Telegram.Core</code> referencia apenas <code>BotForge.Telegram.Abstractions</code>. Nunca referencia <code>Telegram.Bot</code> nem o projeto de adapters.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-number">REGRA 02</div>
+      <div class="rule-title">SDK fica em um único adaptador</div>
+      <div class="rule-desc">Apenas <code>TelegramMessageSender</code> e <code>TelegramPollingAdapter</code> podem usar <code>using Telegram.Bot</code>. Todo o resto da lib é agnóstico (ADR-003).</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-number">REGRA 03</div>
+      <div class="rule-title">Abstractions não tem dependências</div>
+      <div class="rule-desc">O projeto <code>Abstractions</code> não referencia nenhum outro projeto da lib. Ele é o núcleo do grafo de dependências — todos dependem dele, ele não depende de ninguém.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-number">REGRA 04</div>
+      <div class="rule-title">Consumidor não acessa o Core</div>
+      <div class="rule-desc">O desenvolvedor do bot referencia apenas <code>Abstractions</code> para implementar seus handlers e steps. Nunca acessa tipos internos do <code>Core</code> diretamente.</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+(function(){
+  const t=document.querySelector('[data-theme-toggle]'),r=document.documentElement;
+  let d=r.getAttribute('data-theme')||'dark';
+  r.setAttribute('data-theme',d);
+  const icons={
+    dark:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+    light:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+  };
+  function update(){t.innerHTML=icons[d];}
+  update();
+  t&&t.addEventListener('click',()=>{
+    d=d==='dark'?'light':'dark';
+    r.setAttribute('data-theme',d);
+    update();
+  });
+})();
+</script>
+</body>
+</html>
