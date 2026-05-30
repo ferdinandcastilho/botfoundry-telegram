@@ -1,0 +1,1090 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BotForge — Core Pipeline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root,
+      [data-theme="light"] {
+        --bg: #f7f6f2;
+        --surface: #f9f8f5;
+        --s2: #fbfbf9;
+        --soff: #f3f0ec;
+        --border: #d4d1ca;
+        --div: #dcd9d5;
+        --text: #28251d;
+        --muted: #7a7974;
+        --faint: #bab9b4;
+        --p: #01696f;
+        --ph: #cedcd8;
+        --s: #437a22;
+        --sh: #d4dfcc;
+        --o: #da7101;
+        --oh: #e7d7c4;
+        --pu: #7a39bb;
+        --puh: #dacfde;
+        --bl: #006494;
+        --blh: #c6d8e4;
+        --re: #a12c7b;
+        --reh: #e0ced7;
+        --mono: "JetBrains Mono", monospace;
+        --body: "Inter", sans-serif;
+        --xs: clamp(0.72rem, 0.68rem + 0.2vw, 0.82rem);
+        --sm: clamp(0.875rem, 0.82rem + 0.28vw, 0.97rem);
+        --base: clamp(1rem, 0.95rem + 0.25vw, 1.1rem);
+        --lg: clamp(1.1rem, 1rem + 0.6vw, 1.4rem);
+        --xl: clamp(1.5rem, 1.2rem + 1.2vw, 2.1rem);
+        --t: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+        --r: 0.5rem;
+        --rl: 0.75rem;
+        --rx: 1rem;
+        --rf: 9999px;
+      }
+      [data-theme="dark"] {
+        --bg: #171614;
+        --surface: #1c1b19;
+        --s2: #201f1d;
+        --soff: #1d1c1a;
+        --border: #393836;
+        --div: #262523;
+        --text: #cdccca;
+        --muted: #797876;
+        --faint: #5a5957;
+        --p: #4f98a3;
+        --ph: #313b3b;
+        --s: #6daa45;
+        --sh: #3a4435;
+        --o: #fdab43;
+        --oh: #564b3e;
+        --pu: #a86fdf;
+        --puh: #4e4652;
+        --bl: #5591c7;
+        --blh: #3a4550;
+        --re: #d163a7;
+        --reh: #4c3d46;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        -webkit-font-smoothing: antialiased;
+        scroll-behavior: smooth;
+      }
+      body {
+        min-height: 100dvh;
+        font-family: var(--body);
+        font-size: var(--base);
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      button {
+        cursor: pointer;
+        background: none;
+        border: none;
+        font: inherit;
+        color: inherit;
+      }
+      .hdr {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        padding: 0.625rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        backdrop-filter: blur(8px);
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+      }
+      .logo-text {
+        font-size: var(--sm);
+        font-weight: 600;
+      }
+      .logo-sub {
+        font-size: var(--xs);
+        color: var(--muted);
+      }
+      .tbtn {
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border-radius: var(--r);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        transition: background var(--t);
+      }
+      .tbtn:hover {
+        background: var(--surface);
+        color: var(--text);
+      }
+      .page {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 5rem;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 1px 0.5rem;
+        border-radius: var(--rf);
+        font-size: var(--xs);
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+      .bp {
+        background: var(--ph);
+        color: var(--p);
+      }
+      .bs {
+        background: var(--sh);
+        color: var(--s);
+      }
+      .bo {
+        background: var(--oh);
+        color: var(--o);
+      }
+      .bpu {
+        background: var(--puh);
+        color: var(--pu);
+      }
+      .bb {
+        background: var(--blh);
+        color: var(--bl);
+      }
+      .br {
+        background: var(--reh);
+        color: var(--re);
+      }
+      .sec-hdr {
+        margin-bottom: 2rem;
+      }
+      .sec-hdr h1 {
+        font-size: var(--xl);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+        margin-bottom: 0.75rem;
+      }
+      .sec-hdr p {
+        font-size: var(--sm);
+        color: var(--muted);
+        max-width: 62ch;
+      }
+      .divider {
+        margin: 2.75rem 0 1.75rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .divider h2 {
+        font-size: var(--lg);
+        font-weight: 700;
+        white-space: nowrap;
+        letter-spacing: -0.01em;
+      }
+      .divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+      .tabs {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+        padding: 0.375rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--rl);
+      }
+      .tab {
+        padding: 0.375rem 0.875rem;
+        border-radius: var(--r);
+        font-size: var(--xs);
+        font-weight: 600;
+        font-family: var(--mono);
+        cursor: pointer;
+        transition:
+          background var(--t),
+          color var(--t);
+        color: var(--muted);
+      }
+      .tab:hover {
+        background: var(--soff);
+        color: var(--text);
+      }
+      .tab.active {
+        background: var(--bg);
+        color: var(--text);
+        box-shadow: 0 1px 4px oklch(0 0 0/0.12);
+      }
+      .panel {
+        display: none;
+      }
+      .panel.active {
+        display: block;
+      }
+      .file-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--rx);
+        overflow: hidden;
+        margin-bottom: 1.25rem;
+      }
+      .fc-header {
+        padding: 0.75rem 1.25rem;
+        background: var(--soff);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+      }
+      .fc-path {
+        font-family: var(--mono);
+        font-size: var(--xs);
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .fc-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .fc-body {
+        padding: 1.25rem;
+      }
+      .fc-desc {
+        font-size: var(--sm);
+        color: var(--muted);
+        margin-bottom: 1rem;
+      }
+      .code-wrap {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        overflow: hidden;
+      }
+      .code-wrap pre {
+        padding: 1rem 1.25rem;
+        font-family: var(--mono);
+        font-size: var(--xs);
+        line-height: 1.8;
+        overflow-x: auto;
+        tab-size: 2;
+      }
+      .cb-box {
+        margin-top: 0.875rem;
+        padding: 0.875rem 1rem;
+        border-radius: var(--r);
+        border-left: 2px solid;
+        font-size: var(--sm);
+      }
+      .cb-p {
+        background: var(--ph);
+        border-color: var(--p);
+      }
+      .cb-s {
+        background: var(--sh);
+        border-color: var(--s);
+      }
+      .cb-o {
+        background: var(--oh);
+        border-color: var(--o);
+      }
+      .cb-pu {
+        background: var(--puh);
+        border-color: var(--pu);
+      }
+      .cb-bl {
+        background: var(--blh);
+        border-color: var(--bl);
+      }
+      .cb-re {
+        background: var(--reh);
+        border-color: var(--re);
+      }
+      .cb-label {
+        font-size: var(--xs);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.2rem;
+      }
+      .cb-text {
+        color: var(--muted);
+      }
+      code {
+        font-family: var(--mono);
+        font-size: 0.88em;
+        padding: 1px 4px;
+        border-radius: 3px;
+        background: var(--soff);
+      }
+      .kw {
+        color: #4f98a3;
+      }
+      .tp {
+        color: #a86fdf;
+      }
+      .fn {
+        color: #6daa45;
+      }
+      .cm {
+        color: #5a5957;
+        font-style: italic;
+      }
+      .st {
+        color: #fdab43;
+      }
+      .nm {
+        color: #d163a7;
+      }
+      .tree-wrap {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--rx);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+      }
+      .tree-hdr {
+        padding: 0.625rem 1.25rem;
+        background: var(--soff);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .tree-hdr span {
+        font-family: var(--mono);
+        font-size: var(--xs);
+        color: var(--muted);
+      }
+      .tree-body {
+        padding: 1.25rem;
+        overflow-x: auto;
+      }
+      .tree-body pre {
+        font-family: var(--mono);
+        font-size: var(--xs);
+        line-height: 1.9;
+      }
+      .t-dir {
+        color: var(--o);
+        font-weight: 500;
+      }
+      .t-core {
+        color: var(--pu);
+        font-weight: 500;
+      }
+      .t-cm {
+        color: var(--faint);
+        font-style: italic;
+      }
+
+      /* FLOW */
+      .flow-wrap {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--rx);
+        padding: 1.75rem;
+        margin-bottom: 1.5rem;
+        overflow-x: auto;
+      }
+      .flow-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        min-width: 500px;
+      }
+      .flow-step {
+        display: flex;
+        align-items: stretch;
+        gap: 1.25rem;
+      }
+      .flow-num {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+        flex-shrink: 0;
+        width: 28px;
+      }
+      .flow-circle {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: var(--xs);
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .flow-line {
+        width: 1px;
+        flex: 1;
+        background: var(--border);
+        margin: 0 auto;
+      }
+      .flow-content {
+        padding: 0.375rem 0 1.25rem;
+        flex: 1;
+      }
+      .flow-title {
+        font-weight: 600;
+        font-size: var(--sm);
+        margin-bottom: 0.25rem;
+      }
+      .flow-desc {
+        font-size: var(--sm);
+        color: var(--muted);
+      }
+      .fc-p {
+        background: var(--ph);
+        color: var(--p);
+      }
+      .fc-s {
+        background: var(--sh);
+        color: var(--s);
+      }
+      .fc-o {
+        background: var(--oh);
+        color: var(--o);
+      }
+      .fc-pu {
+        background: var(--puh);
+        color: var(--pu);
+      }
+      .fc-bl {
+        background: var(--blh);
+        color: var(--bl);
+      }
+      .fc-re {
+        background: var(--reh);
+        color: var(--re);
+      }
+
+      .rule-card {
+        padding: 1rem 1.25rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--rl);
+        margin-bottom: 0.75rem;
+      }
+      .rule-num {
+        font-size: var(--xs);
+        color: var(--faint);
+        font-family: var(--mono);
+        margin-bottom: 0.375rem;
+      }
+      .rule-title {
+        font-size: var(--sm);
+        font-weight: 600;
+        margin-bottom: 0.375rem;
+      }
+      .rule-desc {
+        font-size: var(--sm);
+        color: var(--muted);
+      }
+
+      .pending-box {
+        padding: 0.875rem 1rem 1rem;
+        background: var(--oh);
+        border: 1px solid var(--o);
+        border-radius: var(--rl);
+        margin-top: 2rem;
+      }
+      .pending-label {
+        font-size: var(--xs);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--o);
+        margin-bottom: 0.5rem;
+      }
+      .pending-item {
+        font-size: var(--sm);
+        color: var(--muted);
+        padding: 0.25rem 0;
+        border-bottom: 1px solid oklch(0 0 0/0.08);
+      }
+      .pending-item:last-child {
+        border-bottom: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hdr">
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+          <rect width="32" height="32" rx="8" fill="var(--p)" opacity="0.15" />
+          <rect x="6" y="6" width="8" height="8" rx="2" fill="var(--p)" />
+          <rect
+            x="18"
+            y="6"
+            width="8"
+            height="8"
+            rx="2"
+            fill="var(--p)"
+            opacity="0.5"
+          />
+          <rect
+            x="6"
+            y="18"
+            width="8"
+            height="8"
+            rx="2"
+            fill="var(--p)"
+            opacity="0.5"
+          />
+          <rect x="18" y="18" width="8" height="8" rx="2" fill="var(--p)" />
+        </svg>
+        <div>
+          <div class="logo-text">BotForge.Telegram</div>
+          <div class="logo-sub">Core Pipeline — Referência</div>
+        </div>
+      </div>
+      <button class="tbtn" data-tt>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      </button>
+    </header>
+
+    <main class="page">
+      <div class="sec-hdr">
+        <div
+          style="
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.875rem;
+          "
+        >
+          <span class="badge bpu">Core</span>
+          <span class="badge bp">Pipeline</span>
+          <span class="badge bs">StepRunner</span>
+          <span class="badge bo">Router</span>
+        </div>
+        <h1>BotForge.Telegram.Core</h1>
+        <p>
+          O núcleo do hexágono — orquestra mensagens, roteamento de comandos,
+          execução de fluxos multi-step e fallback para LLM. Depende apenas de
+          Abstractions; nunca referencia SDK ou infraestrutura.
+        </p>
+      </div>
+
+      <!-- TREE -->
+      <div class="divider"><h2>Estrutura do Projeto</h2></div>
+      <div class="tree-wrap">
+        <div class="tree-hdr">
+          <span>src/BotForge.Telegram.Core/</span
+          ><span class="badge bpu">zero dependência de SDK</span>
+        </div>
+        <div class="tree-body">
+          <pre><span class="t-dir">BotForge.Telegram.Core/</span>
+├── <span class="t-core">IBotPipeline.cs</span>          <span class="t-cm">← driving port — contrato do pipeline</span>
+├── <span class="t-core">BotPipeline.cs</span>           <span class="t-cm">← orquestrador principal</span>
+├── <span class="t-core">CommandRouter.cs</span>         <span class="t-cm">← seleciona o ITopicHandler correto</span>
+└── <span class="t-core">StepRunner.cs</span>            <span class="t-cm">← executa fluxos multi-step</span></pre>
+        </div>
+      </div>
+
+      <!-- PIPELINE FLOW -->
+      <div class="divider"><h2>Fluxo de Decisão do Pipeline</h2></div>
+      <div class="flow-wrap">
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-num">
+              <div class="flow-circle fc-p">1</div>
+              <div class="flow-line"></div>
+            </div>
+            <div class="flow-content">
+              <div class="flow-title">Auth (opcional)</div>
+              <div class="flow-desc">
+                Se <code>IAuthMiddleware</code> estiver registrado no DI, chama
+                <code>IsAllowedAsync</code>. Se retornar <code>false</code>,
+                pipeline encerra sem invocar handlers.
+              </div>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">
+              <div class="flow-circle fc-o">2</div>
+              <div class="flow-line"></div>
+            </div>
+            <div class="flow-content">
+              <div class="flow-title">Step ativo? → StepRunner</div>
+              <div class="flow-desc">
+                Se <code>session.HasActiveFlow</code>, delega ao
+                <code>StepRunner</code>. O runner executa
+                <code>ValidateAsync → ProcessAsync</code> e atualiza a sessão
+                com o próximo step ou limpa o fluxo.
+              </div>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">
+              <div class="flow-circle fc-s">3</div>
+              <div class="flow-line"></div>
+            </div>
+            <div class="flow-content">
+              <div class="flow-title">Comando? → CommandRouter</div>
+              <div class="flow-desc">
+                Se a mensagem começa com <code>/</code>, o
+                <code>CommandRouter</code> identifica o handler registrado pelo
+                <code>Command</code> e invoca <code>HandleAsync</code>. Retorno
+                <code>FlowResult.Continue</code> grava o fluxo na sessão.
+              </div>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">
+              <div class="flow-circle fc-bl">4</div>
+              <div class="flow-line"></div>
+            </div>
+            <div class="flow-content">
+              <div class="flow-title">Texto livre → ILlmBridge (opcional)</div>
+              <div class="flow-desc">
+                Se <code>ILlmBridge</code> estiver registrado, repassa a
+                mensagem e envia a resposta ao usuário. Se não estiver
+                registrado, ignora silenciosamente.
+              </div>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num"><div class="flow-circle fc-re">5</div></div>
+            <div class="flow-content">
+              <div class="flow-title">Salva sessão</div>
+              <div class="flow-desc">
+                Ao final de qualquer ramo, o pipeline chama
+                <code>ISessionStore.SaveAsync</code> para persistir o estado
+                atualizado da sessão.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="divider"><h2>Código C#</h2></div>
+      <div class="tabs">
+        <button class="tab active" data-tab="iface">IBotPipeline</button>
+        <button class="tab" data-tab="pipeline">BotPipeline</button>
+        <button class="tab" data-tab="router">CommandRouter</button>
+        <button class="tab" data-tab="runner">StepRunner</button>
+      </div>
+
+      <!-- IBotPipeline -->
+      <div class="panel active" id="panel-iface">
+        <div class="file-card">
+          <div class="fc-header">
+            <div class="fc-path">
+              <div class="fc-dot" style="background: var(--pu)"></div>
+              IBotPipeline.cs
+            </div>
+            <span class="badge bpu">Driving Port</span>
+          </div>
+          <div class="fc-body">
+            <div class="fc-desc">
+              Contrato do pipeline — é a interface que o
+              <code>TelegramPollingAdapter</code> usa para acionar o núcleo.
+              Vive no Core porque é o contrato do hexágono do lado conduzido
+              pelo adapter.
+            </div>
+            <div class="code-wrap">
+              <pre><span class="kw">namespace</span> <span class="tp">BotForge.Telegram.Core</span>;
+
+<span class="kw">public interface</span> <span class="tp">IBotPipeline</span>
+{
+    <span class="tp">Task</span> <span class="fn">ProcessAsync</span>(
+        <span class="tp">BotContext</span> context,
+        <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
+}</pre>
+            </div>
+            <div class="cb-box cb-pu">
+              <div class="cb-label" style="color: var(--pu)">
+                Conceito — Driving Port no Core
+              </div>
+              <div class="cb-text">
+                <code>IBotPipeline</code> fica no Core (não em Abstractions)
+                porque é um contrato interno da lib — só o adapter de
+                infraestrutura precisa dele. O consumidor nunca invoca o
+                pipeline diretamente.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BotPipeline -->
+      <div class="panel" id="panel-pipeline">
+        <div class="file-card">
+          <div class="fc-header">
+            <div class="fc-path">
+              <div class="fc-dot" style="background: var(--pu)"></div>
+              BotPipeline.cs
+            </div>
+            <span class="badge bpu">Orquestrador</span>
+          </div>
+          <div class="fc-body">
+            <div class="fc-desc">
+              Implementação central do pipeline. Recebe o
+              <code>BotContext</code>, executa os 5 passos do fluxo de decisão e
+              garante que a sessão seja sempre salva ao final — mesmo em caso de
+              exceção não tratada.
+            </div>
+            <div class="code-wrap">
+              <pre><span class="kw">namespace</span> <span class="tp">BotForge.Telegram.Core</span>;
+
+<span class="kw">internal sealed class</span> <span class="tp">BotPipeline</span> : <span class="tp">IBotPipeline</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">ISessionStore</span>               _sessionStore;
+    <span class="kw">private readonly</span> <span class="tp">CommandRouter</span>                _router;
+    <span class="kw">private readonly</span> <span class="tp">StepRunner</span>                   _stepRunner;
+    <span class="kw">private readonly</span> <span class="tp">IAuthMiddleware</span>?              _auth;
+    <span class="kw">private readonly</span> <span class="tp">ILlmBridge</span>?                  _llm;
+    <span class="kw">private readonly</span> <span class="tp">ILogger</span>&lt;<span class="tp">BotPipeline</span>&gt;          _logger;
+
+    <span class="cm">// Injeção via DI — IAuthMiddleware e ILlmBridge são opcionais</span>
+    <span class="kw">public</span> <span class="tp">BotPipeline</span>(
+        <span class="tp">ISessionStore</span>      sessionStore,
+        <span class="tp">CommandRouter</span>      router,
+        <span class="tp">StepRunner</span>         stepRunner,
+        <span class="tp">ILogger</span>&lt;<span class="tp">BotPipeline</span>&gt; logger,
+        <span class="tp">IAuthMiddleware</span>?   auth  = <span class="kw">null</span>,
+        <span class="tp">ILlmBridge</span>?        llm   = <span class="kw">null</span>)
+    {
+        _sessionStore = sessionStore;
+        _router       = router;
+        _stepRunner   = stepRunner;
+        _logger       = logger;
+        _auth         = auth;
+        _llm          = llm;
+    }
+
+    <span class="kw">public async</span> <span class="tp">Task</span> <span class="fn">ProcessAsync</span>(
+        <span class="tp">BotContext</span> context, <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>)
+    {
+        <span class="kw">try</span>
+        {
+            <span class="cm">// 1. Auth</span>
+            <span class="kw">if</span> (_auth <span class="kw">is not null</span>)
+            {
+                <span class="kw">var</span> allowed = <span class="kw">await</span> _auth.<span class="fn">IsAllowedAsync</span>(context, ct);
+                <span class="kw">if</span> (!allowed) <span class="kw">return</span>;
+            }
+
+            <span class="cm">// 2. Step ativo</span>
+            <span class="kw">if</span> (context.Session.HasActiveFlow)
+            {
+                <span class="kw">await</span> _stepRunner.<span class="fn">ResumeAsync</span>(context, ct);
+                <span class="kw">return</span>;
+            }
+
+            <span class="cm">// 3. Comando</span>
+            <span class="kw">if</span> (context.Text.<span class="fn">StartsWith</span>(<span class="st">'/'</span>))
+            {
+                <span class="kw">await</span> _router.<span class="fn">RouteAsync</span>(context, ct);
+                <span class="kw">return</span>;
+            }
+
+            <span class="cm">// 4. Texto livre → LLM</span>
+            <span class="kw">if</span> (_llm <span class="kw">is not null</span>)
+            {
+                <span class="kw">var</span> reply = <span class="kw">await</span> _llm.<span class="fn">ProcessAsync</span>(context.Text, context, ct);
+                <span class="kw">await</span> context.<span class="fn">SendAsync</span>(reply, ct);
+            }
+        }
+        <span class="kw">finally</span>
+        {
+            <span class="cm">// 5. Persiste sessão sempre</span>
+            <span class="kw">await</span> _sessionStore.<span class="fn">SaveAsync</span>(context.Session, ct);
+        }
+    }
+}</pre>
+            </div>
+            <div class="cb-box cb-pu">
+              <div class="cb-label" style="color: var(--pu)">
+                Conceito — finally garante consistência
+              </div>
+              <div class="cb-text">
+                O bloco <code>finally</code> garante que a sessão sempre seja
+                salva — mesmo que o handler lance uma exceção não tratada. Isso
+                evita sessões presas em estado corrompido entre mensagens.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CommandRouter -->
+      <div class="panel" id="panel-router">
+        <div class="file-card">
+          <div class="fc-header">
+            <div class="fc-path">
+              <div class="fc-dot" style="background: var(--o)"></div>
+              CommandRouter.cs
+            </div>
+            <span class="badge bo">Router</span>
+          </div>
+          <div class="fc-body">
+            <div class="fc-desc">
+              Recebe a coleção de <code>ITopicHandler</code> registrados pelo
+              consumidor e constrói um dicionário de lookup pelo
+              <code>Command</code>. Em runtime, localiza o handler em O(1) e
+              invoca <code>HandleAsync</code>.
+            </div>
+            <div class="code-wrap">
+              <pre><span class="kw">namespace</span> <span class="tp">BotForge.Telegram.Core</span>;
+
+<span class="kw">internal sealed class</span> <span class="tp">CommandRouter</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">IReadOnlyDictionary</span>&lt;<span class="kw">string</span>, <span class="tp">ITopicHandler</span>&gt; _handlers;
+    <span class="kw">private readonly</span> <span class="tp">ILogger</span>&lt;<span class="tp">CommandRouter</span>&gt;                  _logger;
+
+    <span class="kw">public</span> <span class="tp">CommandRouter</span>(
+        <span class="tp">IEnumerable</span>&lt;<span class="tp">ITopicHandler</span>&gt; handlers,
+        <span class="tp">ILogger</span>&lt;<span class="tp">CommandRouter</span>&gt;     logger)
+    {
+        _logger   = logger;
+        _handlers = handlers.<span class="fn">ToDictionary</span>(h => h.Command, <span class="tp">StringComparer</span>.OrdinalIgnoreCase);
+    }
+
+    <span class="kw">public async</span> <span class="tp">Task</span> <span class="fn">RouteAsync</span>(
+        <span class="tp">BotContext</span> context, <span class="tp">CancellationToken</span> ct)
+    {
+        <span class="cm">// Extrai o comando — ex: "/start args" → "start"</span>
+        <span class="kw">var</span> command = context.Text[<span class="nm">1</span>..].Split(<span class="st">' '</span>)[<span class="nm">0</span>].ToLowerInvariant();
+
+        <span class="kw">if</span> (!_handlers.<span class="fn">TryGetValue</span>(command, <span class="kw">out var</span> handler))
+        {
+            _logger.<span class="fn">LogWarning</span>(<span class="st">"Comando não registrado: {Command}"</span>, command);
+            <span class="kw">return</span>;
+        }
+
+        <span class="kw">var</span> result = <span class="kw">await</span> handler.<span class="fn">HandleAsync</span>(context, ct);
+
+        <span class="cm">// Se o handler iniciou um fluxo, grava o tópico ativo na sessão</span>
+        <span class="kw">if</span> (!result.IsComplete)
+            context.Session.ActiveTopic = command;
+    }
+}</pre>
+            </div>
+            <div class="cb-box cb-o">
+              <div class="cb-label" style="color: var(--o)">
+                Conceito — Lookup O(1)
+              </div>
+              <div class="cb-text">
+                O dicionário é construído uma única vez no construtor (startup).
+                Em runtime, cada mensagem faz apenas um
+                <code>TryGetValue</code> — independente do número de handlers
+                registrados.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- StepRunner -->
+      <div class="panel" id="panel-runner">
+        <div class="file-card">
+          <div class="fc-header">
+            <div class="fc-path">
+              <div class="fc-dot" style="background: var(--s)"></div>
+              StepRunner.cs
+            </div>
+            <span class="badge bs">StepRunner</span>
+          </div>
+          <div class="fc-body">
+            <div class="fc-desc">
+              Executa um fluxo multi-step em andamento. Localiza o step ativo
+              pelo <code>ActiveStepId</code>, valida a resposta do usuário e
+              processa o resultado — avançando, redirecionando ou encerrando o
+              fluxo.
+            </div>
+            <div class="code-wrap">
+              <pre><span class="kw">namespace</span> <span class="tp">BotForge.Telegram.Core</span>;
+
+<span class="kw">internal sealed class</span> <span class="tp">StepRunner</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">IReadOnlyDictionary</span>&lt;<span class="kw">string</span>, <span class="tp">IConversationStep</span>&gt; _steps;
+    <span class="kw">private readonly</span> <span class="tp">ILogger</span>&lt;<span class="tp">StepRunner</span>&gt;                          _logger;
+
+    <span class="kw">public</span> <span class="tp">StepRunner</span>(
+        <span class="tp">IEnumerable</span>&lt;<span class="tp">IConversationStep</span>&gt; steps,
+        <span class="tp">ILogger</span>&lt;<span class="tp">StepRunner</span>&gt;             logger)
+    {
+        _logger = logger;
+        _steps  = steps.<span class="fn">ToDictionary</span>(s => s.StepId, <span class="tp">StringComparer</span>.OrdinalIgnoreCase);
+    }
+
+    <span class="kw">public async</span> <span class="tp">Task</span> <span class="fn">ResumeAsync</span>(
+        <span class="tp">BotContext</span> context, <span class="tp">CancellationToken</span> ct)
+    {
+        <span class="kw">var</span> stepId = context.Session.ActiveStepId;
+
+        <span class="kw">if</span> (stepId <span class="kw">is null</span> || !_steps.<span class="fn">TryGetValue</span>(stepId, <span class="kw">out var</span> step))
+        {
+            _logger.<span class="fn">LogWarning</span>(<span class="st">"Step não encontrado: {StepId}. Limpando fluxo."</span>, stepId);
+            context.Session.<span class="fn">ClearFlow</span>();
+            <span class="kw">return</span>;
+        }
+
+        <span class="cm">// Valida — se inválido, repete a pergunta</span>
+        <span class="kw">var</span> valid = <span class="kw">await</span> step.<span class="fn">ValidateAsync</span>(context, ct);
+        <span class="kw">if</span> (!valid)
+        {
+            <span class="kw">await</span> step.<span class="fn">AskAsync</span>(context, ct);
+            <span class="kw">return</span>;
+        }
+
+        <span class="kw">var</span> result = <span class="kw">await</span> step.<span class="fn">ProcessAsync</span>(context, ct);
+
+        <span class="kw">switch</span> (result.Kind)
+        {
+            <span class="kw">case</span> <span class="tp">StepResultKind</span>.Complete:
+                context.Session.<span class="fn">ClearFlow</span>();
+                <span class="kw">break</span>;
+
+            <span class="kw">case</span> <span class="tp">StepResultKind</span>.JumpTo:
+                context.Session.ActiveStepId = result.TargetId;
+                <span class="kw">if</span> (_steps.<span class="fn">TryGetValue</span>(result.TargetId!, <span class="kw">out var</span> next))
+                    <span class="kw">await</span> next.<span class="fn">AskAsync</span>(context, ct);
+                <span class="kw">break</span>;
+
+            <span class="kw">case</span> <span class="tp">StepResultKind</span>.Continue:
+            <span class="kw">default</span>:
+                <span class="cm">// ActiveStepId já deve ter sido atualizado pelo step em ProcessAsync</span>
+                <span class="kw">break</span>;
+        }
+    }
+}</pre>
+            </div>
+            <div class="cb-box cb-s">
+              <div class="cb-label" style="color: var(--s)">
+                Conceito — Responsabilidade do step em Continue
+              </div>
+              <div class="cb-text">
+                Em <code>StepResultKind.Continue</code>, é responsabilidade do
+                <code>ProcessAsync</code> do step atualizar
+                <code>context.Session.ActiveStepId</code> para o próximo step. O
+                runner não assume sequência implícita — bifurcações são
+                controladas pelo consumidor.
+              </div>
+            </div>
+            <div class="cb-box cb-bl" style="margin-top: 0.75rem">
+              <div class="cb-label" style="color: var(--bl)">
+                Conceito — AskAsync em JumpTo
+              </div>
+              <div class="cb-text">
+                Quando o resultado é <code>JumpTo</code>, o runner já chama
+                <code>AskAsync</code> do step de destino na mesma mensagem — o
+                usuário recebe a próxima pergunta imediatamente, sem precisar
+                enviar outra mensagem.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RULES -->
+      <div class="divider"><h2>Regras desta Task</h2></div>
+      <div class="rule-card">
+        <div class="rule-num">REGRA 01</div>
+        <div class="rule-title">Nenhuma referência ao SDK neste projeto</div>
+        <div class="rule-desc">
+          O projeto <code>BotForge.Telegram.Core</code> só referencia
+          <code>BotForge.Telegram.Abstractions</code> e
+          <code>Microsoft.Extensions.Logging.Abstractions</code>. Se aparecer
+          <code>using Telegram.Bot</code>, é erro de camada.
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">REGRA 02</div>
+        <div class="rule-title">
+          <code>BotPipeline</code> e <code>CommandRouter</code> e
+          <code>StepRunner</code> são <code>internal</code>
+        </div>
+        <div class="rule-desc">
+          Somente <code>IBotPipeline</code> é <code>public</code>. O consumidor
+          não acessa as implementações concretas do Core diretamente.
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">REGRA 03</div>
+        <div class="rule-title">
+          Descomentar o registro de <code>IBotPipeline</code> no DI
+        </div>
+        <div class="rule-desc">
+          Após criar <code>BotPipeline</code>, remover o comentário em
+          <code>BotForgeServiceCollectionExtensions</code> e adicionar os
+          registros de <code>CommandRouter</code> e <code>StepRunner</code>.
+        </div>
+      </div>
+    </main>
+
+    <script>
+      (function () {
+        const tt = document.querySelector("[data-tt]"),
+          r = document.documentElement;
+        let d = "dark";
+        const ic = {
+          dark: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+          light:
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
+        };
+        tt &&
+          tt.addEventListener("click", () => {
+            d = d === "dark" ? "light" : "dark";
+            r.setAttribute("data-theme", d);
+            tt.innerHTML = ic[d];
+          });
+        document.querySelectorAll(".tab").forEach((tab) => {
+          tab.addEventListener("click", () => {
+            const key = tab.dataset.tab;
+            document
+              .querySelectorAll(".tab")
+              .forEach((t) => t.classList.remove("active"));
+            document
+              .querySelectorAll(".panel")
+              .forEach((p) => p.classList.remove("active"));
+            tab.classList.add("active");
+            document.getElementById("panel-" + key)?.classList.add("active");
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
