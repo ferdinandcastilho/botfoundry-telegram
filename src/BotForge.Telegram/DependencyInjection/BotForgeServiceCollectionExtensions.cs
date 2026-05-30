@@ -22,8 +22,10 @@ namespace BotForge.Telegram.DependencyInjection
             if (!services.Any(d => d.ServiceType == typeof(ISessionStore)))
                 services.AddSingleton<ISessionStore, InMemorySessionStore>();
 
-            // IBotPipeline registration left commented — BotPipeline will be implemented in a later task
-            // services.AddSingleton<IBotPipeline, BotPipeline>();
+            // Core
+            services.AddSingleton<BotForge.Telegram.Abstractions.Ports.IBotPipeline, BotForge.Telegram.Core.BotPipeline>();
+            services.AddSingleton<BotForge.Telegram.Core.CommandRouter>();
+            services.AddSingleton<BotForge.Telegram.Core.StepRunner>();
 
             services.AddHostedService<TelegramPollingAdapter>();
             return services;
