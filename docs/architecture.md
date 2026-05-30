@@ -208,11 +208,11 @@ Mensagem recebida pelo Hosting
 
 **Opções consideradas:**
 - Usar `Telegram.Bot` diretamente em toda a lib
-- Isolar em uma única classe interna, expondo apenas abstrações próprias
+- Isolar em dois componentes internos dedicados, expondo apenas abstrações próprias
 
-**Decisão:** Apenas um componente interno de mensageria referencia `Telegram.Bot`. Todo o restante da lib e toda a API pública usam tipos agnósticos.
+**Decisão:** Apenas dois componentes internos de infraestrutura referenciam `Telegram.Bot`: o adapter de mensageria (`TelegramMessageSender`) e o adapter de polling (`TelegramPollingAdapter`). Todo o restante da lib e toda a API pública usam tipos agnósticos.
 
-**Rationale:** Atualizações do SDK ficam contidas em um único ponto. Handlers e steps do consumidor são 100% testáveis sem depender do Telegram.
+**Rationale:** Atualizações do SDK ficam contidas em dois pontos bem definidos. Handlers e steps do consumidor são 100% testáveis sem depender do Telegram.
 
 **Trade-off aceito:** Funcionalidades avançadas do SDK precisam ser explicitamente expostas via contrato de mensageria — não estão disponíveis automaticamente.
 
