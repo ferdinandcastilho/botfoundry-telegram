@@ -10,22 +10,25 @@ namespace BotForge.Telegram.DependencyInjection
     {
         public static IServiceCollection AddBotForge(
             this IServiceCollection services,
-            Action<BotForgeOptions> configure)
+            string token,
+            Action<BotForgeOptions>? configure = null)
         {
-            var options = new BotForgeOptions { Token = string.Empty };
-            configure(options);
+            var options = new BotForgeOptions();
+            configure?.Invoke(options);
 
             // Instantiate TelegramBotClient without an explicit using for Telegram.Bot
-            services.AddSingleton<global::Telegram.Bot.ITelegramBotClient>(_ => new global::Telegram.Bot.TelegramBotClient(options.Token));
+            var botClient = new global::Telegram.Bot.TelegramBotClient(token);
+            services.AddSingleton(botClient);
+            services.AddSingleton<global::Telegram.Bot.ITelegramBotClient>(botClient);
             services.AddSingleton<IMessageSender, TelegramMessageSender>();
 
             if (!services.Any(d => d.ServiceType == typeof(ISessionStore)))
                 services.AddSingleton<ISessionStore, InMemorySessionStore>();
 
             // Core
-            services.AddSingleton<BotForge.Telegram.Abstractions.Ports.IBotPipeline, BotForge.Telegram.Core.BotPipeline>();
-            services.AddSingleton<BotForge.Telegram.Core.CommandRouter>();
-            services.AddSingleton<BotForge.Telegram.Core.StepRunner>();
+            services.AddSingleton<IBotPipeline, Core.BotPipeline>();
+            services.AddSingleton<Core.CommandRouter>();
+            services.AddSingleton<Core.StepRunner>();
 
             services.AddHostedService<TelegramPollingAdapter>();
             return services;
@@ -34,7 +37,6 @@ namespace BotForge.Telegram.DependencyInjection
 
     public sealed class BotForgeOptions
     {
-        public required string Token { get; set; }
         public TimeSpan SessionExpiry { get; set; } = TimeSpan.FromHours(24);
     }
 }
