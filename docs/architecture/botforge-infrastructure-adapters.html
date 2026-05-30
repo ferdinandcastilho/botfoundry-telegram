@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BotForge — Infrastructure Adapters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="light"]{
+  --bg:#f7f6f2;--surface:#f9f8f5;--s2:#fbfbf9;--soff:#f3f0ec;
+  --border:#d4d1ca;--div:#dcd9d5;--text:#28251d;--muted:#7a7974;--faint:#bab9b4;
+  --p:#01696f;--ph:#cedcd8;--s:#437a22;--sh:#d4dfcc;
+  --o:#da7101;--oh:#e7d7c4;--pu:#7a39bb;--puh:#dacfde;
+  --bl:#006494;--blh:#c6d8e4;--re:#a12c7b;--reh:#e0ced7;
+  --mono:'JetBrains Mono',monospace;--body:'Inter',sans-serif;
+  --xs:clamp(0.72rem,0.68rem + 0.2vw,0.82rem);
+  --sm:clamp(0.875rem,0.82rem + 0.28vw,0.97rem);
+  --base:clamp(1rem,0.95rem + 0.25vw,1.1rem);
+  --lg:clamp(1.1rem,1rem + 0.6vw,1.4rem);
+  --xl:clamp(1.5rem,1.2rem + 1.2vw,2.1rem);
+  --t:180ms cubic-bezier(0.16,1,0.3,1);--r:.5rem;--rl:.75rem;--rx:1rem;--rf:9999px;
+}
+[data-theme="dark"]{
+  --bg:#171614;--surface:#1c1b19;--s2:#201f1d;--soff:#1d1c1a;
+  --border:#393836;--div:#262523;--text:#cdccca;--muted:#797876;--faint:#5a5957;
+  --p:#4f98a3;--ph:#313b3b;--s:#6daa45;--sh:#3a4435;
+  --o:#fdab43;--oh:#564b3e;--pu:#a86fdf;--puh:#4e4652;
+  --bl:#5591c7;--blh:#3a4550;--re:#d163a7;--reh:#4c3d46;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{min-height:100dvh;font-family:var(--body);font-size:var(--base);color:var(--text);background:var(--bg);line-height:1.65}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
+.hdr{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);padding:.625rem 1.5rem;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(8px)}
+.logo{display:flex;align-items:center;gap:.625rem}
+.logo-text{font-size:var(--sm);font-weight:600}.logo-sub{font-size:var(--xs);color:var(--muted)}
+.tbtn{width:34px;height:34px;display:grid;place-items:center;border-radius:var(--r);border:1px solid var(--border);color:var(--muted);transition:background var(--t)}
+.tbtn:hover{background:var(--surface);color:var(--text)}
+.page{max-width:980px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
+.badge{display:inline-flex;align-items:center;padding:1px .5rem;border-radius:var(--rf);font-size:var(--xs);font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+.bp{background:var(--ph);color:var(--p)}.bs{background:var(--sh);color:var(--s)}
+.bo{background:var(--oh);color:var(--o)}.bpu{background:var(--puh);color:var(--pu)}
+.bb{background:var(--blh);color:var(--bl)}.br{background:var(--reh);color:var(--re)}
+.sec-hdr{margin-bottom:2rem}
+.sec-hdr h1{font-size:var(--xl);font-weight:700;letter-spacing:-.02em;line-height:1.2;margin-bottom:.75rem}
+.sec-hdr p{font-size:var(--sm);color:var(--muted);max-width:62ch}
+.divider{margin:2.75rem 0 1.75rem;display:flex;align-items:center;gap:1rem}
+.divider h2{font-size:var(--lg);font-weight:700;white-space:nowrap;letter-spacing:-.01em}
+.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.tabs{display:flex;gap:.25rem;flex-wrap:wrap;margin-bottom:2rem;padding:.375rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--rl)}
+.tab{padding:.375rem .875rem;border-radius:var(--r);font-size:var(--xs);font-weight:600;font-family:var(--mono);cursor:pointer;transition:background var(--t),color var(--t);color:var(--muted)}
+.tab:hover{background:var(--soff);color:var(--text)}
+.tab.active{background:var(--bg);color:var(--text);box-shadow:0 1px 4px oklch(0 0 0/.12)}
+.panel{display:none}.panel.active{display:block}
+.file-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rx);overflow:hidden;margin-bottom:1.25rem}
+.fc-header{padding:.75rem 1.25rem;background:var(--soff);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+.fc-path{font-family:var(--mono);font-size:var(--xs);color:var(--muted);display:flex;align-items:center;gap:.5rem}
+.fc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.fc-body{padding:1.25rem}
+.fc-desc{font-size:var(--sm);color:var(--muted);margin-bottom:1rem}
+.code-wrap{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.code-wrap pre{padding:1rem 1.25rem;font-family:var(--mono);font-size:var(--xs);line-height:1.8;overflow-x:auto;tab-size:2}
+.cb-box{margin-top:.875rem;padding:.875rem 1rem;border-radius:var(--r);border-left:2px solid;font-size:var(--sm)}
+.cb-p{background:var(--ph);border-color:var(--p)}.cb-s{background:var(--sh);border-color:var(--s)}
+.cb-o{background:var(--oh);border-color:var(--o)}.cb-pu{background:var(--puh);border-color:var(--pu)}
+.cb-bl{background:var(--blh);border-color:var(--bl)}.cb-re{background:var(--reh);border-color:var(--re)}
+.cb-label{font-size:var(--xs);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem}
+.cb-text{color:var(--muted)}
+code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;background:var(--soff)}
+.kw{color:#4f98a3}.tp{color:#a86fdf}.fn{color:#6daa45}.cm{color:#5a5957;font-style:italic}.st{color:#fdab43}.pn{color:var(--text)}.nm{color:#d163a7}
+.tree-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--rx);overflow:hidden;margin-bottom:1.5rem}
+.tree-hdr{padding:.625rem 1.25rem;background:var(--soff);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.tree-hdr span{font-family:var(--mono);font-size:var(--xs);color:var(--muted)}
+.tree-body{padding:1.25rem;overflow-x:auto}
+.tree-body pre{font-family:var(--mono);font-size:var(--xs);line-height:1.9}
+.t-dir{color:var(--o);font-weight:500}.t-adapter{color:var(--p);font-weight:500}
+.t-di{color:var(--s);font-weight:500}.t-cm{color:var(--faint);font-style:italic}
+.flow-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--rx);padding:1.75rem;margin-bottom:1.5rem;overflow-x:auto}
+.flow{display:flex;flex-direction:column;align-items:center;gap:.875rem;min-width:440px}
+.flow-row{display:flex;align-items:center;justify-content:center;gap:.75rem;width:100%}
+.fb{padding:.5rem 1.25rem;border-radius:var(--r);font-family:var(--mono);font-size:var(--xs);font-weight:600;text-align:center;border:1px solid transparent;min-width:160px}
+.fb-ext{background:var(--soff);border-color:var(--border);color:var(--muted)}
+.fb-adapter{background:var(--oh);border-color:var(--o);color:var(--o)}
+.fb-port{background:var(--ph);border-color:var(--p);color:var(--p)}
+.fb-core{background:var(--puh);border-color:var(--pu);color:var(--pu);min-width:200px}
+.farr{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--faint);font-size:var(--xs)}
+.farr-line{width:1px;height:16px;background:var(--border)}
+.flow-legend{display:flex;gap:1.25rem;flex-wrap:wrap;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--div)}
+.fl-item{display:flex;align-items:center;gap:.5rem;font-size:var(--xs);color:var(--muted)}
+.fl-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.rule-card{padding:1rem 1.25rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);margin-bottom:.75rem}
+.rule-num{font-size:var(--xs);color:var(--faint);font-family:var(--mono);margin-bottom:.375rem}
+.rule-title{font-size:var(--sm);font-weight:600;margin-bottom:.375rem}
+.rule-desc{font-size:var(--sm);color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="logo">
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="var(--p)" opacity="0.15"/>
+      <rect x="6" y="6" width="8" height="8" rx="2" fill="var(--p)"/>
+      <rect x="18" y="6" width="8" height="8" rx="2" fill="var(--p)" opacity="0.5"/>
+      <rect x="6" y="18" width="8" height="8" rx="2" fill="var(--p)" opacity="0.5"/>
+      <rect x="18" y="18" width="8" height="8" rx="2" fill="var(--p)"/>
+    </svg>
+    <div>
+      <div class="logo-text">BotForge.Telegram</div>
+      <div class="logo-sub">Infrastructure Adapters — Referência</div>
+    </div>
+  </div>
+  <button class="tbtn" data-tt><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+</header>
+
+<main class="page">
+  <div class="sec-hdr">
+    <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.875rem">
+      <span class="badge bo">Driven Adapters</span>
+      <span class="badge bp">Driving Adapter</span>
+      <span class="badge bpu">Hexagonal</span>
+    </div>
+    <h1>Infrastructure Adapters</h1>
+    <p>Os três adapters que a lib entrega prontos — a "casca" do hexágono. São os únicos pontos de contato com o mundo externo: SDK Telegram, memória e DI. O núcleo nunca os referencia diretamente.</p>
+  </div>
+
+  <!-- TREE -->
+  <div class="divider"><h2>Estrutura do Projeto</h2></div>
+  <div class="tree-wrap">
+    <div class="tree-hdr"><span>src/BotForge.Telegram/</span><span class="badge bo">único projeto que usa Telegram.Bot SDK</span></div>
+    <div class="tree-body"><pre><span class="t-dir">BotForge.Telegram/</span>
+├── <span class="t-dir">Adapters/</span>
+│   ├── <span class="t-adapter">InMemorySessionStore.cs</span>      <span class="t-cm">← driven adapter — ISessionStore (ADR-002)</span>
+│   ├── <span class="t-adapter">TelegramMessageSender.cs</span>     <span class="t-cm">← driven adapter — IMessageSender (ADR-003)</span>
+│   └── <span class="t-adapter">TelegramPollingAdapter.cs</span>    <span class="t-cm">← driving adapter — IHostedService</span>
+├── <span class="t-dir">DependencyInjection/</span>
+│   └── <span class="t-di">BotForgeServiceCollectionExtensions.cs</span>   <span class="t-cm">← entry point público</span>
+└── <span class="t-dir">BotForge.Telegram.csproj</span></pre>
+    </div>
+  </div>
+
+  <!-- FLOW DIAGRAM -->
+  <div class="divider"><h2>Posição no Hexágono</h2></div>
+  <div class="flow-wrap">
+    <div class="flow">
+      <div class="flow-row">
+        <div class="fb fb-ext">Telegram API</div>
+        <div style="width:2rem"></div>
+        <div class="fb fb-ext">ISessionStore consumer</div>
+      </div>
+      <div class="flow-row">
+        <div class="farr"><div class="farr-line"></div><span>▼</span></div>
+        <div style="width:2rem"></div>
+        <div class="farr"><div class="farr-line"></div><span>▼</span></div>
+      </div>
+      <div class="flow-row">
+        <div class="fb fb-adapter">TelegramPollingAdapter<br><span style="font-size:.65rem;opacity:.8">Driving Adapter</span></div>
+        <div style="width:2rem"></div>
+        <div class="fb fb-adapter">InMemorySessionStore<br><span style="font-size:.65rem;opacity:.8">Driven Adapter</span></div>
+      </div>
+      <div class="flow-row">
+        <div class="farr"><div class="farr-line"></div><span>▼</span></div>
+        <div style="width:2rem"></div>
+        <div class="farr" style="transform:rotate(180deg)"><div class="farr-line"></div><span>▼</span></div>
+      </div>
+      <div class="flow-row">
+        <div class="fb fb-port">IBotPipeline<br><span style="font-size:.65rem;opacity:.8">Driving Port</span></div>
+        <div style="width:2rem"></div>
+        <div class="fb fb-port">ISessionStore<br><span style="font-size:.65rem;opacity:.8">Driven Port</span></div>
+      </div>
+      <div class="flow-row">
+        <div class="farr"><div class="farr-line"></div><span>▼</span></div>
+        <div style="width:2rem"></div>
+        <div class="fb fb-adapter">TelegramMessageSender<br><span style="font-size:.65rem;opacity:.8">Driven Adapter</span></div>
+      </div>
+      <div class="flow-row">
+        <div class="fb fb-core">NÚCLEO (Core)<br><span style="font-size:.65rem;opacity:.8">Pipeline · Routing · Session · StepRunner</span></div>
+        <div style="width:2rem"></div>
+        <div class="farr" style="transform:rotate(180deg)"><div class="farr-line"></div><span>▼</span></div>
+      </div>
+      <div class="flow-row">
+        <div style="min-width:200px"></div>
+        <div style="width:2rem"></div>
+        <div class="fb fb-port">IMessageSender<br><span style="font-size:.65rem;opacity:.8">Driven Port</span></div>
+      </div>
+    </div>
+    <div class="flow-legend">
+      <div class="fl-item"><div class="fl-dot" style="background:var(--o)"></div>Adapters (esta task)</div>
+      <div class="fl-item"><div class="fl-dot" style="background:var(--p)"></div>Ports (Abstractions — já implementados)</div>
+      <div class="fl-item"><div class="fl-dot" style="background:var(--pu)"></div>Core (próxima task)</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="divider"><h2>Código C#</h2></div>
+  <div class="tabs">
+    <button class="tab active" data-tab="session">InMemorySessionStore</button>
+    <button class="tab" data-tab="sender">TelegramMessageSender</button>
+    <button class="tab" data-tab="polling">TelegramPollingAdapter</button>
+    <button class="tab" data-tab="di">DependencyInjection</button>
+  </div>
+
+  <!-- InMemorySessionStore -->
+  <div class="panel active" id="panel-session">
+    <div class="file-card">
+      <div class="fc-header">
+        <div class="fc-path"><div class="fc-dot" style="background:var(--o)"></div>Adapters/InMemorySessionStore.cs</div>
+        <span class="badge bo">Driven Adapter</span>
+      </div>
+      <div class="fc-body">
+        <div class="fc-desc">Implementação padrão de <code>ISessionStore</code> usando <code>ConcurrentDictionary</code> para acesso concorrente sem locks explícitos. Registrada automaticamente se o consumidor não registrar outra implementação (ADR-002).</div>
+        <div class="code-wrap"><pre><span class="kw">namespace</span> <span class="tp">BotForge.Telegram.Adapters</span>;
+
+<span class="kw">internal sealed class</span> <span class="tp">InMemorySessionStore</span> : <span class="tp">ISessionStore</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">Dictionary</span>&lt;<span class="kw">long</span>, <span class="tp">UserSession</span>&gt; _store = <span class="kw">new</span>();
+    <span class="kw">    <span class="kw">public async</span> <span class="tp">Task</span>&lt;<span class="tp">UserSession</span>?&gt; <span class="fn">GetAsync</span>(
+        <span class="kw">long</span> chatId, <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>)
+    {
+        <span class="kw">_store</span>.<span class="fn">TryGetValue</span>(chatId, <span class="kw">out var</span> session);
+        <span class="kw">return</span> session
+    }
+
+    <span class="kw">public async</span> <span class="tp">Task</span> <span class="fn">SaveAsync</span>(
+        <span class="tp">UserSession</span> session, <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>)
+    {
+        _store[session.ChatId] = session
+    }
+
+    <span class="kw">public async</span> <span class="tp">Task</span> <span class="fn">DeleteAsync</span>(
+        <span class="kw">long</span> chatId, <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>)
+    {
+        _store.<span class="fn">TryRemove</span>(chatId, <span class="kw">out _</span>)
+    }
+}</pre></div>
+        <div class="cb-box cb-o">
+          <div class="cb-label" style="color:var(--o)">Conceito — internal + Driven Adapter (ADR-002)</div>
+          <div class="cb-text"><code>internal</code> garante que o consumidor não acessa este tipo diretamente — só via <code>ISessionStore</code>. O <code>ConcurrentDictionary</code> garante thread-safety para múltiplas mensagens simultâneas de um mesmo bot sem gerenciamento manual de locks.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TelegramMessageSender -->
+  <div class="panel" id="panel-sender">
+    <div class="file-card">
+      <div class="fc-header">
+        <div class="fc-path"><div class="fc-dot" style="background:var(--p)"></div>Adapters/TelegramMessageSender.cs</div>
+        <span class="badge bp">Driven Adapter — SDK</span>
+      </div>
+      <div class="fc-body">
+        <div class="fc-desc">Único arquivo da lib que usa <code>Telegram.Bot</code>. Implementa <code>IMessageSender</code> delegando ao <code>ITelegramBotClient</code> do SDK. Todo o resto da lib usa apenas a interface.</div>
+        <div class="code-wrap"><pre><span class="kw">using</span> <span class="tp">Telegram.Bot</span>;
+<span class="kw">using</span> <span class="tp">Telegram.Bot.Types.ReplyMarkups</span>;
+
+<span class="kw">namespace</span> <span class="tp">BotForge.Telegram.Adapters</span>;
+
+<span class="kw">internal sealed class</span> <span class="tp">TelegramMessageSender</span> : <span class="tp">IMessageSender</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">ITelegramBotClient</span> _client;
+
+    <span class="kw">public</span> <span class="tp">TelegramMessageSender</span>(<span class="tp">ITelegramBotClient</span> client)
+        => _client = client;
+
+    <span class="kw">public</span> <span class="tp">Task</span> <span class="fn">SendTextAsync</span>(
+        <span class="kw">long</span> chatId,
+        <span class="kw">string</span> text,
+        <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>)
+        => _client.<span class="fn">SendMessage</span>(chatId, text, cancellationToken: ct);
+
+    <span class="kw">public</span> <span class="tp">Task</span> <span class="fn">SendTextAsync</span>(
+        <span class="kw">long</span> chatId,
+        <span class="kw">string</span> text,
+        <span class="tp">IReadOnlyList</span>&lt;<span class="kw">string</span>&gt;? quickReplies,
+        <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>)
+    {
+        <span class="kw">if</span> (quickReplies <span class="kw">is null or</span> { Count: <span class="nm">0</span> })
+            <span class="kw">return</span> <span class="fn">SendTextAsync</span>(chatId, text, ct);
+
+        <span class="kw">var</span> markup = <span class="kw">new</span> <span class="tp">ReplyKeyboardMarkup</span>(
+            quickReplies.<span class="fn">Select</span>(r => <span class="kw">new</span> <span class="tp">KeyboardButton</span>(r)))
+        { ResizeKeyboard = <span class="kw">true</span>, OneTimeKeyboard = <span class="kw">true</span> };
+
+        <span class="kw">return</span> _client.<span class="fn">SendMessage</span>(chatId, text,
+            replyMarkup: markup, cancellationToken: ct);
+    }
+}</pre></div>
+        <div class="cb-box cb-p">
+          <div class="cb-label" style="color:var(--p)">Conceito — ADR-003 (isolamento do SDK)</div>
+          <div class="cb-text">O único <code>using Telegram.Bot</code> de toda a lib está aqui. Se o SDK sofrer breaking change, a correção fica contida neste único arquivo — o Core e o consumidor não são afetados.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TelegramPollingAdapter -->
+  <div class="panel" id="panel-polling">
+    <div class="file-card">
+      <div class="fc-header">
+        <div class="fc-path"><div class="fc-dot" style="background:var(--s)"></div>Adapters/TelegramPollingAdapter.cs</div>
+        <span class="badge bs">Driving Adapter</span>
+      </div>
+      <div class="fc-body">
+        <div class="fc-desc">Hosted service que mantém o loop de long polling com o Telegram. Recebe updates do SDK, traduz para <code>BotContext</code> e aciona o pipeline do Core. É o único ponto de entrada de mensagens na lib.</div>
+        <div class="code-wrap"><pre><span class="kw">using</span> <span class="tp">Telegram.Bot</span>;
+<span class="kw">using</span> <span class="tp">Telegram.Bot.Polling</span>;
+<span class="kw">using</span> <span class="tp">Telegram.Bot.Types</span>;
+<span class="kw">using</span> <span class="tp">Telegram.Bot.Types.Enums</span>;
+
+<span class="kw">namespace</span> <span class="tp">BotForge.Telegram.Adapters</span>;
+
+<span class="kw">internal sealed class</span> <span class="tp">TelegramPollingAdapter</span> : <span class="tp">IHostedService</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">ITelegramBotClient</span> _client;
+    <span class="kw">private readonly</span> <span class="tp">IBotPipeline</span>        _pipeline;
+    <span class="kw">private readonly</span> <span class="tp">IMessageSender</span>      _sender;
+    <span class="kw">private readonly</span> <span class="tp">ISessionStore</span>       _sessionStore;
+    <span class="kw">private readonly</span> <span class="tp">ILogger</span>&lt;<span class="tp">TelegramPollingAdapter</span>&gt; _logger;
+
+    <span class="cm">// ... construtor via DI ...</span>
+
+    <span class="kw">public</span> <span class="tp">Task</span> <span class="fn">StartAsync</span>(<span class="tp">CancellationToken</span> ct)
+    {
+        <span class="kw">var</span> options = <span class="kw">new</span> <span class="tp">ReceiverOptions</span>
+        {
+            AllowedUpdates = [<span class="tp">UpdateType</span>.Message]
+        };
+
+        _client.<span class="fn">StartReceiving</span>(
+            updateHandler:      <span class="fn">HandleUpdateAsync</span>,
+            pollingErrorHandler:<span class="fn">HandleErrorAsync</span>,
+            receiverOptions:    options,
+            cancellationToken:  ct);
+
+        <span class="kw">return</span> <span class="tp">Task</span>.CompletedTask;
+    }
+
+    <span class="kw">public</span> <span class="tp">Task</span> <span class="fn">StopAsync</span>(<span class="tp">CancellationToken</span> ct)
+        => <span class="tp">Task</span>.CompletedTask;
+
+    <span class="kw">private async</span> <span class="tp">Task</span> <span class="fn">HandleUpdateAsync</span>(
+        <span class="tp">ITelegramBotClient</span> _,
+        <span class="tp">Update</span> update,
+        <span class="tp">CancellationToken</span> ct)
+    {
+        <span class="cm">// Filtra: apenas mensagens de texto</span>
+        <span class="kw">if</span> (update.Message?.Text <span class="kw">is not</span> { } text) <span class="kw">return</span>;
+
+        <span class="kw">var</span> chatId  = update.Message.Chat.Id;
+        <span class="kw">var</span> session = <span class="kw">await</span> _sessionStore.<span class="fn">GetAsync</span>(chatId, ct)
+                      ?? <span class="kw">new</span> <span class="tp">UserSession</span> { ChatId = chatId,
+                             ExpiresAt = <span class="tp">DateTimeOffset</span>.UtcNow.<span class="fn">AddHours</span>(<span class="nm">24</span>) };
+
+        <span class="cm">// Tradução: Update (SDK) → BotContext (lib)</span>
+        <span class="kw">var</span> context = <span class="kw">new</span> <span class="tp">BotContext</span>
+        {
+            ChatId  = chatId,
+            Text    = text,
+            Session = session,
+            Sender  = _sender
+        };
+
+        <span class="kw">await</span> _pipeline.<span class="fn">ProcessAsync</span>(context, ct);
+    }
+
+    <span class="kw">private</span> <span class="tp">Task</span> <span class="fn">HandleErrorAsync</span>(
+        <span class="tp">ITelegramBotClient</span> _,
+        <span class="tp">Exception</span> ex,
+        <span class="tp">CancellationToken</span> ct)
+    {
+        _logger.<span class="fn">LogError</span>(ex, <span class="st">"Polling error"</span>);
+        <span class="kw">return</span> <span class="tp">Task</span>.CompletedTask;
+    }
+}</pre></div>
+        <div class="cb-box cb-s">
+          <div class="cb-label" style="color:var(--s)">Conceito — Driving Adapter + Modelo de Fronteira</div>
+          <div class="cb-text">Este adapter faz a tradução <code>Update (SDK) → BotContext (lib)</code>. Depois disso, o objeto <code>Update</code> nunca mais aparece — o Core só enxerga <code>BotContext</code>. É aqui que o mundo externo "entra" no hexágono.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DependencyInjection -->
+  <div class="panel" id="panel-di">
+    <div class="file-card">
+      <div class="fc-header">
+        <div class="fc-path"><div class="fc-dot" style="background:var(--s)"></div>DependencyInjection/BotForgeServiceCollectionExtensions.cs</div>
+        <span class="badge bs">Entry Point Público</span>
+      </div>
+      <div class="fc-body">
+        <div class="fc-desc">Único tipo <code>public</code> deste projeto. Registra todos os serviços internos da lib no DI do .NET. O consumidor chama apenas <code>AddBotForge()</code> no <code>Program.cs</code> — sem conhecer nenhum tipo interno.</div>
+        <div class="code-wrap"><pre><span class="kw">namespace</span> <span class="tp">BotForge.Telegram.DependencyInjection</span>;
+
+<span class="kw">public static class</span> <span class="tp">BotForgeServiceCollectionExtensions</span>
+{
+    <span class="kw">public static</span> <span class="tp">IServiceCollection</span> <span class="fn">AddBotForge</span>(
+        <span class="kw">this</span> <span class="tp">IServiceCollection</span> services,
+        <span class="tp">Action</span>&lt;<span class="tp">BotForgeOptions</span>&gt; configure)
+    {
+        <span class="kw">var</span> options = <span class="kw">new</span> <span class="tp">BotForgeOptions</span>();
+        <span class="fn">configure</span>(options);
+
+        <span class="cm">// SDK</span>
+        services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ITelegramBotClient</span>&gt;(
+            <span class="kw">new</span> <span class="tp">TelegramBotClient</span>(options.Token));
+
+        <span class="cm">// Driven adapters de infraestrutura</span>
+        services.<span class="fn">AddSingleton</span>&lt;<span class="tp">IMessageSender</span>, <span class="tp">TelegramMessageSender</span>&gt;();
+
+        <span class="cm">// ISessionStore: só registra fallback se consumidor não registrou antes</span>
+        <span class="kw">if</span> (!services.<span class="fn">Any</span>(d => d.ServiceType == <span class="kw">typeof</span>(<span class="tp">ISessionStore</span>)))
+            services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore</span>, <span class="tp">InMemorySessionStore</span>&gt;();
+
+        <span class="cm">// Core (pipeline — a implementar na próxima task)</span>
+        services.<span class="fn">AddSingleton</span>&lt;<span class="tp">IBotPipeline</span>, <span class="tp">BotPipeline</span>&gt;();
+
+        <span class="cm">// Driving adapter — mantém o loop de polling</span>
+        services.<span class="fn">AddHostedService</span>&lt;<span class="tp">TelegramPollingAdapter</span>&gt;();
+
+        <span class="kw">return</span> services;
+    }
+}
+
+<span class="kw">public sealed class</span> <span class="tp">BotForgeOptions</span>
+{
+    <span class="kw">public required string</span> Token { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="tp">TimeSpan</span> SessionExpiry { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="tp">TimeSpan</span>.<span class="fn">FromHours</span>(<span class="nm">24</span>);
+}</pre></div>
+        <div class="cb-box cb-s">
+          <div class="cb-label" style="color:var(--s)">Conceito — Convenção DI (ADR-002)</div>
+          <div class="cb-text">A verificação <code>services.Any(d => d.ServiceType == typeof(ISessionStore))</code> é o mecanismo de fallback — o consumidor registra seu store <em>antes</em> de chamar <code>AddBotForge()</code> e a lib respeita a escolha.</div>
+        </div>
+        <div class="cb-box cb-re" style="margin-top:.75rem">
+          <div class="cb-label" style="color:var(--re)">Atenção — dependência futura</div>
+          <div class="cb-text"><code>BotPipeline</code> e <code>IBotPipeline</code> ainda não existem — serão criados na próxima task (Core). Por ora, deixe o registro comentado ou use um placeholder para que o build passe.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RULES -->
+  <div class="divider"><h2>Regras desta Task</h2></div>
+  <div class="rule-card">
+    <div class="rule-num">REGRA 01</div>
+    <div class="rule-title">Todos os adapters são <code>internal</code></div>
+    <div class="rule-desc">Apenas <code>BotForgeServiceCollectionExtensions</code> e <code>BotForgeOptions</code> são <code>public</code>. O consumidor nunca instancia um adapter diretamente — só via DI.</div>
+  </div>
+  <div class="rule-card">
+    <div class="rule-num">REGRA 02</div>
+    <div class="rule-title"><code>using Telegram.Bot</code> só em dois arquivos</div>
+    <div class="rule-desc"><code>TelegramMessageSender.cs</code> e <code>TelegramPollingAdapter.cs</code> são os únicos que podem importar o SDK. Nenhum outro arquivo do projeto deve referenciar tipos do <code>Telegram.Bot</code>.</div>
+  </div>
+  <div class="rule-card">
+    <div class="rule-num">REGRA 03</div>
+    <div class="rule-title">Registro de <code>IBotPipeline</code> fica comentado</div>
+    <div class="rule-desc"><code>BotPipeline</code> ainda não existe. Deixe a linha de registro comentada no DI para que o <code>dotnet build</code> passe sem erros. Será descomentada na task do Core.</div>
+  </div>
+
+</main>
+
+<script>
+(function(){
+  const tt=document.querySelector('[data-tt]'),r=document.documentElement;
+  let d='dark';
+  const ic={dark:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',light:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'};
+  tt&&tt.addEventListener('click',()=>{d=d==='dark'?'light':'dark';r.setAttribute('data-theme',d);tt.innerHTML=ic[d];});
+  document.querySelectorAll('.tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      const key=tab.dataset.tab;
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-'+key)?.classList.add('active');
+    });
+  });
+})();
+</script>
+</body>
+</html>
