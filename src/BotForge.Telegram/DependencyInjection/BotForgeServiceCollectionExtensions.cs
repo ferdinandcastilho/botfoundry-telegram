@@ -26,9 +26,9 @@ namespace BotForge.Telegram.DependencyInjection
                 services.AddSingleton<ISessionStore, InMemorySessionStore>();
 
             // Core
-            services.AddSingleton<BotForge.Telegram.Abstractions.Ports.IBotPipeline, BotForge.Telegram.Core.BotPipeline>();
-            services.AddSingleton<BotForge.Telegram.Core.CommandRouter>();
-            services.AddSingleton<BotForge.Telegram.Core.StepRunner>();
+            services.AddSingleton<IBotPipeline, Core.BotPipeline>();
+            services.AddSingleton<Core.CommandRouter>();
+            services.AddSingleton<Core.StepRunner>();
 
             services.AddHostedService<TelegramPollingAdapter>();
             return services;
