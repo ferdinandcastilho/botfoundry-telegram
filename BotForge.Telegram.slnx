@@ -7,5 +7,6 @@
   <Folder Name="/tests/">
     <Project Path="tests/BotForge.Telegram.Core.Tests/BotForge.Telegram.Core.Tests.csproj" />
     <Project Path="tests/BotForge.Telegram.Integration.Tests/BotForge.Telegram.Integration.Tests.csproj" />
+    <Project Path="tests/BotForge.Telegram.Tests/BotForge.Telegram.Tests.csproj" />
   </Folder>
 </Solution>
