@@ -21,6 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\BotForge.Telegram.Abstractions\BotForge.Telegram.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\BotForge.Telegram.Core\BotForge.Telegram.Core.csproj" />
     <ProjectReference Include="..\..\..\src\BotForge.Telegram\BotForge.Telegram.csproj" />
   </ItemGroup>
 
