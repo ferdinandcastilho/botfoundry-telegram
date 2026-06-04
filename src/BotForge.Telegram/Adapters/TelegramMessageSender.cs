@@ -4,7 +4,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BotForge.Telegram.Adapters
 {
-    internal sealed class TelegramMessageSender(TelegramBotClient client) : IMessageSender
+    internal sealed class TelegramMessageSender(ITelegramBotClient client) : IMessageSender
     {
         public Task SendTextAsync(long chatId, string text, CancellationToken ct = default)
             => client.SendMessage(chatId, text, cancellationToken: ct);
