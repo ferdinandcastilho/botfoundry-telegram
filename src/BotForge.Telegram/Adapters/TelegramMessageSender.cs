@@ -1,20 +1,13 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using BotForge.Telegram.Abstractions.Ports;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BotForge.Telegram.Adapters
 {
-    internal sealed class TelegramMessageSender : IMessageSender
+    internal sealed class TelegramMessageSender(TelegramBotClient client) : IMessageSender
     {
-        private readonly TelegramBotClient _client;
-        public TelegramMessageSender(TelegramBotClient client) => _client = client;
-
         public Task SendTextAsync(long chatId, string text, CancellationToken ct = default)
-            => _client.SendMessage(chatId, text, cancellationToken: ct);
+            => client.SendMessage(chatId, text, cancellationToken: ct);
 
         public Task SendTextAsync(long chatId, string text, IReadOnlyList<string>? quickReplies, CancellationToken ct = default)
         {
@@ -22,13 +15,13 @@ namespace BotForge.Telegram.Adapters
                 return SendTextAsync(chatId, text, ct);
 
             var buttons = quickReplies.Select(r => new KeyboardButton(r)).ToArray();
-            var markup = new ReplyKeyboardMarkup(new[] { buttons })
+            var markup = new ReplyKeyboardMarkup([buttons])
             {
                 ResizeKeyboard = true,
                 OneTimeKeyboard = true
             };
 
-            return _client.SendMessage(chatId, text, replyMarkup: markup, cancellationToken: ct);
+            return client.SendMessage(chatId, text, replyMarkup: markup, cancellationToken: ct);
         }
     }
 }

@@ -1,12 +1,9 @@
-using System.Threading;
-using System.Threading.Tasks;
 using BotForge.Telegram.Abstractions.Models;
 using BotForge.Telegram.Abstractions.Ports;
 using BotForge.Telegram.Core;
 using BotForge.Telegram.Tests.Fakes;
 using FluentAssertions;
 using NSubstitute;
-using Xunit;
 
 namespace BotForge.Telegram.Tests.Pipeline
 {
@@ -48,7 +45,7 @@ namespace BotForge.Telegram.Tests.Pipeline
             handler.HandleAsync(Arg.Any<BotContext>(), Arg.Any<CancellationToken>())
                 .Returns(FlowResult.Continue());
 
-            var router = new CommandRouter(new[] { handler }, new FakeLogger<CommandRouter>());
+            var router = new CommandRouter([handler], new FakeLogger<CommandRouter>());
             var stepRunner = new StepRunner([], new FakeLogger<StepRunner>());
             var logger = new FakeLogger<BotPipeline>();
 

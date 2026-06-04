@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace BotForge.Telegram.Abstractions.Models
 {
     public sealed class UserSession

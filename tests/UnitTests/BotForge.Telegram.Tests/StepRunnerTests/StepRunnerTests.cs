@@ -1,12 +1,9 @@
-using System.Threading;
-using System.Threading.Tasks;
 using BotForge.Telegram.Abstractions.Models;
 using BotForge.Telegram.Abstractions.Ports;
 using BotForge.Telegram.Core;
 using BotForge.Telegram.Tests.Fakes;
 using FluentAssertions;
 using NSubstitute;
-using Xunit;
 
 namespace BotForge.Telegram.Tests.StepRunnerTests
 {
@@ -21,10 +18,13 @@ namespace BotForge.Telegram.Tests.StepRunnerTests
             step.ProcessAsync(Arg.Any<BotContext>(), Arg.Any<CancellationToken>())
                 .Returns(StepResult.Complete());
 
-            var stepRunner = new StepRunner(new[] { step }, new FakeLogger<StepRunner>());
-            var session = new UserSession { ChatId = 123 };
-            session.ActiveTopic = "test_flow";
-            session.ActiveStepId = "step1";
+            var stepRunner = new StepRunner([step], new FakeLogger<StepRunner>());
+            var session = new UserSession
+            {
+                ChatId = 123,
+                ActiveTopic = "test_flow",
+                ActiveStepId = "step1"
+            };
 
             var context = new BotContext
             {
@@ -46,10 +46,13 @@ namespace BotForge.Telegram.Tests.StepRunnerTests
             step.StepId.Returns("step1");
             step.ValidateAsync(Arg.Any<BotContext>(), Arg.Any<CancellationToken>()).Returns(false);
 
-            var stepRunner = new StepRunner(new[] { step }, new FakeLogger<StepRunner>());
-            var session = new UserSession { ChatId = 123 };
-            session.ActiveTopic = "test_flow";
-            session.ActiveStepId = "step1";
+            var stepRunner = new StepRunner([step], new FakeLogger<StepRunner>());
+            var session = new UserSession
+            {
+                ChatId = 123,
+                ActiveTopic = "test_flow",
+                ActiveStepId = "step1"
+            };
 
             var context = new BotContext
             {
@@ -77,10 +80,13 @@ namespace BotForge.Telegram.Tests.StepRunnerTests
             var step2 = Substitute.For<IConversationStep>();
             step2.StepId.Returns("step2");
 
-            var stepRunner = new StepRunner(new[] { step1, step2 }, new FakeLogger<StepRunner>());
-            var session = new UserSession { ChatId = 123 };
-            session.ActiveTopic = "test_flow";
-            session.ActiveStepId = "step1";
+            var stepRunner = new StepRunner([step1, step2], new FakeLogger<StepRunner>());
+            var session = new UserSession
+            {
+                ChatId = 123,
+                ActiveTopic = "test_flow",
+                ActiveStepId = "step1"
+            };
 
             var context = new BotContext
             {

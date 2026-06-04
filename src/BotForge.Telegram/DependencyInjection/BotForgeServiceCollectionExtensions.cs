@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using BotForge.Telegram.Abstractions.Ports;
 using BotForge.Telegram.Adapters;
