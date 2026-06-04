@@ -5,8 +5,8 @@
     <Project Path="src/BotForge.Telegram/BotForge.Telegram.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/BotForge.Telegram.Core.Tests/BotForge.Telegram.Core.Tests.csproj" />
-    <Project Path="tests/BotForge.Telegram.Integration.Tests/BotForge.Telegram.Integration.Tests.csproj" />
-    <Project Path="tests/BotForge.Telegram.Tests/BotForge.Telegram.Tests.csproj" />
+    <Project Path="tests/IntegrationTests/BotForge.Telegram.Integration.Tests/BotForge.Telegram.Integration.Tests.csproj" />
+    <Project Path="tests/UnitTests/BotForge.Telegram.Core.Tests/BotForge.Telegram.Core.Tests.csproj" />
+    <Project Path="tests/UnitTests/BotForge.Telegram.Tests/BotForge.Telegram.Tests.csproj" />
   </Folder>
 </Solution>

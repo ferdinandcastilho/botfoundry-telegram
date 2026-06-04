@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using BotForge.Telegram.Abstractions.Models;
 using BotForge.Telegram.Abstractions.Ports;
-using BotForge.Telegram.Core;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 

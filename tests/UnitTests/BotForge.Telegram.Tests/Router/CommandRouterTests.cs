@@ -1,13 +1,9 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using BotForge.Telegram.Abstractions.Models;
 using BotForge.Telegram.Abstractions.Ports;
 using BotForge.Telegram.Core;
 using BotForge.Telegram.Tests.Fakes;
 using FluentAssertions;
 using NSubstitute;
-using Xunit;
 
 namespace BotForge.Telegram.Tests.Router
 {
@@ -21,7 +17,7 @@ namespace BotForge.Telegram.Tests.Router
             handler.HandleAsync(Arg.Any<BotContext>(), Arg.Any<CancellationToken>())
                 .Returns(FlowResult.Complete());
 
-            var router = new CommandRouter(new[] { handler }, new FakeLogger<CommandRouter>());
+            var router = new CommandRouter([handler], new FakeLogger<CommandRouter>());
             var session = new UserSession { ChatId = 123 };
             var context = new BotContext
             {
@@ -42,7 +38,7 @@ namespace BotForge.Telegram.Tests.Router
             var handler = Substitute.For<ITopicHandler>();
             handler.Command.Returns("start");
 
-            var router = new CommandRouter(new[] { handler }, new FakeLogger<CommandRouter>());
+            var router = new CommandRouter([handler], new FakeLogger<CommandRouter>());
             var session = new UserSession { ChatId = 123 };
             var context = new BotContext
             {
@@ -65,7 +61,7 @@ namespace BotForge.Telegram.Tests.Router
             handler.HandleAsync(Arg.Any<BotContext>(), Arg.Any<CancellationToken>())
                 .Returns(FlowResult.Continue());
 
-            var router = new CommandRouter(new[] { handler }, new FakeLogger<CommandRouter>());
+            var router = new CommandRouter([handler], new FakeLogger<CommandRouter>());
             var session = new UserSession { ChatId = 123 };
             var context = new BotContext
             {
