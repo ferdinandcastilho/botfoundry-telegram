@@ -1,25 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using BotForge.Telegram.Abstractions.Models;
 using BotForge.Telegram.Abstractions.Ports;
 using Microsoft.Extensions.Logging;
 
 namespace BotForge.Telegram.Core
 {
-    internal sealed class StepRunner
+    internal sealed class StepRunner(IEnumerable<IConversationStep> steps, ILogger<StepRunner> logger)
     {
-        private readonly IDictionary<string, IConversationStep> _steps;
-        private readonly ILogger<StepRunner> _logger;
-
-        public StepRunner(IEnumerable<IConversationStep> steps, ILogger<StepRunner> logger)
-        {
-            _logger = logger;
-            _steps = steps?.ToDictionary(s => s.StepId, StringComparer.OrdinalIgnoreCase)
+        private readonly IDictionary<string, IConversationStep> _steps = steps?.ToDictionary(s => s.StepId, StringComparer.OrdinalIgnoreCase)
                       ?? new Dictionary<string, IConversationStep>(StringComparer.OrdinalIgnoreCase);
-        }
 
         public async Task ResumeAsync(BotContext context, CancellationToken ct = default)
         {
@@ -27,7 +15,7 @@ namespace BotForge.Telegram.Core
 
             if (stepId is null || !_steps.TryGetValue(stepId, out var step))
             {
-                _logger.LogWarning("Step não encontrado: {StepId}. Limpando fluxo.", stepId);
+                logger.LogWarning("Step não encontrado: {StepId}. Limpando fluxo.", stepId);
                 context.Session.ClearFlow();
                 return;
             }

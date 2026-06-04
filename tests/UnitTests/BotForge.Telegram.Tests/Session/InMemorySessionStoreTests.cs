@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using BotForge.Telegram.Abstractions.Models;
 using BotForge.Telegram.Adapters;
 using FluentAssertions;
-using Xunit;
 
 namespace BotForge.Telegram.Tests.Session
 {
