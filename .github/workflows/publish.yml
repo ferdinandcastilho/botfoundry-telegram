@@ -38,6 +38,10 @@ jobs:
       - name: Test
         run: dotnet test --no-build -c Release
 
+      - name: Verificar se a tag está em main
+        if: startsWith(github.ref, 'refs/tags/')
+        run: git fetch origin main && git merge-base --is-ancestor ${{ github.sha }} origin/main || exit 1
+
       - name: Pack
         run: dotnet pack src/BotForge.Telegram/BotForge.Telegram.csproj --no-build -c Release -o ./nupkg
 
