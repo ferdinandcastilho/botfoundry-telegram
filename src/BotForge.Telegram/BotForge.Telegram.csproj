@@ -17,6 +17,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
     <PackageId>BotForge.Telegram</PackageId>
     <Title>BotForge.Telegram</Title>
     <Description>Biblioteca para construir bots Telegram em C# sem reimplementar infraestrutura a cada projeto.</Description>
