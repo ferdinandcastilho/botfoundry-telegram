@@ -149,7 +149,7 @@ public sealed class ObservacaoDespesaStep : IConversationStep
 
     public Task AskAsync(BotContext ctx, CancellationToken ct)
         => ctx.SendAsync(
-            "📝 Alguma observação? (ou digite "pular")", ct);
+            "📝 Alguma observação? (ou digite \"pular\")", ct);
 
     public Task<bool> ValidateAsync(BotContext ctx, CancellationToken ct)
         => Task.FromResult(true); // sempre válido
