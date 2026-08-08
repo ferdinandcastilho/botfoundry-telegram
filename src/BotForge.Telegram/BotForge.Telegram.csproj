@@ -23,7 +23,9 @@
     <Description>Biblioteca para construir bots Telegram em C# sem reimplementar infraestrutura a cada projeto.</Description>
     <Authors>Ferdinand Castilho</Authors>
     <RepositoryUrl>https://github.com/ferdinandcastilho/botforge-telegram</RepositoryUrl>
-    <PackageTags>telegram;bot;botforge;dotnet;csharp</PackageTags>
+    <PackageProjectUrl>https://github.com/ferdinandcastilho/botforge-telegram</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>telegram;telegram-bot;chatbot;sdk;botforge;dotnet;csharp</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeProjectReferencesInPackage</TargetsForTfmSpecificBuildOutput>
