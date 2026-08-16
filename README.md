@@ -43,7 +43,7 @@ public sealed class OiHandler : ITopicHandler
     public async Task<FlowResult> HandleAsync(BotContext ctx, CancellationToken ct)
     {
         await ctx.SendAsync("👋 Olá! Como posso te ajudar?", ct);
-        return FlowResult.Complete;
+        return FlowResult.Complete();
     }
 }
 ```
@@ -88,7 +88,7 @@ public sealed class DespesaHandler : ITopicHandler
             quickReplies: ["Alimentação", "Transporte", "Lazer", "Outro"],
             ct);
 
-        return FlowResult.Continue; // sinaliza que há steps a seguir
+        return FlowResult.Continue(); // sinaliza que há steps a seguir
     }
 }
 ```
@@ -116,7 +116,7 @@ public sealed class CategoriaDespesaStep : IConversationStep
     public Task<StepResult> ProcessAsync(BotContext ctx, CancellationToken ct)
     {
         ctx.Session.Set("despesa_categoria", ctx.Text); // salva na sessão
-        return Task.FromResult(StepResult.Next);
+        return Task.FromResult(StepResult.Continue());
     }
 }
 
@@ -138,7 +138,7 @@ public sealed class ValorDespesaStep : IConversationStep
     public Task<StepResult> ProcessAsync(BotContext ctx, CancellationToken ct)
     {
         ctx.Session.Set("despesa_valor", ctx.Text);
-        return Task.FromResult(StepResult.Next);
+        return Task.FromResult(StepResult.Continue());
     }
 }
 
@@ -167,7 +167,7 @@ public sealed class ObservacaoDespesaStep : IConversationStep
             $"📝 Observação: {obs}",
             ct);
 
-        return StepResult.Complete;
+        return StepResult.Complete();
     }
 }
 ```
