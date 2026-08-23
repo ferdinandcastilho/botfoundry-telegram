@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\BotFoundry.Telegram.Abstractions\BotFoundry.Telegram.Abstractions.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\BotFoundry.Telegram.Core\BotFoundry.Telegram.Core.csproj" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MinVer" Version="6.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.8" />
+    <PackageReference Include="Telegram.Bot" Version="22.10.0.1" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <PackageId>BotFoundry.Telegram</PackageId>
+    <Title>BotFoundry.Telegram</Title>
+    <Description>Biblioteca para construir bots Telegram em C# sem reimplementar infraestrutura a cada projeto.</Description>
+    <Authors>Fernando Castilho</Authors>
+    <RepositoryUrl>https://github.com/ferdinandcastilho/botforge-telegram</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/ferdinandcastilho/botforge-telegram</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>telegram;telegram-bot;chatbot;sdk;botfoundry;dotnet;csharp</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeProjectReferencesInPackage</TargetsForTfmSpecificBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <Target Name="IncludeProjectReferencesInPackage">
+    <ItemGroup>
+      <BuildOutputInPackage Include="$(OutputPath)BotFoundry.Telegram.Abstractions.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)BotFoundry.Telegram.Core.dll" />
+    </ItemGroup>
+  </Target>
+
+</Project>

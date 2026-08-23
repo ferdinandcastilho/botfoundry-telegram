@@ -1,4 +1,4 @@
-# BotForge.Telegram — Architecture Document
+# BotFoundry.Telegram — Architecture Document
 
 > **Nota:** Este é o documento arquitetural do projeto. Ele descreve o problema, requisitos, estrutura e decisões de design de forma agnóstica — sem código ou detalhes de implementação. Para contratos de interface, estrutura de pastas e exemplos de uso, consulte o Design Doc.
 
@@ -14,7 +14,7 @@ Essa repetição gera três consequências diretas:
 - **Inconsistência:** cada bot resolve o mesmo problema de forma ligeiramente diferente, aumentando a carga cognitiva ao alternar entre projetos
 - **Fragilidade:** sem uma base comum testada, bugs de infraestrutura se repetem em todos os bots
 
-**BotForge.Telegram** existe para eliminar esse problema: fornece a infraestrutura comum como uma biblioteca reutilizável, permitindo que o desenvolvedor foque exclusivamente na lógica de domínio de cada bot, amparado por uma base padronizada e resiliente.
+**BotFoundry.Telegram** existe para eliminar esse problema: fornece a infraestrutura comum como uma biblioteca reutilizável, permitindo que o desenvolvedor foque exclusivamente na lógica de domínio de cada bot, amparado por uma base padronizada e resiliente.
 
 ---
 
@@ -72,7 +72,7 @@ Verdades assumidas sobre o contexto de uso que, se mudarem, podem exigir revisã
 
 ## 4. Visão Arquitetural
 
-**BotForge.Telegram** é organizada em duas zonas com responsabilidades distintas e fronteiras explícitas.
+**BotFoundry.Telegram** é organizada em duas zonas com responsabilidades distintas e fronteiras explícitas.
 
 ### Zona 1 — Infraestrutura (gerenciada pela lib)
 
@@ -240,7 +240,7 @@ Mensagem recebida pelo Hosting
 
 ## 7. Fora do Escopo
 
-Esta seção define explicitamente o que **BotForge.Telegram** não faz na v0.1. Seu propósito é evitar suposições incorretas sobre as capacidades da lib e orientar decisões de evolução futura.
+Esta seção define explicitamente o que **BotFoundry.Telegram** não faz na v0.1. Seu propósito é evitar suposições incorretas sobre as capacidades da lib e orientar decisões de evolução futura.
 
 ### Fora do escopo permanente
 

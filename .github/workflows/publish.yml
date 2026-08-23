@@ -43,7 +43,7 @@ jobs:
         run: git fetch origin main && git merge-base --is-ancestor ${{ github.sha }} origin/main || exit 1
 
       - name: Pack
-        run: dotnet pack src/BotForge.Telegram/BotForge.Telegram.csproj --no-build -c Release -o ./nupkg
+        run: dotnet pack src/BotFoundry.Telegram/BotFoundry.Telegram.csproj --no-build -c Release -o ./nupkg
 
       - name: Push
         run: dotnet nuget push ./nupkg/*.nupkg --source github --api-key "${{ secrets.GH_PACKAGES_TOKEN }}" --skip-duplicate

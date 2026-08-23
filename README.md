@@ -1,4 +1,4 @@
-# 🤖 BotForge.Telegram
+# 🤖 BotFoundry.Telegram
 
 Biblioteca para construir bots Telegram em C# sem reimplementar infraestrutura a cada projeto.
 
@@ -9,7 +9,7 @@ Você escreve os handlers e os steps. A lib cuida do pipeline, da sessão, do ro
 ## 📦 Instalação
 
 ```bash
-dotnet add package BotForge.Telegram
+dotnet add package BotFoundry.Telegram
 ```
 
 ---
@@ -20,7 +20,7 @@ dotnet add package BotForge.Telegram
 // Program.cs
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddBotForge("SEU_TOKEN_AQUI");
+builder.Services.AddBotFoundry("SEU_TOKEN_AQUI");
 
 var app = builder.Build();
 await app.RunAsync();
@@ -51,7 +51,7 @@ public sealed class OiHandler : ITopicHandler
 ```csharp
 // Program.cs
 builder.Services.AddSingleton<ITopicHandler, OiHandler>();
-builder.Services.AddBotForge("SEU_TOKEN_AQUI");
+builder.Services.AddBotFoundry("SEU_TOKEN_AQUI");
 ```
 
 O usuário envia `/oi` → o bot responde e o fluxo encerra.
@@ -182,7 +182,7 @@ builder.Services.AddSingleton<IConversationStep, CategoriaDespesaStep>();
 builder.Services.AddSingleton<IConversationStep, ValorDespesaStep>();
 builder.Services.AddSingleton<IConversationStep, ObservacaoDespesaStep>();
 
-builder.Services.AddBotForge("SEU_TOKEN_AQUI");
+builder.Services.AddBotFoundry("SEU_TOKEN_AQUI");
 ```
 
 > **Como a sessão funciona:** cada step lê e escreve em `ctx.Session` — um dicionário por usuário que persiste entre mensagens. O step 3 lê os valores gravados pelos steps 1 e 2 sem que o usuário precise reenviar nada.
@@ -217,22 +217,25 @@ public sealed class AllowListAuth : IAuthMiddleware
 ```
 
 ```csharp
-// Registre antes de AddBotForge
+// Registre antes de AddBotFoundry
 builder.Services.AddSingleton<IAuthMiddleware, AllowListAuth>();
-builder.Services.AddBotForge("SEU_TOKEN_AQUI");
+builder.Services.AddBotFoundry("SEU_TOKEN_AQUI");
 ```
 
 ---
 
 ## 📁 Estrutura do repositório
 
+A família pública BotFoundry é limitada a `BotFoundry.Telegram` e ao futuro `BotFoundry.Core`.
+`BotFoundry.Telegram.Abstractions` e `BotFoundry.Telegram.Core` são componentes internos distribuídos junto com o pacote Telegram, não pacotes NuGet públicos independentes.
+
 ```
 src/
-├── BotForge.Telegram.Abstractions/   # Contratos públicos (ITopicHandler, IConversationStep, …)
-├── BotForge.Telegram.Core/           # Pipeline, router, step runner
-└── BotForge.Telegram/                # Adapters Telegram.Bot, DI registration
+├── BotFoundry.Telegram.Abstractions/   # Contratos públicos (ITopicHandler, IConversationStep, …)
+├── BotFoundry.Telegram.Core/           # Pipeline, router, step runner
+└── BotFoundry.Telegram/                # Adapters Telegram.Bot, DI registration
 tests/
-└── BotForge.Telegram.Tests/          # xUnit + NSubstitute + FluentAssertions
+└── BotFoundry.Telegram.Tests/          # xUnit + NSubstitute + FluentAssertions
 docs/
 └── architecture/                     # Architecture Doc, Design Doc, ADRs
 ```
