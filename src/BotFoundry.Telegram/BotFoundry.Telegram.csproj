@@ -22,8 +22,8 @@
     <Title>BotFoundry.Telegram</Title>
     <Description>Biblioteca para construir bots Telegram em C# sem reimplementar infraestrutura a cada projeto.</Description>
     <Authors>Fernando Castilho</Authors>
-    <RepositoryUrl>https://github.com/ferdinandcastilho/botforge-telegram</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/ferdinandcastilho/botforge-telegram</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ferdinandcastilho/botfoundry-telegram</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/ferdinandcastilho/botfoundry-telegram</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>telegram;telegram-bot;chatbot;sdk;botfoundry;dotnet;csharp</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
