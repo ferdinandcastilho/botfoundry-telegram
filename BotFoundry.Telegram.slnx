@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BotFoundry.Telegram.Abstractions/BotFoundry.Telegram.Abstractions.csproj" />
+    <Project Path="src/BotFoundry.Telegram.Core/BotFoundry.Telegram.Core.csproj" />
+    <Project Path="src/BotFoundry.Telegram/BotFoundry.Telegram.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/IntegrationTests/BotFoundry.Telegram.Integration.Tests/BotFoundry.Telegram.Integration.Tests.csproj" />
+    <Project Path="tests/UnitTests/BotFoundry.Telegram.Core.Tests/BotFoundry.Telegram.Core.Tests.csproj" />
+    <Project Path="tests/UnitTests/BotFoundry.Telegram.Tests/BotFoundry.Telegram.Tests.csproj" />
+  </Folder>
+</Solution>
