@@ -10,7 +10,7 @@ applyTo: '**/*'
 - Frase direta em português (pt-BR) descrevendo a ação
 - Sem prefixo de categoria no título
 - Exemplos:
-  - `Remover testes redundantes do BotForge.Telegram.Tests`
+  - `Remover testes redundantes do BotFoundry.Telegram.Tests`
   - `Implementar workflow de publish do NuGet`
   - `Corrigir comportamento do TelegramMessageSender`
 
@@ -33,12 +33,12 @@ Cada issue deve ter ao menos **uma label de tipo** e, quando aplicável, **uma l
 
 | Label | Projeto |
 |---|---|
-| `BotForge.Telegram` | `src/BotForge.Telegram` |
-| `BotForge.Telegram.Core` | `src/BotForge.Telegram.Core` |
-| `BotForge.Telegram.Abstractions` | `src/BotForge.Telegram.Abstractions` |
-| `BotForge.Telegram.Tests` | `tests/UnitTests/BotForge.Telegram.Tests` |
-| `BotForge.Telegram.Core.Tests` | `tests/UnitTests/BotForge.Telegram.Core.Tests` |
-| `BotForge.Telegram.Integration.Tests` | `tests/IntegrationTests/BotForge.Telegram.Integration.Tests` |
+| `BotFoundry.Telegram` | `src/BotFoundry.Telegram` |
+| `BotFoundry.Telegram.Core` | `src/BotFoundry.Telegram.Core` |
+| `BotFoundry.Telegram.Abstractions` | `src/BotFoundry.Telegram.Abstractions` |
+| `BotFoundry.Telegram.Tests` | `tests/UnitTests/BotFoundry.Telegram.Tests` |
+| `BotFoundry.Telegram.Core.Tests` | `tests/UnitTests/BotFoundry.Telegram.Core.Tests` |
+| `BotFoundry.Telegram.Integration.Tests` | `tests/IntegrationTests/BotFoundry.Telegram.Integration.Tests` |
 
 ## Idioma
 
