@@ -228,9 +228,6 @@ builder.Services.AddBotFoundry("YOUR_TOKEN_HERE");
 
 ## 📁 Repository structure
 
-The public BotFoundry family is limited to `BotFoundry.Telegram` and the future `BotFoundry.Core`.
-`BotFoundry.Telegram.Abstractions` and `BotFoundry.Telegram.Core` are internal components distributed with the Telegram package, not independent public NuGet packages.
-
 ```
 src/
 ├── BotFoundry.Telegram.Abstractions/   # Public contracts (ITopicHandler, IConversationStep, …)
