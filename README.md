@@ -1,12 +1,14 @@
 # 🤖 BotFoundry.Telegram
 
-Biblioteca para construir bots Telegram em C# sem reimplementar infraestrutura a cada projeto.
+Library for building Telegram bots in C# without reimplementing infrastructure for every project.
 
-Você escreve os handlers e os steps. A lib cuida do pipeline, da sessão, do roteamento e da conexão com o Telegram.
+You write the handlers and steps. The library takes care of the pipeline, session, routing, and connection to Telegram.
+
+> **Repository status:** This repository is intended to be public once the CI/CD setup is complete.
 
 ---
 
-## 📦 Instalação
+## 📦 Installation
 
 ```bash
 dotnet add package BotFoundry.Telegram
@@ -14,35 +16,35 @@ dotnet add package BotFoundry.Telegram
 
 ---
 
-## ⚡ Setup mínimo
+## ⚡ Minimal setup
 
 ```csharp
 // Program.cs
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddBotFoundry("SEU_TOKEN_AQUI");
+builder.Services.AddBotFoundry("YOUR_TOKEN_HERE");
 
 var app = builder.Build();
 await app.RunAsync();
 ```
 
-O bot já está conectado ao Telegram via long polling. Nenhuma configuração adicional é necessária para começar.
+The bot is already connected to Telegram via long polling. No additional configuration is required to get started.
 
 ---
 
-## 🧩 Criando um handler simples
+## 🧩 Creating a simple handler
 
-Um handler responde a um comando do tipo `/comando`. Implemente `ITopicHandler` e registre no DI.
+A handler responds to a command such as `/command`. Implement `ITopicHandler` and register it with DI.
 
 ```csharp
-// Responde ao comando /oi
-public sealed class OiHandler : ITopicHandler
+// Responds to the /hello command
+public sealed class HelloHandler : ITopicHandler
 {
-    public string Command => "oi";
+    public string Command => "hello";
 
     public async Task<FlowResult> HandleAsync(BotContext ctx, CancellationToken ct)
     {
-        await ctx.SendAsync("👋 Olá! Como posso te ajudar?", ct);
+        await ctx.SendAsync("👋 Hello! How can I help you?", ct);
         return FlowResult.Complete();
     }
 }
@@ -50,46 +52,46 @@ public sealed class OiHandler : ITopicHandler
 
 ```csharp
 // Program.cs
-builder.Services.AddSingleton<ITopicHandler, OiHandler>();
-builder.Services.AddBotFoundry("SEU_TOKEN_AQUI");
+builder.Services.AddSingleton<ITopicHandler, HelloHandler>();
+builder.Services.AddBotFoundry("YOUR_TOKEN_HERE");
 ```
 
-O usuário envia `/oi` → o bot responde e o fluxo encerra.
+The user sends `/hello` → the bot replies and the flow ends.
 
 ---
 
-## 💬 Fluxo multi-step com sessão
+## 💬 Multi-step flow with a session
 
-Handlers mais ricos guiam o usuário por múltiplas etapas. Cada step pode ler e escrever dados na sessão — que persiste entre as mensagens.
+Richer handlers guide the user through multiple steps. Each step can read and write session data, which persists between messages.
 
-### Exemplo: registro de despesa
+### Example: expense registration
 
-O usuário digita `/despesa`. O bot guia três steps em sequência, acumulando os dados na sessão até exibir o resumo final.
+The user types `/expense`. The bot guides them through three consecutive steps, accumulating data in the session until it displays the final summary.
 
 ```
-/despesa
-  → Qual a categoria?   [Alimentação] [Transporte] [Lazer] [Outro]
-  → Qual o valor? (ex: 45.90)
-  → Alguma observação? (opcional — digite "pular" para ignorar)
-  → ✅ Despesa registrada: Alimentação · R$ 45,90 · "almoço"
+/expense
+  → What is the category?   [Food] [Transport] [Leisure] [Other]
+  → What is the amount? (e.g. 45.90)
+  → Any notes? (optional — type "skip" to ignore)
+  → ✅ Expense registered: Food · $45.90 · "lunch"
 ```
 
-#### Handler — ponto de entrada
+#### Handler — entry point
 
 ```csharp
-public sealed class DespesaHandler : ITopicHandler
+public sealed class ExpenseHandler : ITopicHandler
 {
-    public string Command => "despesa";
+    public string Command => "expense";
 
     public async Task<FlowResult> HandleAsync(BotContext ctx, CancellationToken ct)
     {
         await ctx.SendAsync(
-            "📂 Qual a categoria da despesa?",
-            quickReplies: ["Alimentação", "Transporte", "Lazer", "Outro"],
+            "📂 What is the expense category?",
+            quickReplies: ["Food", "Transport", "Leisure", "Other"],
             ct);
 
-        ctx.Session.ActiveStepId = "despesa_categoria";
-        return FlowResult.Continue(); // sinaliza que há steps a seguir
+        ctx.Session.ActiveStepId = "expense_category";
+        return FlowResult.Continue(); // indicates that there are steps to follow
     }
 }
 ```
@@ -97,75 +99,75 @@ public sealed class DespesaHandler : ITopicHandler
 #### Steps
 
 ```csharp
-// Step 1 — captura a categoria (já enviada pelo handler)
-public sealed class CategoriaDespesaStep : IConversationStep
+// Step 1 — captures the category (already sent by the handler)
+public sealed class ExpenseCategoryStep : IConversationStep
 {
-    public string StepId => "despesa_categoria";
+    public string StepId => "expense_category";
 
     public Task AskAsync(BotContext ctx, CancellationToken ct)
         => ctx.SendAsync(
-            "📂 Qual a categoria da despesa?",
-            quickReplies: ["Alimentação", "Transporte", "Lazer", "Outro"],
+            "📂 What is the expense category?",
+            quickReplies: ["Food", "Transport", "Leisure", "Other"],
             ct);
 
     public Task<bool> ValidateAsync(BotContext ctx, CancellationToken ct)
     {
-        string[] validas = ["Alimentação", "Transporte", "Lazer", "Outro"];
-        return Task.FromResult(validas.Contains(ctx.Text));
+        string[] validCategories = ["Food", "Transport", "Leisure", "Other"];
+        return Task.FromResult(validCategories.Contains(ctx.Text));
     }
 
     public Task<StepResult> ProcessAsync(BotContext ctx, CancellationToken ct)
     {
-        ctx.Session.Data["despesa_categoria"] = ctx.Text; // salva na sessão
-        return Task.FromResult(StepResult.JumpTo("despesa_valor"));
+        ctx.Session.Data["expense_category"] = ctx.Text; // saves to the session
+        return Task.FromResult(StepResult.JumpTo("expense_amount"));
     }
 }
 
-// Step 2 — captura o valor
-public sealed class ValorDespesaStep : IConversationStep
+// Step 2 — captures the amount
+public sealed class ExpenseAmountStep : IConversationStep
 {
-    public string StepId => "despesa_valor";
+    public string StepId => "expense_amount";
 
     public Task AskAsync(BotContext ctx, CancellationToken ct)
-        => ctx.SendAsync("💰 Qual o valor? (ex: 45.90)", ct);
+        => ctx.SendAsync("💰 What is the amount? (e.g. 45.90)", ct);
 
     public Task<bool> ValidateAsync(BotContext ctx, CancellationToken ct)
         => Task.FromResult(decimal.TryParse(
             ctx.Text,
             System.Globalization.NumberStyles.Number,
             System.Globalization.CultureInfo.InvariantCulture,
-            out var v) && v > 0);
+            out var value) && value > 0);
 
     public Task<StepResult> ProcessAsync(BotContext ctx, CancellationToken ct)
     {
-        ctx.Session.Data["despesa_valor"] = ctx.Text;
-        return Task.FromResult(StepResult.JumpTo("despesa_observacao"));
+        ctx.Session.Data["expense_amount"] = ctx.Text;
+        return Task.FromResult(StepResult.JumpTo("expense_note"));
     }
 }
 
-// Step 3 — observação opcional + exibe resumo
-public sealed class ObservacaoDespesaStep : IConversationStep
+// Step 3 — optional note and final summary
+public sealed class ExpenseNoteStep : IConversationStep
 {
-    public string StepId => "despesa_observacao";
+    public string StepId => "expense_note";
 
     public Task AskAsync(BotContext ctx, CancellationToken ct)
         => ctx.SendAsync(
-            "📝 Alguma observação? (ou digite \"pular\")", ct);
+            "📝 Any notes? (or type \"skip\")", ct);
 
     public Task<bool> ValidateAsync(BotContext ctx, CancellationToken ct)
-        => Task.FromResult(true); // sempre válido
+        => Task.FromResult(true); // always valid
 
     public async Task<StepResult> ProcessAsync(BotContext ctx, CancellationToken ct)
     {
-        var categoria = ctx.Session.Data["despesa_categoria"];
-        var valor     = ctx.Session.Data["despesa_valor"];
-        var obs       = ctx.Text == "pular" ? "—" : ctx.Text;
+        var category = ctx.Session.Data["expense_category"];
+        var amount   = ctx.Session.Data["expense_amount"];
+        var note     = ctx.Text == "skip" ? "—" : ctx.Text;
 
         await ctx.SendAsync(
-            $"✅ Despesa registrada!\n\n" +
-            $"📂 Categoria: {categoria}\n" +
-            $"💰 Valor: R$ {valor}\n" +
-            $"📝 Observação: {obs}",
+            $"✅ Expense registered!\n\n" +
+            $"📂 Category: {category}\n" +
+            $"💰 Amount: ${amount}\n" +
+            $"📝 Note: {note}",
             ct);
 
         return StepResult.Complete();
@@ -173,33 +175,33 @@ public sealed class ObservacaoDespesaStep : IConversationStep
 }
 ```
 
-#### Registro no DI
+#### DI registration
 
 ```csharp
 // Program.cs
-builder.Services.AddSingleton<ITopicHandler, DespesaHandler>();
-builder.Services.AddSingleton<IConversationStep, CategoriaDespesaStep>();
-builder.Services.AddSingleton<IConversationStep, ValorDespesaStep>();
-builder.Services.AddSingleton<IConversationStep, ObservacaoDespesaStep>();
+builder.Services.AddSingleton<ITopicHandler, ExpenseHandler>();
+builder.Services.AddSingleton<IConversationStep, ExpenseCategoryStep>();
+builder.Services.AddSingleton<IConversationStep, ExpenseAmountStep>();
+builder.Services.AddSingleton<IConversationStep, ExpenseNoteStep>();
 
-builder.Services.AddBotFoundry("SEU_TOKEN_AQUI");
+builder.Services.AddBotFoundry("YOUR_TOKEN_HERE");
 ```
 
-> **Como a sessão funciona:** cada step lê e escreve em `ctx.Session` — um dicionário por usuário que persiste entre mensagens. O step 3 lê os valores gravados pelos steps 1 e 2 sem que o usuário precise reenviar nada.
+> **How the session works:** each step reads and writes to `ctx.Session`, a per-user dictionary that persists between messages. Step 3 reads the values saved by steps 1 and 2 without requiring the user to send anything again.
 
 ---
 
-## 🔌 Extensões opcionais
+## 🔌 Optional extensions
 
-Todos os contratos abaixo são opcionais. Registre apenas os que o seu bot precisar.
+All of the contracts below are optional. Register only the ones your bot needs.
 
-| Contrato | Quando usar |
+| Contract | When to use |
 |---|---|
-| `ISessionStore` | Persistir sessões além da memória (Redis, SQL). Padrão: in-memory |
-| `IAuthMiddleware` | Restringir acesso por `chatId` ou qualquer outra regra |
-| `ILlmBridge` | Repassar mensagens sem comando ativo para um agente de linguagem |
+| `ISessionStore` | Persist sessions beyond memory (Redis, SQL). Default: in-memory |
+| `IAuthMiddleware` | Restrict access by `chatId` or any other rule |
+| `ILlmBridge` | Forward messages without an active command to a language agent |
 
-### Exemplo — restringir acesso por lista de usuários
+### Example — restrict access with an allowlist
 
 ```csharp
 public sealed class AllowListAuth : IAuthMiddleware
@@ -210,38 +212,35 @@ public sealed class AllowListAuth : IAuthMiddleware
     {
         if (_allowed.Contains(ctx.ChatId)) return true;
 
-        await ctx.SendAsync("⛔ Acesso não autorizado.", ct);
+        await ctx.SendAsync("⛔ Access not authorized.", ct);
         return false;
     }
 }
 ```
 
 ```csharp
-// Registre antes de AddBotFoundry
+// Register before AddBotFoundry
 builder.Services.AddSingleton<IAuthMiddleware, AllowListAuth>();
-builder.Services.AddBotFoundry("SEU_TOKEN_AQUI");
+builder.Services.AddBotFoundry("YOUR_TOKEN_HERE");
 ```
 
 ---
 
-## 📁 Estrutura do repositório
-
-A família pública BotFoundry é limitada a `BotFoundry.Telegram` e ao futuro `BotFoundry.Core`.
-`BotFoundry.Telegram.Abstractions` e `BotFoundry.Telegram.Core` são componentes internos distribuídos junto com o pacote Telegram, não pacotes NuGet públicos independentes.
+## 📁 Repository structure
 
 ```
 src/
-├── BotFoundry.Telegram.Abstractions/   # Contratos públicos (ITopicHandler, IConversationStep, …)
+├── BotFoundry.Telegram.Abstractions/   # Public contracts (ITopicHandler, IConversationStep, …)
 ├── BotFoundry.Telegram.Core/           # Pipeline, router, step runner
-└── BotFoundry.Telegram/                # Adapters Telegram.Bot, DI registration
+└── BotFoundry.Telegram/                # Telegram.Bot adapters, DI registration
 tests/
 └── BotFoundry.Telegram.Tests/          # xUnit + NSubstitute + FluentAssertions
 docs/
-└── architecture/                     # Architecture Doc, Design Doc, ADRs
+└── architecture/                       # Architecture docs, design docs, ADRs
 ```
 
 ---
 
-## 📄 Licença
+## 📄 License
 
 MIT
