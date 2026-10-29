@@ -1,0 +1,82 @@
+name: Publish stable
+
+# Runs when the qa branch is merged into main (promotion after homologation).
+# Bump kind comes from the label on the merged PR: major | minor | (none = patch).
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: publish-stable
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish stable to NuGet
+    runs-on: ubuntu-latest
+    environment: nuget-stable
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve bump kind from PR labels
+        id: bump
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          labels="$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/pulls" --jq '.[].labels[].name' || true)"
+          echo "Labels: ${labels:-<none>}"
+          bump=patch
+          if echo "$labels" | grep -qx 'minor'; then bump=minor; fi
+          if echo "$labels" | grep -qx 'major'; then bump=major; fi
+          echo "kind=$bump" >> "$GITHUB_OUTPUT"
+
+      - name: Compute version
+        id: version
+        run: |
+          version="$(bash .github/scripts/next-version.sh "${{ steps.bump.outputs.kind }}")"
+          echo "Next stable version: $version (${{ steps.bump.outputs.kind }})"
+          echo "value=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore -c Release -p:MinVerVersionOverride=${{ steps.version.outputs.value }}
+
+      - name: Test
+        run: dotnet test --no-build -c Release -p:MinVerVersionOverride=${{ steps.version.outputs.value }}
+
+      - name: Pack
+        run: dotnet pack src/BotFoundry.Telegram/BotFoundry.Telegram.csproj --no-build -c Release -p:MinVerVersionOverride=${{ steps.version.outputs.value }} -o ./nupkg
+
+      - name: Push
+        run: dotnet nuget push ./nupkg/*.nupkg --source https://api.nuget.org/v3/index.json --api-key "${{ secrets.NUGET_API_KEY }}" --skip-duplicate
+
+      # Tag the qa tip (second parent of the merge commit) so it is reachable from
+      # both main and qa. MinVer on qa then computes the next alphas from this tag.
+      - name: Tag release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v${{ steps.version.outputs.value }}"
+          target="$(git rev-parse HEAD^2 2>/dev/null || git rev-parse HEAD)"
+          gh api "repos/${{ github.repository }}/git/refs" -f ref="refs/tags/$tag" -f sha="$target"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "v${{ steps.version.outputs.value }}" --title "v${{ steps.version.outputs.value }}" --generate-notes ./nupkg/*.nupkg

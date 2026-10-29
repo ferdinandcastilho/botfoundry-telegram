@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [qa, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  # Required check on main: only the qa branch may be promoted to main.
+  verify-source-branch:
+    name: Verify source branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Only qa can target main
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_REF: ${{ github.head_ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          THIS_REPO: ${{ github.repository }}
+        run: |
+          if [ "$BASE_REF" = "main" ]; then
+            if [ "$HEAD_REF" != "qa" ] || [ "$HEAD_REPO" != "$THIS_REPO" ]; then
+              echo "::error::Pull requests to main must come from the qa branch of this repository."
+              exit 1
+            fi
+          fi
+          echo "OK: $HEAD_REPO:$HEAD_REF -> $BASE_REF"
+
+  build-and-test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore -c Release
+
+      - name: Test
+        run: dotnet test --no-build -c Release
