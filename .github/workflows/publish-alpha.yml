@@ -1,16 +1,24 @@
-name: Publish NuGet Package
+name: Publish alpha
+
+# Runs when a pull request is merged into qa (homologation).
+# Version is computed by MinVer: <next patch>-alpha.0.<commit height>.
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [qa]
 
 permissions:
   contents: read
 
+concurrency:
+  group: publish-alpha
+  cancel-in-progress: false
+
 jobs:
   publish:
+    name: Publish alpha to NuGet
     runs-on: ubuntu-latest
+    environment: nuget-alpha
 
     steps:
       - name: Checkout
@@ -31,10 +39,6 @@ jobs:
 
       - name: Test
         run: dotnet test --no-build -c Release
-
-      - name: Verificar se a tag está em main
-        if: startsWith(github.ref, 'refs/tags/')
-        run: git fetch origin main && git merge-base --is-ancestor ${{ github.sha }} origin/main || exit 1
 
       - name: Pack
         run: dotnet pack src/BotFoundry.Telegram/BotFoundry.Telegram.csproj --no-build -c Release -o ./nupkg
