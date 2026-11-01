@@ -108,7 +108,7 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     </svg>
     <div>
       <div class="logo-text">BotFoundry.Telegram</div>
-      <div class="logo-sub">Infrastructure Adapters — Referência</div>
+      <div class="logo-sub">Infrastructure Adapters — Reference</div>
     </div>
   </div>
   <button class="tbtn" data-tt><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
@@ -122,26 +122,26 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
       <span class="badge bpu">Hexagonal</span>
     </div>
     <h1>Infrastructure Adapters</h1>
-    <p>Os três adapters que a lib entrega prontos — a "casca" do hexágono. São os únicos pontos de contato com o mundo externo: SDK Telegram, memória e DI. O núcleo nunca os referencia diretamente.</p>
+    <p>The three adapters the library ships ready to use — the "shell" of the hexagon. They are the only points of contact with the outside world: the Telegram SDK, memory and DI. The core never references them directly.</p>
   </div>
 
   <!-- TREE -->
-  <div class="divider"><h2>Estrutura do Projeto</h2></div>
+  <div class="divider"><h2>Project Structure</h2></div>
   <div class="tree-wrap">
-    <div class="tree-hdr"><span>src/BotFoundry.Telegram/</span><span class="badge bo">único projeto que usa Telegram.Bot SDK</span></div>
+    <div class="tree-hdr"><span>src/BotFoundry.Telegram/</span><span class="badge bo">only project that uses the Telegram.Bot SDK</span></div>
     <div class="tree-body"><pre><span class="t-dir">BotFoundry.Telegram/</span>
 ├── <span class="t-dir">Adapters/</span>
 │   ├── <span class="t-adapter">InMemorySessionStore.cs</span>      <span class="t-cm">← driven adapter — ISessionStore (ADR-002)</span>
 │   ├── <span class="t-adapter">TelegramMessageSender.cs</span>     <span class="t-cm">← driven adapter — IMessageSender (ADR-003)</span>
 │   └── <span class="t-adapter">TelegramPollingAdapter.cs</span>    <span class="t-cm">← driving adapter — IHostedService</span>
 ├── <span class="t-dir">DependencyInjection/</span>
-│   └── <span class="t-di">BotFoundryServiceCollectionExtensions.cs</span>   <span class="t-cm">← entry point público</span>
+│   └── <span class="t-di">BotFoundryServiceCollectionExtensions.cs</span>   <span class="t-cm">← public entry point</span>
 └── <span class="t-dir">BotFoundry.Telegram.csproj</span></pre>
     </div>
   </div>
 
   <!-- FLOW DIAGRAM -->
-  <div class="divider"><h2>Posição no Hexágono</h2></div>
+  <div class="divider"><h2>Position in the Hexagon</h2></div>
   <div class="flow-wrap">
     <div class="flow">
       <div class="flow-row">
@@ -175,7 +175,7 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
         <div class="fb fb-adapter">TelegramMessageSender<br><span style="font-size:.65rem;opacity:.8">Driven Adapter</span></div>
       </div>
       <div class="flow-row">
-        <div class="fb fb-core">NÚCLEO (Core)<br><span style="font-size:.65rem;opacity:.8">Pipeline · Routing · Session · StepRunner</span></div>
+        <div class="fb fb-core">CORE<br><span style="font-size:.65rem;opacity:.8">Pipeline · Routing · Session · StepRunner</span></div>
         <div style="width:2rem"></div>
         <div class="farr" style="transform:rotate(180deg)"><div class="farr-line"></div><span>▼</span></div>
       </div>
@@ -186,14 +186,14 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
       </div>
     </div>
     <div class="flow-legend">
-      <div class="fl-item"><div class="fl-dot" style="background:var(--o)"></div>Adapters (esta task)</div>
-      <div class="fl-item"><div class="fl-dot" style="background:var(--p)"></div>Ports (Abstractions — já implementados)</div>
-      <div class="fl-item"><div class="fl-dot" style="background:var(--pu)"></div>Core (próxima task)</div>
+      <div class="fl-item"><div class="fl-dot" style="background:var(--o)"></div>Adapters (this task)</div>
+      <div class="fl-item"><div class="fl-dot" style="background:var(--p)"></div>Ports (Abstractions — already implemented)</div>
+      <div class="fl-item"><div class="fl-dot" style="background:var(--pu)"></div>Core (next task)</div>
     </div>
   </div>
 
   <!-- TABS -->
-  <div class="divider"><h2>Código C#</h2></div>
+  <div class="divider"><h2>C# Code</h2></div>
   <div class="tabs">
     <button class="tab active" data-tab="session">InMemorySessionStore</button>
     <button class="tab" data-tab="sender">TelegramMessageSender</button>
@@ -209,7 +209,7 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
         <span class="badge bo">Driven Adapter</span>
       </div>
       <div class="fc-body">
-        <div class="fc-desc">Implementação padrão de <code>ISessionStore</code> usando <code>ConcurrentDictionary</code> para acesso concorrente sem locks explícitos. Registrada automaticamente se o consumidor não registrar outra implementação (ADR-002).</div>
+        <div class="fc-desc">Default implementation of <code>ISessionStore</code> using <code>ConcurrentDictionary</code> for concurrent access without explicit locks. Registered automatically if the consumer does not register another implementation (ADR-002).</div>
         <div class="code-wrap"><pre><span class="kw">namespace</span> <span class="tp">BotFoundry.Telegram.Adapters</span>;
 
 <span class="kw">internal sealed class</span> <span class="tp">InMemorySessionStore</span> : <span class="tp">ISessionStore</span>
@@ -235,8 +235,8 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     }
 }</pre></div>
         <div class="cb-box cb-o">
-          <div class="cb-label" style="color:var(--o)">Conceito — internal + Driven Adapter (ADR-002)</div>
-          <div class="cb-text"><code>internal</code> garante que o consumidor não acessa este tipo diretamente — só via <code>ISessionStore</code>. O <code>ConcurrentDictionary</code> garante thread-safety para múltiplas mensagens simultâneas de um mesmo bot sem gerenciamento manual de locks.</div>
+          <div class="cb-label" style="color:var(--o)">Concept — internal + Driven Adapter (ADR-002)</div>
+          <div class="cb-text"><code>internal</code> ensures the consumer does not access this type directly — only through <code>ISessionStore</code>. O <code>ConcurrentDictionary</code> guarantees thread safety for multiple simultaneous messages of the same bot without manual lock management.</div>
         </div>
       </div>
     </div>
@@ -250,7 +250,7 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
         <span class="badge bp">Driven Adapter — SDK</span>
       </div>
       <div class="fc-body">
-        <div class="fc-desc">Único arquivo da lib que usa <code>Telegram.Bot</code>. Implementa <code>IMessageSender</code> delegando ao <code>ITelegramBotClient</code> do SDK. Todo o resto da lib usa apenas a interface.</div>
+        <div class="fc-desc">The only file in the library that uses <code>Telegram.Bot</code>. Implements <code>IMessageSender</code> delegating to <code>ITelegramBotClient</code> of the SDK. The rest of the library uses only the interface.</div>
         <div class="code-wrap"><pre><span class="kw">using</span> <span class="tp">Telegram.Bot</span>;
 <span class="kw">using</span> <span class="tp">Telegram.Bot.Types.ReplyMarkups</span>;
 
@@ -287,8 +287,8 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     }
 }</pre></div>
         <div class="cb-box cb-p">
-          <div class="cb-label" style="color:var(--p)">Conceito — ADR-003 (isolamento do SDK)</div>
-          <div class="cb-text">O único <code>using Telegram.Bot</code> de toda a lib está aqui. Se o SDK sofrer breaking change, a correção fica contida neste único arquivo — o Core e o consumidor não são afetados.</div>
+          <div class="cb-label" style="color:var(--p)">Concept — ADR-003 (SDK isolation)</div>
+          <div class="cb-text">The only <code>using Telegram.Bot</code> in the whole library is here. If the SDK has a breaking change, the fix stays contained in this single file — the Core and the consumer are not affected.</div>
         </div>
       </div>
     </div>
@@ -302,7 +302,7 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
         <span class="badge bs">Driving Adapter</span>
       </div>
       <div class="fc-body">
-        <div class="fc-desc">Hosted service que mantém o loop de long polling com o Telegram. Recebe updates do SDK, traduz para <code>BotContext</code> e aciona o pipeline do Core. É o único ponto de entrada de mensagens na lib.</div>
+        <div class="fc-desc">Hosted service that keeps the long polling loop with Telegram. Receives updates from the SDK, translates them into <code>BotContext</code> and triggers the Core pipeline. It is the only message entry point in the library.</div>
         <div class="code-wrap"><pre><span class="kw">using</span> <span class="tp">Telegram.Bot</span>;
 <span class="kw">using</span> <span class="tp">Telegram.Bot.Polling</span>;
 <span class="kw">using</span> <span class="tp">Telegram.Bot.Types</span>;
@@ -318,7 +318,7 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     <span class="kw">private readonly</span> <span class="tp">ISessionStore</span>       _sessionStore;
     <span class="kw">private readonly</span> <span class="tp">ILogger</span>&lt;<span class="tp">TelegramPollingAdapter</span>&gt; _logger;
 
-    <span class="cm">// ... construtor via DI ...</span>
+    <span class="cm">// ... constructor via DI ...</span>
 
     <span class="kw">public</span> <span class="tp">Task</span> <span class="fn">StartAsync</span>(<span class="tp">CancellationToken</span> ct)
     {
@@ -344,7 +344,7 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
         <span class="tp">Update</span> update,
         <span class="tp">CancellationToken</span> ct)
     {
-        <span class="cm">// Filtra: apenas mensagens de texto</span>
+        <span class="cm">// Filter: text messages only</span>
         <span class="kw">if</span> (update.Message?.Text <span class="kw">is not</span> { } text) <span class="kw">return</span>;
 
         <span class="kw">var</span> chatId  = update.Message.Chat.Id;
@@ -352,7 +352,7 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
                       ?? <span class="kw">new</span> <span class="tp">UserSession</span> { ChatId = chatId,
                              ExpiresAt = <span class="tp">DateTimeOffset</span>.UtcNow.<span class="fn">AddHours</span>(<span class="nm">24</span>) };
 
-        <span class="cm">// Tradução: Update (SDK) → BotContext (lib)</span>
+        <span class="cm">// Translation: Update (SDK) → BotContext (lib)</span>
         <span class="kw">var</span> context = <span class="kw">new</span> <span class="tp">BotContext</span>
         {
             ChatId  = chatId,
@@ -374,8 +374,8 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     }
 }</pre></div>
         <div class="cb-box cb-s">
-          <div class="cb-label" style="color:var(--s)">Conceito — Driving Adapter + Modelo de Fronteira</div>
-          <div class="cb-text">Este adapter faz a tradução <code>Update (SDK) → BotContext (lib)</code>. Depois disso, o objeto <code>Update</code> nunca mais aparece — o Core só enxerga <code>BotContext</code>. É aqui que o mundo externo "entra" no hexágono.</div>
+          <div class="cb-label" style="color:var(--s)">Concept — Driving Adapter + Boundary Model</div>
+          <div class="cb-text">This adapter performs the translation <code>Update (SDK) → BotContext (lib)</code>. After that, the object <code>Update</code> never appears again — the Core only sees <code>BotContext</code>. This is where the outside world "enters" the hexagon.</div>
         </div>
       </div>
     </div>
@@ -386,10 +386,10 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     <div class="file-card">
       <div class="fc-header">
         <div class="fc-path"><div class="fc-dot" style="background:var(--s)"></div>DependencyInjection/BotFoundryServiceCollectionExtensions.cs</div>
-        <span class="badge bs">Entry Point Público</span>
+        <span class="badge bs">Public Entry Point</span>
       </div>
       <div class="fc-body">
-        <div class="fc-desc">Único tipo <code>public</code> deste projeto. Registra todos os serviços internos da lib no DI do .NET. O consumidor chama apenas <code>AddBotFoundry()</code> no <code>Program.cs</code> — sem conhecer nenhum tipo interno.</div>
+        <div class="fc-desc">The only <code>public</code> type of this project. Registers all the library's internal services in the .NET DI. The consumer only calls <code>AddBotFoundry()</code> in <code>Program.cs</code> — without knowing any internal type.</div>
         <div class="code-wrap"><pre><span class="kw">namespace</span> <span class="tp">BotFoundry.Telegram.DependencyInjection</span>;
 
 <span class="kw">public static class</span> <span class="tp">BotFoundryServiceCollectionExtensions</span>
@@ -405,17 +405,17 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
         services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ITelegramBotClient</span>&gt;(
             <span class="kw">new</span> <span class="tp">TelegramBotClient</span>(options.Token));
 
-        <span class="cm">// Driven adapters de infraestrutura</span>
+        <span class="cm">// Infrastructure driven adapters</span>
         services.<span class="fn">AddSingleton</span>&lt;<span class="tp">IMessageSender</span>, <span class="tp">TelegramMessageSender</span>&gt;();
 
-        <span class="cm">// ISessionStore: só registra fallback se consumidor não registrou antes</span>
+        <span class="cm">// ISessionStore: registers the fallback only if the consumer has not registered one before</span>
         <span class="kw">if</span> (!services.<span class="fn">Any</span>(d => d.ServiceType == <span class="kw">typeof</span>(<span class="tp">ISessionStore</span>)))
             services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore</span>, <span class="tp">InMemorySessionStore</span>&gt;();
 
-        <span class="cm">// Core (pipeline — a implementar na próxima task)</span>
+        <span class="cm">// Core (pipeline — to be implemented in the next task)</span>
         services.<span class="fn">AddSingleton</span>&lt;<span class="tp">IBotPipeline</span>, <span class="tp">BotPipeline</span>&gt;();
 
-        <span class="cm">// Driving adapter — mantém o loop de polling</span>
+        <span class="cm">// Driving adapter — keeps the polling loop</span>
         services.<span class="fn">AddHostedService</span>&lt;<span class="tp">TelegramPollingAdapter</span>&gt;();
 
         <span class="kw">return</span> services;
@@ -428,33 +428,33 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     <span class="kw">public</span> <span class="tp">TimeSpan</span> SessionExpiry { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="tp">TimeSpan</span>.<span class="fn">FromHours</span>(<span class="nm">24</span>);
 }</pre></div>
         <div class="cb-box cb-s">
-          <div class="cb-label" style="color:var(--s)">Conceito — Convenção DI (ADR-002)</div>
-          <div class="cb-text">A verificação <code>services.Any(d => d.ServiceType == typeof(ISessionStore))</code> é o mecanismo de fallback — o consumidor registra seu store <em>antes</em> de chamar <code>AddBotFoundry()</code> e a lib respeita a escolha.</div>
+          <div class="cb-label" style="color:var(--s)">Concept — DI Convention (ADR-002)</div>
+          <div class="cb-text">The check <code>services.Any(d => d.ServiceType == typeof(ISessionStore))</code> is the fallback mechanism — the consumer registers their store <em>before</em> calling <code>AddBotFoundry()</code> and the library respects the choice.</div>
         </div>
         <div class="cb-box cb-re" style="margin-top:.75rem">
-          <div class="cb-label" style="color:var(--re)">Atenção — dependência futura</div>
-          <div class="cb-text"><code>BotPipeline</code> e <code>IBotPipeline</code> ainda não existem — serão criados na próxima task (Core). Por ora, deixe o registro comentado ou use um placeholder para que o build passe.</div>
+          <div class="cb-label" style="color:var(--re)">Attention — future dependency</div>
+          <div class="cb-text"><code>BotPipeline</code> and <code>IBotPipeline</code> do not exist yet — they will be created in the next task (Core). For now, leave the registration commented out or use a placeholder so the build passes.</div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- RULES -->
-  <div class="divider"><h2>Regras desta Task</h2></div>
+  <div class="divider"><h2>Rules of this Task</h2></div>
   <div class="rule-card">
     <div class="rule-num">REGRA 01</div>
-    <div class="rule-title">Todos os adapters são <code>internal</code></div>
-    <div class="rule-desc">Apenas <code>BotFoundryServiceCollectionExtensions</code> e <code>BotFoundryOptions</code> são <code>public</code>. O consumidor nunca instancia um adapter diretamente — só via DI.</div>
+    <div class="rule-title">All adapters are <code>internal</code></div>
+    <div class="rule-desc">Only <code>BotFoundryServiceCollectionExtensions</code> and <code>BotFoundryOptions</code> are <code>public</code>. The consumer never instantiates an adapter directly — only through DI.</div>
   </div>
   <div class="rule-card">
     <div class="rule-num">REGRA 02</div>
-    <div class="rule-title"><code>using Telegram.Bot</code> só em dois arquivos</div>
-    <div class="rule-desc"><code>TelegramMessageSender.cs</code> e <code>TelegramPollingAdapter.cs</code> são os únicos que podem importar o SDK. Nenhum outro arquivo do projeto deve referenciar tipos do <code>Telegram.Bot</code>.</div>
+    <div class="rule-title"><code>using Telegram.Bot</code> only in two files</div>
+    <div class="rule-desc"><code>TelegramMessageSender.cs</code> e <code>TelegramPollingAdapter.cs</code> are the only ones allowed to import the SDK. No other file in the project may reference types from <code>Telegram.Bot</code>.</div>
   </div>
   <div class="rule-card">
     <div class="rule-num">REGRA 03</div>
-    <div class="rule-title">Registro de <code>IBotPipeline</code> fica comentado</div>
-    <div class="rule-desc"><code>BotPipeline</code> ainda não existe. Deixe a linha de registro comentada no DI para que o <code>dotnet build</code> passe sem erros. Será descomentada na task do Core.</div>
+    <div class="rule-title">Registration of <code>IBotPipeline</code> stays commented out</div>
+    <div class="rule-desc"><code>BotPipeline</code> does not exist yet. Leave the registration line commented out in DI so that <code>dotnet build</code> passes without errors. It will be uncommented in the Core task.</div>
   </div>
 
 </main>

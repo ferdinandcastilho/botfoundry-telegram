@@ -2,6 +2,7 @@ using System.Reflection;
 using BotFoundry.Telegram.Abstractions.Models;
 using BotFoundry.Telegram.Abstractions.Ports;
 using BotFoundry.Telegram.Adapters;
+using BotFoundry.Telegram.DependencyInjection;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Telegram.Bot;
@@ -58,7 +59,7 @@ namespace BotFoundry.Telegram.Tests.Adapters
         }
 
         [Fact]
-        public async Task HandleUpdateAsync_WhenSessionDoesNotExist_CreatesSessionExpiringInTwentyFourHours()
+        public async Task HandleUpdateAsync_WhenSessionDoesNotExist_CreatesSessionWithDefaultExpiry()
         {
             var before = DateTimeOffset.UtcNow;
             var pipeline = new FakeBotPipeline();
@@ -74,7 +75,60 @@ namespace BotFoundry.Telegram.Tests.Adapters
         }
 
         [Fact]
-        public async Task HandleUpdateAsync_WhenSessionIsNotExpired_SavesSession()
+        public async Task HandleUpdateAsync_UsesConfiguredSessionExpiry()
+        {
+            var before = DateTimeOffset.UtcNow;
+            var pipeline = new FakeBotPipeline();
+            var options = new BotFoundryOptions { SessionExpiry = TimeSpan.FromMinutes(5) };
+            var adapter = CreateAdapter(pipeline, new FakeSessionStore(), options);
+
+            await InvokeHandleUpdateAsync(adapter, TextUpdate(123, "hello"));
+
+            var session = pipeline.SingleContext().Session;
+            session.ExpiresAt.Should().BeOnOrAfter(before.AddMinutes(5));
+            session.ExpiresAt.Should().BeOnOrBefore(DateTimeOffset.UtcNow.AddMinutes(5));
+        }
+
+        [Fact]
+        public async Task HandleUpdateAsync_WhenSessionIsActive_RenewsExpiration()
+        {
+            var existingSession = new UserSession { ChatId = 123, ExpiresAt = DateTimeOffset.UtcNow.AddMinutes(1) };
+            var pipeline = new FakeBotPipeline();
+            var sessionStore = new FakeSessionStore { SessionToReturn = existingSession };
+            var adapter = CreateAdapter(pipeline, sessionStore);
+
+            await InvokeHandleUpdateAsync(adapter, TextUpdate(123, "hello"));
+
+            existingSession.ExpiresAt.Should().BeAfter(DateTimeOffset.UtcNow.AddHours(23));
+            sessionStore.DeletedChatIds.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task HandleUpdateAsync_WhenSessionIsExpired_DeletesItAndStartsNewSessionWithoutActiveFlow()
+        {
+            var expiredSession = new UserSession
+            {
+                ChatId = 123,
+                ExpiresAt = DateTimeOffset.UtcNow.AddSeconds(-1),
+                ActiveTopic = "order",
+                ActiveStepId = "ask-name"
+            };
+            var pipeline = new FakeBotPipeline();
+            var sessionStore = new FakeSessionStore { SessionToReturn = expiredSession };
+            var adapter = CreateAdapter(pipeline, sessionStore);
+
+            await InvokeHandleUpdateAsync(adapter, TextUpdate(123, "hello"));
+
+            sessionStore.DeletedChatIds.Should().ContainSingle().Which.Should().Be(123);
+            var session = pipeline.SingleContext().Session;
+            session.Should().NotBeSameAs(expiredSession);
+            session.HasActiveFlow.Should().BeFalse();
+            session.ActiveStepId.Should().BeNull();
+            session.IsExpired.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task HandleUpdateAsync_DoesNotSaveSession_BecauseThePipelinePersistsIt()
         {
             var pipeline = new FakeBotPipeline();
             var sessionStore = new FakeSessionStore();
@@ -82,33 +136,15 @@ namespace BotFoundry.Telegram.Tests.Adapters
 
             await InvokeHandleUpdateAsync(adapter, TextUpdate(123, "hello"));
 
-            sessionStore.SavedSessions.Should().ContainSingle();
-            sessionStore.SavedSessions.Single().ChatId.Should().Be(123);
-            sessionStore.DeletedChatIds.Should().BeEmpty();
-        }
-
-        [Fact]
-        public async Task HandleUpdateAsync_WhenSessionIsExpiredAfterProcessing_DeletesSession()
-        {
-            var pipeline = new FakeBotPipeline
-            {
-                OnProcess = context =>
-                    context.Session.ExpiresAt = DateTimeOffset.UtcNow.AddSeconds(-1)
-            };
-            var sessionStore = new FakeSessionStore();
-            var adapter = CreateAdapter(pipeline, sessionStore);
-
-            await InvokeHandleUpdateAsync(adapter, TextUpdate(123, "hello"));
-
-            sessionStore.DeletedChatIds.Should().ContainSingle().Which.Should().Be(123);
             sessionStore.SavedSessions.Should().BeEmpty();
         }
 
         [Fact]
         public async Task HandleUpdateAsync_PropagatesCancellationTokenToPipelineAndStore()
         {
+            var expiredSession = new UserSession { ChatId = 123, ExpiresAt = DateTimeOffset.UtcNow.AddSeconds(-1) };
             var pipeline = new FakeBotPipeline();
-            var sessionStore = new FakeSessionStore();
+            var sessionStore = new FakeSessionStore { SessionToReturn = expiredSession };
             var adapter = CreateAdapter(pipeline, sessionStore);
             using var cts = new CancellationTokenSource();
 
@@ -116,7 +152,7 @@ namespace BotFoundry.Telegram.Tests.Adapters
 
             pipeline.LastCancellationToken.Should().Be(cts.Token);
             sessionStore.GetCancellationToken.Should().Be(cts.Token);
-            sessionStore.SaveCancellationToken.Should().Be(cts.Token);
+            sessionStore.DeleteCancellationToken.Should().Be(cts.Token);
         }
 
         [Fact]
@@ -130,12 +166,14 @@ namespace BotFoundry.Telegram.Tests.Adapters
 
         private static TelegramPollingAdapter CreateAdapter(
             FakeBotPipeline pipeline,
-            FakeSessionStore sessionStore)
+            FakeSessionStore sessionStore,
+            BotFoundryOptions? options = null)
             => new(
                 new FakeTelegramBotClient(),
                 pipeline,
                 new FakeMessageSender(),
                 sessionStore,
+                options ?? new BotFoundryOptions(),
                 NullLogger<TelegramPollingAdapter>.Instance);
 
         private static Update TextUpdate(long chatId, string text)

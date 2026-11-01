@@ -2,6 +2,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using BotFoundry.Telegram.Abstractions.Ports;
 using BotFoundry.Telegram.Abstractions.Models;
+using BotFoundry.Telegram.DependencyInjection;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -14,6 +15,7 @@ namespace BotFoundry.Telegram.Adapters
         IBotPipeline pipeline,
         IMessageSender sender,
         ISessionStore sessionStore,
+        BotFoundryOptions options,
         ILogger<TelegramPollingAdapter> logger) : IHostedService
     {
         public Task StartAsync(CancellationToken ct)
@@ -31,17 +33,22 @@ namespace BotFoundry.Telegram.Adapters
             if (update.Message?.Text is not { } text) return;
 
             var chatId = update.Message.Chat.Id;
-            var session = await sessionStore.GetAsync(chatId, ct)
-                          ?? new UserSession { ChatId = chatId, ExpiresAt = DateTimeOffset.UtcNow.AddHours(24) };
+            var session = await sessionStore.GetAsync(chatId, ct);
+
+            // An expired session is discarded before the context is built, so it can never resume an old flow.
+            if (session is not null && session.IsExpired)
+            {
+                await sessionStore.DeleteAsync(chatId, ct);
+                session = null;
+            }
+
+            session ??= new UserSession { ChatId = chatId };
+            session.ExpiresAt = DateTimeOffset.UtcNow.Add(options.SessionExpiry);
 
             var context = new BotContext { ChatId = chatId, Text = text, Session = session, Sender = sender };
 
+            // The pipeline persists the session (or skips it when access is denied).
             await pipeline.ProcessAsync(context, ct);
-
-            if (session.IsExpired)
-                await sessionStore.DeleteAsync(chatId, ct);
-            else
-                await sessionStore.SaveAsync(session, ct);
         }
 
         private Task HandleErrorAsync(ITelegramBotClient _, Exception ex, CancellationToken ct)

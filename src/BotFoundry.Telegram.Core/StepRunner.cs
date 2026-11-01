@@ -15,7 +15,7 @@ namespace BotFoundry.Telegram.Core
 
             if (stepId is null || !_steps.TryGetValue(stepId, out var step))
             {
-                logger.LogWarning("Step não encontrado: {StepId}. Limpando fluxo.", stepId);
+                logger.LogWarning("Step not found: {StepId}. Clearing conversation flow.", stepId);
                 context.Session.ClearFlow();
                 return;
             }
@@ -41,7 +41,7 @@ namespace BotFoundry.Telegram.Core
                     break;
                 case StepResultKind.Continue:
                 default:
-                    // ActiveStepId deve ser atualizado pelo step em ProcessAsync
+                    // The step must update ActiveStepId in ProcessAsync
                     break;
             }
         }

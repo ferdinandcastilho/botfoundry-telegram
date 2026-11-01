@@ -565,7 +565,7 @@
         </svg>
         <div>
           <div class="logo-text">BotFoundry.Telegram</div>
-          <div class="logo-sub">Core Pipeline — Referência</div>
+          <div class="logo-sub">Core Pipeline — Reference</div>
         </div>
       </div>
       <button class="tbtn" data-tt>
@@ -599,30 +599,28 @@
         </div>
         <h1>BotFoundry.Telegram.Core</h1>
         <p>
-          O núcleo do hexágono — orquestra mensagens, roteamento de comandos,
-          execução de fluxos multi-step e fallback para LLM. Depende apenas de
-          Abstractions; nunca referencia SDK ou infraestrutura.
+          The core of the hexagon — orchestrates messages, command routing, multi-step flow execution and LLM fallback. Depends only on Abstractions; never references the SDK or infrastructure.
         </p>
       </div>
 
       <!-- TREE -->
-      <div class="divider"><h2>Estrutura do Projeto</h2></div>
+      <div class="divider"><h2>Project Structure</h2></div>
       <div class="tree-wrap">
         <div class="tree-hdr">
           <span>src/BotFoundry.Telegram.Core/</span
-          ><span class="badge bpu">zero dependência de SDK</span>
+          ><span class="badge bpu">zero SDK dependency</span>
         </div>
         <div class="tree-body">
           <pre><span class="t-dir">BotFoundry.Telegram.Core/</span>
-├── <span class="t-core">IBotPipeline.cs</span>          <span class="t-cm">← driving port — contrato do pipeline</span>
-├── <span class="t-core">BotPipeline.cs</span>           <span class="t-cm">← orquestrador principal</span>
-├── <span class="t-core">CommandRouter.cs</span>         <span class="t-cm">← seleciona o ITopicHandler correto</span>
-└── <span class="t-core">StepRunner.cs</span>            <span class="t-cm">← executa fluxos multi-step</span></pre>
+├── <span class="t-core">IBotPipeline.cs</span>          <span class="t-cm">← driving port — pipeline contract</span>
+├── <span class="t-core">BotPipeline.cs</span>           <span class="t-cm">← main orchestrator</span>
+├── <span class="t-core">CommandRouter.cs</span>         <span class="t-cm">← selects the right ITopicHandler</span>
+└── <span class="t-core">StepRunner.cs</span>            <span class="t-cm">← runs multi-step flows</span></pre>
         </div>
       </div>
 
       <!-- PIPELINE FLOW -->
-      <div class="divider"><h2>Fluxo de Decisão do Pipeline</h2></div>
+      <div class="divider"><h2>Pipeline Decision Flow</h2></div>
       <div class="flow-wrap">
         <div class="flow-steps">
           <div class="flow-step">
@@ -631,11 +629,10 @@
               <div class="flow-line"></div>
             </div>
             <div class="flow-content">
-              <div class="flow-title">Auth (opcional)</div>
+              <div class="flow-title">Auth (optional)</div>
               <div class="flow-desc">
-                Se <code>IAuthMiddleware</code> estiver registrado no DI, chama
-                <code>IsAllowedAsync</code>. Se retornar <code>false</code>,
-                pipeline encerra sem invocar handlers.
+                Se <code>IAuthMiddleware</code> is registered in DI, calls
+                <code>IsAllowedAsync</code>. If it returns <code>false</code>, the pipeline stops without invoking handlers.
               </div>
             </div>
           </div>
@@ -645,12 +642,11 @@
               <div class="flow-line"></div>
             </div>
             <div class="flow-content">
-              <div class="flow-title">Step ativo? → StepRunner</div>
+              <div class="flow-title">Active step? → StepRunner</div>
               <div class="flow-desc">
-                Se <code>session.HasActiveFlow</code>, delega ao
-                <code>StepRunner</code>. O runner executa
-                <code>ValidateAsync → ProcessAsync</code> e atualiza a sessão
-                com o próximo step ou limpa o fluxo.
+                If <code>session.HasActiveFlow</code>, it delegates to
+                <code>StepRunner</code>. The runner runs
+                <code>ValidateAsync → ProcessAsync</code> and updates the session with the next step or clears the flow.
               </div>
             </div>
           </div>
@@ -660,12 +656,12 @@
               <div class="flow-line"></div>
             </div>
             <div class="flow-content">
-              <div class="flow-title">Comando? → CommandRouter</div>
+              <div class="flow-title">Command? → CommandRouter</div>
               <div class="flow-desc">
-                Se a mensagem começa com <code>/</code>, o
-                <code>CommandRouter</code> identifica o handler registrado pelo
-                <code>Command</code> e invoca <code>HandleAsync</code>. Retorno
-                <code>FlowResult.Continue</code> grava o fluxo na sessão.
+                If the message starts with <code>/</code>, the
+                <code>CommandRouter</code> identifies the handler registered by
+                <code>Command</code> and invokes <code>HandleAsync</code>. A return of
+                <code>FlowResult.Continue</code> stores the flow in the session.
               </div>
             </div>
           </div>
@@ -675,22 +671,19 @@
               <div class="flow-line"></div>
             </div>
             <div class="flow-content">
-              <div class="flow-title">Texto livre → ILlmBridge (opcional)</div>
+              <div class="flow-title">Free text → ILlmBridge (optional)</div>
               <div class="flow-desc">
-                Se <code>ILlmBridge</code> estiver registrado, repassa a
-                mensagem e envia a resposta ao usuário. Se não estiver
-                registrado, ignora silenciosamente.
+                Se <code>ILlmBridge</code> is registered, forwards the message and sends the reply to the user. If it is not registered, it silently ignores the message.
               </div>
             </div>
           </div>
           <div class="flow-step">
             <div class="flow-num"><div class="flow-circle fc-re">5</div></div>
             <div class="flow-content">
-              <div class="flow-title">Salva sessão</div>
+              <div class="flow-title">Saves session</div>
               <div class="flow-desc">
-                Ao final de qualquer ramo, o pipeline chama
-                <code>ISessionStore.SaveAsync</code> para persistir o estado
-                atualizado da sessão.
+                At the end of any branch, the pipeline calls
+                <code>ISessionStore.SaveAsync</code> to persist the updated session state, unless access was denied.
               </div>
             </div>
           </div>
@@ -698,7 +691,7 @@
       </div>
 
       <!-- TABS -->
-      <div class="divider"><h2>Código C#</h2></div>
+      <div class="divider"><h2>C# Code</h2></div>
       <div class="tabs">
         <button class="tab active" data-tab="iface">IBotPipeline</button>
         <button class="tab" data-tab="pipeline">BotPipeline</button>
@@ -718,10 +711,8 @@
           </div>
           <div class="fc-body">
             <div class="fc-desc">
-              Contrato do pipeline — é a interface que o
-              <code>TelegramPollingAdapter</code> usa para acionar o núcleo.
-              Vive no Core porque é o contrato do hexágono do lado conduzido
-              pelo adapter.
+              Pipeline contract — the interface that
+              <code>TelegramPollingAdapter</code> uses to trigger the core. It lives in the Core because it is the contract of the hexagon's driving side, used by the adapter.
             </div>
             <div class="code-wrap">
               <pre><span class="kw">namespace</span> <span class="tp">BotFoundry.Telegram.Core</span>;
@@ -735,13 +726,10 @@
             </div>
             <div class="cb-box cb-pu">
               <div class="cb-label" style="color: var(--pu)">
-                Conceito — Driving Port no Core
+                Concept — Driving Port in the Core
               </div>
               <div class="cb-text">
-                <code>IBotPipeline</code> fica no Core (não em Abstractions)
-                porque é um contrato interno da lib — só o adapter de
-                infraestrutura precisa dele. O consumidor nunca invoca o
-                pipeline diretamente.
+                <code>IBotPipeline</code> lives in the Core (not in Abstractions) because it is an internal contract of the library — only the infrastructure adapter needs it. The consumer never invokes the pipeline directly.
               </div>
             </div>
           </div>
@@ -760,10 +748,8 @@
           </div>
           <div class="fc-body">
             <div class="fc-desc">
-              Implementação central do pipeline. Recebe o
-              <code>BotContext</code>, executa os 5 passos do fluxo de decisão e
-              garante que a sessão seja sempre salva ao final — mesmo em caso de
-              exceção não tratada.
+              Central implementation of the pipeline. Receives the
+              <code>BotContext</code>, runs the 5 steps of the decision flow and guarantees the session is saved at the end — even on an unhandled exception — unless access was denied.
             </div>
             <div class="code-wrap">
               <pre><span class="kw">namespace</span> <span class="tp">BotFoundry.Telegram.Core</span>;
@@ -777,7 +763,7 @@
     <span class="kw">private readonly</span> <span class="tp">ILlmBridge</span>?                  _llm;
     <span class="kw">private readonly</span> <span class="tp">ILogger</span>&lt;<span class="tp">BotPipeline</span>&gt;          _logger;
 
-    <span class="cm">// Injeção via DI — IAuthMiddleware e ILlmBridge são opcionais</span>
+    <span class="cm">// Injected via DI — IAuthMiddleware and ILlmBridge are optional</span>
     <span class="kw">public</span> <span class="tp">BotPipeline</span>(
         <span class="tp">ISessionStore</span>      sessionStore,
         <span class="tp">CommandRouter</span>      router,
@@ -806,7 +792,7 @@
                 <span class="kw">if</span> (!allowed) <span class="kw">return</span>;
             }
 
-            <span class="cm">// 2. Step ativo</span>
+            <span class="cm">// 2. Active step</span>
             <span class="kw">if</span> (context.Session.HasActiveFlow)
             {
                 <span class="kw">await</span> _stepRunner.<span class="fn">ResumeAsync</span>(context, ct);
@@ -820,7 +806,7 @@
                 <span class="kw">return</span>;
             }
 
-            <span class="cm">// 4. Texto livre → LLM</span>
+            <span class="cm">// 4. Free text → LLM</span>
             <span class="kw">if</span> (_llm <span class="kw">is not null</span>)
             {
                 <span class="kw">var</span> reply = <span class="kw">await</span> _llm.<span class="fn">ProcessAsync</span>(context.Text, context, ct);
@@ -829,7 +815,7 @@
         }
         <span class="kw">finally</span>
         {
-            <span class="cm">// 5. Persiste sessão sempre</span>
+            <span class="cm">// 5. Persist the session unless access was denied</span>
             <span class="kw">await</span> _sessionStore.<span class="fn">SaveAsync</span>(context.Session, ct);
         }
     }
@@ -837,12 +823,10 @@
             </div>
             <div class="cb-box cb-pu">
               <div class="cb-label" style="color: var(--pu)">
-                Conceito — finally garante consistência
+                Concept — finally guarantees consistency
               </div>
               <div class="cb-text">
-                O bloco <code>finally</code> garante que a sessão sempre seja
-                salva — mesmo que o handler lance uma exceção não tratada. Isso
-                evita sessões presas em estado corrompido entre mensagens.
+                The <code>finally</code> block guarantees the session is always saved — even if the handler throws an unhandled exception. This avoids sessions stuck in a corrupted state between messages. Chats denied by the auth middleware are the exception: they get no stored session.
               </div>
             </div>
           </div>
@@ -861,10 +845,8 @@
           </div>
           <div class="fc-body">
             <div class="fc-desc">
-              Recebe a coleção de <code>ITopicHandler</code> registrados pelo
-              consumidor e constrói um dicionário de lookup pelo
-              <code>Command</code>. Em runtime, localiza o handler em O(1) e
-              invoca <code>HandleAsync</code>.
+              Receives the collection of <code>ITopicHandler</code> registered by the consumer and builds a lookup dictionary by
+              <code>Command</code>. At runtime, it finds the handler in O(1) and invokes <code>HandleAsync</code>.
             </div>
             <div class="code-wrap">
               <pre><span class="kw">namespace</span> <span class="tp">BotFoundry.Telegram.Core</span>;
@@ -885,18 +867,18 @@
     <span class="kw">public async</span> <span class="tp">Task</span> <span class="fn">RouteAsync</span>(
         <span class="tp">BotContext</span> context, <span class="tp">CancellationToken</span> ct)
     {
-        <span class="cm">// Extrai o comando — ex: "/start args" → "start"</span>
+        <span class="cm">// Extract the command — e.g. "/start args" → "start"</span>
         <span class="kw">var</span> command = context.Text[<span class="nm">1</span>..].Split(<span class="st">' '</span>)[<span class="nm">0</span>].ToLowerInvariant();
 
         <span class="kw">if</span> (!_handlers.<span class="fn">TryGetValue</span>(command, <span class="kw">out var</span> handler))
         {
-            _logger.<span class="fn">LogWarning</span>(<span class="st">"Comando não registrado: {Command}"</span>, command);
+            _logger.<span class="fn">LogWarning</span>(<span class="st">"Command not registered: {Command}"</span>, command);
             <span class="kw">return</span>;
         }
 
         <span class="kw">var</span> result = <span class="kw">await</span> handler.<span class="fn">HandleAsync</span>(context, ct);
 
-        <span class="cm">// Se o handler iniciou um fluxo, grava o tópico ativo na sessão</span>
+        <span class="cm">// If the handler started a flow, store the active topic in the session</span>
         <span class="kw">if</span> (!result.IsComplete)
             context.Session.ActiveTopic = command;
     }
@@ -904,13 +886,11 @@
             </div>
             <div class="cb-box cb-o">
               <div class="cb-label" style="color: var(--o)">
-                Conceito — Lookup O(1)
+                Concept — O(1) lookup
               </div>
               <div class="cb-text">
-                O dicionário é construído uma única vez no construtor (startup).
-                Em runtime, cada mensagem faz apenas um
-                <code>TryGetValue</code> — independente do número de handlers
-                registrados.
+                The dictionary is built once in the constructor (startup). At runtime, each message performs only one
+                <code>TryGetValue</code> — regardless of the number of registered handlers.
               </div>
             </div>
           </div>
@@ -929,10 +909,7 @@
           </div>
           <div class="fc-body">
             <div class="fc-desc">
-              Executa um fluxo multi-step em andamento. Localiza o step ativo
-              pelo <code>ActiveStepId</code>, valida a resposta do usuário e
-              processa o resultado — avançando, redirecionando ou encerrando o
-              fluxo.
+              Runs an ongoing multi-step flow. Finds the active step by <code>ActiveStepId</code>, validates the user's reply and processes the result — advancing, redirecting or ending the flow.
             </div>
             <div class="code-wrap">
               <pre><span class="kw">namespace</span> <span class="tp">BotFoundry.Telegram.Core</span>;
@@ -957,12 +934,12 @@
 
         <span class="kw">if</span> (stepId <span class="kw">is null</span> || !_steps.<span class="fn">TryGetValue</span>(stepId, <span class="kw">out var</span> step))
         {
-            _logger.<span class="fn">LogWarning</span>(<span class="st">"Step não encontrado: {StepId}. Limpando fluxo."</span>, stepId);
+            _logger.<span class="fn">LogWarning</span>(<span class="st">"Step not found: {StepId}. Clearing conversation flow."</span>, stepId);
             context.Session.<span class="fn">ClearFlow</span>();
             <span class="kw">return</span>;
         }
 
-        <span class="cm">// Valida — se inválido, repete a pergunta</span>
+        <span class="cm">// Validate — if invalid, repeat the question</span>
         <span class="kw">var</span> valid = <span class="kw">await</span> step.<span class="fn">ValidateAsync</span>(context, ct);
         <span class="kw">if</span> (!valid)
         {
@@ -986,7 +963,7 @@
 
             <span class="kw">case</span> <span class="tp">StepResultKind</span>.Continue:
             <span class="kw">default</span>:
-                <span class="cm">// ActiveStepId já deve ter sido atualizado pelo step em ProcessAsync</span>
+                <span class="cm">// The step must already have updated ActiveStepId in ProcessAsync</span>
                 <span class="kw">break</span>;
         }
     }
@@ -994,25 +971,21 @@
             </div>
             <div class="cb-box cb-s">
               <div class="cb-label" style="color: var(--s)">
-                Conceito — Responsabilidade do step em Continue
+                Concept — Step responsibility on Continue
               </div>
               <div class="cb-text">
-                Em <code>StepResultKind.Continue</code>, é responsabilidade do
-                <code>ProcessAsync</code> do step atualizar
-                <code>context.Session.ActiveStepId</code> para o próximo step. O
-                runner não assume sequência implícita — bifurcações são
-                controladas pelo consumidor.
+                On <code>StepResultKind.Continue</code>, it is the responsibility of the
+                <code>ProcessAsync</code> of the step to update
+                <code>context.Session.ActiveStepId</code> to the next step. The runner assumes no implicit sequence — branching is controlled by the consumer.
               </div>
             </div>
             <div class="cb-box cb-bl" style="margin-top: 0.75rem">
               <div class="cb-label" style="color: var(--bl)">
-                Conceito — AskAsync em JumpTo
+                Concept — AskAsync on JumpTo
               </div>
               <div class="cb-text">
-                Quando o resultado é <code>JumpTo</code>, o runner já chama
-                <code>AskAsync</code> do step de destino na mesma mensagem — o
-                usuário recebe a próxima pergunta imediatamente, sem precisar
-                enviar outra mensagem.
+                When the result is <code>JumpTo</code>, the runner already calls
+                <code>AskAsync</code> of the destination step in the same message — the user receives the next question immediately, without having to send another message.
               </div>
             </div>
           </div>
@@ -1020,37 +993,34 @@
       </div>
 
       <!-- RULES -->
-      <div class="divider"><h2>Regras desta Task</h2></div>
+      <div class="divider"><h2>Rules of this Task</h2></div>
       <div class="rule-card">
-        <div class="rule-num">REGRA 01</div>
-        <div class="rule-title">Nenhuma referência ao SDK neste projeto</div>
+        <div class="rule-num">RULE 01</div>
+        <div class="rule-title">No SDK reference in this project</div>
         <div class="rule-desc">
-          O projeto <code>BotFoundry.Telegram.Core</code> só referencia
-          <code>BotFoundry.Telegram.Abstractions</code> e
-          <code>Microsoft.Extensions.Logging.Abstractions</code>. Se aparecer
-          <code>using Telegram.Bot</code>, é erro de camada.
+          The <code>BotFoundry.Telegram.Core</code> project only references
+          <code>BotFoundry.Telegram.Abstractions</code> and
+          <code>Microsoft.Extensions.Logging.Abstractions</code>. If
+          <code>using Telegram.Bot</code> appears, it is a layering error.
         </div>
       </div>
       <div class="rule-card">
-        <div class="rule-num">REGRA 02</div>
+        <div class="rule-num">RULE 02</div>
         <div class="rule-title">
-          <code>BotPipeline</code> e <code>CommandRouter</code> e
-          <code>StepRunner</code> são <code>internal</code>
+          <code>BotPipeline</code>, <code>CommandRouter</code> and <code>StepRunner</code> are <code>internal</code>
         </div>
         <div class="rule-desc">
-          Somente <code>IBotPipeline</code> é <code>public</code>. O consumidor
-          não acessa as implementações concretas do Core diretamente.
+          Only <code>IBotPipeline</code> is <code>public</code>. The consumer does not access the Core's concrete implementations directly.
         </div>
       </div>
       <div class="rule-card">
-        <div class="rule-num">REGRA 03</div>
+        <div class="rule-num">RULE 03</div>
         <div class="rule-title">
-          Descomentar o registro de <code>IBotPipeline</code> no DI
+          Uncomment the registration of <code>IBotPipeline</code> in DI
         </div>
         <div class="rule-desc">
-          Após criar <code>BotPipeline</code>, remover o comentário em
-          <code>BotFoundryServiceCollectionExtensions</code> e adicionar os
-          registros de <code>CommandRouter</code> e <code>StepRunner</code>.
+          After creating <code>BotPipeline</code>, remove the comment on
+          <code>BotFoundryServiceCollectionExtensions</code> and add the registrations of <code>CommandRouter</code> and <code>StepRunner</code>.
         </div>
       </div>
     </main>

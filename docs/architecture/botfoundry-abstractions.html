@@ -123,7 +123,7 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     </svg>
     <div>
       <div class="logo-text">BotFoundry.Telegram</div>
-      <div class="logo-sub">Abstractions — Ports &amp; Modelos</div>
+      <div class="logo-sub">Abstractions — Ports &amp; Models</div>
     </div>
   </div>
   <button class="tbtn" data-tt><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
@@ -133,58 +133,58 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
   <div class="sec-hdr">
     <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.875rem">
       <span class="badge bp">Ports</span>
-      <span class="badge bs">Modelos</span>
+      <span class="badge bs">Models</span>
       <span class="badge bpu">Hexagonal</span>
     </div>
     <h1>BotFoundry.Telegram.Abstractions</h1>
-    <p>Todos os contratos públicos da lib — interfaces (Ports) e modelos de domínio. Nenhuma lógica, nenhuma dependência de infraestrutura. Este projeto é a base de todo o grafo de dependências.</p>
+    <p>All the library's public contracts — interfaces (Ports) and domain models. No logic, no infrastructure dependency. This project is the base of the whole dependency graph.</p>
   </div>
 
   <!-- TREE -->
-  <div class="divider"><h2>Estrutura do Projeto</h2></div>
+  <div class="divider"><h2>Project Structure</h2></div>
   <div class="tree-wrap">
-    <div class="tree-hdr"><span>src/BotFoundry.Telegram.Abstractions/</span><span class="badge bp">sem lógica</span></div>
+    <div class="tree-hdr"><span>src/BotFoundry.Telegram.Abstractions/</span><span class="badge bp">no logic</span></div>
     <div class="tree-body"><pre><span class="t-dir">BotFoundry.Telegram.Abstractions/</span>
 ├── <span class="t-dir">Ports/</span>
-│   ├── <span class="t-iface">ISessionStore.cs</span>           <span class="t-cm">← driven port — infraestrutura</span>
-│   ├── <span class="t-iface">IMessageSender.cs</span>          <span class="t-cm">← driven port — infraestrutura</span>
-│   ├── <span class="t-iface">ITopicHandler.cs</span>           <span class="t-cm">← driven port — domínio do consumidor</span>
-│   ├── <span class="t-iface">IConversationStep.cs</span>       <span class="t-cm">← driven port — domínio do consumidor</span>
-│   ├── <span class="t-iface">IAuthMiddleware.cs</span>         <span class="t-cm">← driven port — opcional</span>
-│   └── <span class="t-iface">ILlmBridge.cs</span>              <span class="t-cm">← driven port — extensão</span>
+│   ├── <span class="t-iface">ISessionStore.cs</span>           <span class="t-cm">← driven port — infrastructure</span>
+│   ├── <span class="t-iface">IMessageSender.cs</span>          <span class="t-cm">← driven port — infrastructure</span>
+│   ├── <span class="t-iface">ITopicHandler.cs</span>           <span class="t-cm">← driven port — consumer domain</span>
+│   ├── <span class="t-iface">IConversationStep.cs</span>       <span class="t-cm">← driven port — consumer domain</span>
+│   ├── <span class="t-iface">IAuthMiddleware.cs</span>         <span class="t-cm">← driven port — optional</span>
+│   └── <span class="t-iface">ILlmBridge.cs</span>              <span class="t-cm">← driven port — extension</span>
 ├── <span class="t-dir">Models/</span>
-│   ├── <span class="t-model">BotContext.cs</span>              <span class="t-cm">← objeto que trafega pelo pipeline</span>
-│   ├── <span class="t-model">UserSession.cs</span>             <span class="t-cm">← estado do usuário por chatId</span>
-│   ├── <span class="t-model">FlowResult.cs</span>              <span class="t-cm">← resultado de um TopicHandler</span>
-│   └── <span class="t-model">StepResult.cs</span>              <span class="t-cm">← resultado de um ConversationStep</span>
+│   ├── <span class="t-model">BotContext.cs</span>              <span class="t-cm">← object that travels through the pipeline</span>
+│   ├── <span class="t-model">UserSession.cs</span>             <span class="t-cm">← per-user state keyed by chatId</span>
+│   ├── <span class="t-model">FlowResult.cs</span>              <span class="t-cm">← result of a TopicHandler</span>
+│   └── <span class="t-model">StepResult.cs</span>              <span class="t-cm">← result of a ConversationStep</span>
 └── <span class="t-dir">BotFoundry.Telegram.Abstractions.csproj</span></pre>
     </div>
   </div>
 
   <!-- OVERVIEW TABLE -->
-  <div class="divider"><h2>Visão Geral</h2></div>
+  <div class="divider"><h2>Overview</h2></div>
   <table class="ov-table">
-    <thead><tr><th>Arquivo</th><th>Tipo</th><th>Quem implementa</th><th>Conceito</th></tr></thead>
+    <thead><tr><th>File</th><th>Type</th><th>Implemented by</th><th>Concept</th></tr></thead>
     <tbody>
-      <tr><td class="mono">ISessionStore</td><td><span class="badge bo">Driven Port</span></td><td>Lib (padrão) ou consumidor (Redis, SQL)</td><td>ADR-002 — persistência plugável</td></tr>
-      <tr><td class="mono">IMessageSender</td><td><span class="badge bo">Driven Port</span></td><td>Lib (único que usa SDK)</td><td>ADR-003 — isolamento do SDK</td></tr>
-      <tr><td class="mono">ITopicHandler</td><td><span class="badge bs">Port de Domínio</span></td><td>Consumidor (handlers de comando)</td><td>Zona 2 — lógica de negócio</td></tr>
-      <tr><td class="mono">IConversationStep</td><td><span class="badge bs">Port de Domínio</span></td><td>Consumidor (steps do fluxo)</td><td>StepRunner — fluxo multi-step</td></tr>
-      <tr><td class="mono">IAuthMiddleware</td><td><span class="badge bpu">Port Opcional</span></td><td>Consumidor (se precisar de auth)</td><td>Gancho opcional no pipeline</td></tr>
-      <tr><td class="mono">ILlmBridge</td><td><span class="badge bb">Port de Extensão</span></td><td>Consumidor (OpenAI, Gemini…)</td><td>Fluxo 3 — texto livre</td></tr>
-      <tr><td class="mono">BotContext</td><td><span class="badge bp">Modelo</span></td><td>—</td><td>Objeto que trafega pelo pipeline</td></tr>
-      <tr><td class="mono">UserSession</td><td><span class="badge bp">Modelo</span></td><td>—</td><td>Estado por chatId</td></tr>
-      <tr><td class="mono">FlowResult</td><td><span class="badge bp">Modelo</span></td><td>—</td><td>Retorno do TopicHandler</td></tr>
-      <tr><td class="mono">StepResult</td><td><span class="badge bp">Modelo</span></td><td>—</td><td>Retorno do ConversationStep</td></tr>
+      <tr><td class="mono">ISessionStore</td><td><span class="badge bo">Driven Port</span></td><td>Library (default) or consumer (Redis, SQL)</td><td>ADR-002 — pluggable persistence</td></tr>
+      <tr><td class="mono">IMessageSender</td><td><span class="badge bo">Driven Port</span></td><td>Library (the only one using the SDK)</td><td>ADR-003 — SDK isolation</td></tr>
+      <tr><td class="mono">ITopicHandler</td><td><span class="badge bs">Domain Port</span></td><td>Consumer (command handlers)</td><td>Zone 2 — business logic</td></tr>
+      <tr><td class="mono">IConversationStep</td><td><span class="badge bs">Domain Port</span></td><td>Consumer (flow steps)</td><td>StepRunner — multi-step flow</td></tr>
+      <tr><td class="mono">IAuthMiddleware</td><td><span class="badge bpu">Optional Port</span></td><td>Consumer (if auth is needed)</td><td>Optional hook in the pipeline</td></tr>
+      <tr><td class="mono">ILlmBridge</td><td><span class="badge bb">Extension Port</span></td><td>Consumer (OpenAI, Gemini…)</td><td>Flow 3 — free text</td></tr>
+      <tr><td class="mono">BotContext</td><td><span class="badge bp">Model</span></td><td>—</td><td>Object that travels through the pipeline</td></tr>
+      <tr><td class="mono">UserSession</td><td><span class="badge bp">Model</span></td><td>—</td><td>State per chatId</td></tr>
+      <tr><td class="mono">FlowResult</td><td><span class="badge bp">Model</span></td><td>—</td><td>TopicHandler return</td></tr>
+      <tr><td class="mono">StepResult</td><td><span class="badge bp">Model</span></td><td>—</td><td>ConversationStep return</td></tr>
     </tbody>
   </table>
 
   <!-- TABS -->
-  <div class="divider"><h2>Código C#</h2></div>
+  <div class="divider"><h2>C# Code</h2></div>
 
   <div class="tabs">
     <button class="tab active" data-tab="ports">Ports</button>
-    <button class="tab" data-tab="models">Modelos</button>
+    <button class="tab" data-tab="models">Models</button>
   </div>
 
   <!-- PORTS PANEL -->
@@ -197,7 +197,7 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
         <span class="badge bo">Driven Port</span>
       </div>
       <div class="fc-body">
-        <div class="fc-desc">Define onde e como a sessão de cada usuário é persistida entre mensagens. A lib registra <code>InMemorySessionStore</code> automaticamente se nenhuma implementação for registrada antes (ADR-002).</div>
+        <div class="fc-desc">Defines where and how each user's session is persisted between messages. The library registers <code>InMemorySessionStore</code> automatically if no implementation was registered before (ADR-002).</div>
         <div class="code-wrap"><pre><span class="kw">namespace</span> <span class="tp">BotFoundry.Telegram.Abstractions.Ports</span>;
 
 <span class="kw">public interface</span> <span class="tp">ISessionStore</span>
@@ -215,8 +215,8 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
         <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
 }</pre></div>
         <div class="cb-box cb-o">
-          <div class="cb-label" style="color:var(--o)">Conceito — ADR-002</div>
-          <div class="cb-text">O núcleo chama <code>ISessionStore</code> sem saber se a sessão está em memória, Redis ou banco. Trocar a implementação é questão de registro no DI — zero mudança no Core.</div>
+          <div class="cb-label" style="color:var(--o)">Concept — ADR-002</div>
+          <div class="cb-text">The core calls <code>ISessionStore</code> without knowing whether the session lives in memory, Redis or a database. Swapping the implementation is a DI registration matter — zero change in the Core.</div>
         </div>
       </div>
     </div>
@@ -228,7 +228,7 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
         <span class="badge bo">Driven Port</span>
       </div>
       <div class="fc-body">
-        <div class="fc-desc">Abstrai o envio de respostas ao usuário. É o único ponto de contato do núcleo com o mundo externo de saída — o SDK <code>Telegram.Bot</code> nunca aparece no Core.</div>
+        <div class="fc-desc">Abstracts sending replies to the user. It is the core's only contact point with the outgoing outside world — the <code>Telegram.Bot</code> SDK never appears in the Core.</div>
         <div class="code-wrap"><pre><span class="kw">namespace</span> <span class="tp">BotFoundry.Telegram.Abstractions.Ports</span>;
 
 <span class="kw">public interface</span> <span class="tp">IMessageSender</span>
@@ -245,8 +245,8 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
         <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
 }</pre></div>
         <div class="cb-box cb-p">
-          <div class="cb-label" style="color:var(--p)">Conceito — ADR-003</div>
-          <div class="cb-text">Apenas <code>TelegramMessageSender</code> (projeto de adapters) implementa esta interface usando o SDK. Em testes, um <code>FakeMessageSender</code> coleta as mensagens em memória — sem rede, sem token.</div>
+          <div class="cb-label" style="color:var(--p)">Concept — ADR-003</div>
+          <div class="cb-text">Only <code>TelegramMessageSender</code> (adapters project) implements this interface using the SDK. In tests, a <code>FakeMessageSender</code> collects the messages in memory — no network, no token.</div>
         </div>
       </div>
     </div>
@@ -255,15 +255,15 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     <div class="file-card">
       <div class="fc-header">
         <div class="fc-path"><div class="fc-dot" style="background:var(--s)"></div>Ports/ITopicHandler.cs</div>
-        <span class="badge bs">Port de Domínio</span>
+        <span class="badge bs">Domain Port</span>
       </div>
       <div class="fc-body">
-        <div class="fc-desc">Contrato que o consumidor implementa para responder a um comando específico (<code>/start</code>, <code>/ajuda</code>…). A lib invoca este contrato quando o Routing identifica o comando.</div>
+        <div class="fc-desc">Contract the consumer implements to answer a specific command (<code>/start</code>, <code>/help</code>…). The library invokes this contract when Routing identifies the command.</div>
         <div class="code-wrap"><pre><span class="kw">namespace</span> <span class="tp">BotFoundry.Telegram.Abstractions.Ports</span>;
 
 <span class="kw">public interface</span> <span class="tp">ITopicHandler</span>
 {
-    <span class="cm">/// Comando que este handler atende (sem "/"), ex: "start"</span>
+    <span class="cm">/// Command this handler serves (without "/"), e.g. "start"</span>
     <span class="kw">string</span> Command { <span class="kw">get</span>; }
 
     <span class="tp">Task</span>&lt;<span class="tp">FlowResult</span>&gt; <span class="fn">HandleAsync</span>(
@@ -271,8 +271,8 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
         <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
 }</pre></div>
         <div class="cb-box cb-s">
-          <div class="cb-label" style="color:var(--s)">Conceito — Zona 2 (Domínio)</div>
-          <div class="cb-text">A lib nunca conhece a lógica de negócio do bot — ela só conhece o contrato. O consumidor registra N handlers via DI; o Routing descobre qual invocar em runtime pelo valor de <code>Command</code>.</div>
+          <div class="cb-label" style="color:var(--s)">Concept — Zone 2 (Domain)</div>
+          <div class="cb-text">The library never knows the bot's business logic — it only knows the contract. The consumer registers N handlers through DI; Routing finds which one to invoke at runtime by the value of <code>Command</code>.</div>
         </div>
       </div>
     </div>
@@ -281,35 +281,35 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     <div class="file-card">
       <div class="fc-header">
         <div class="fc-path"><div class="fc-dot" style="background:var(--s)"></div>Ports/IConversationStep.cs</div>
-        <span class="badge bs">Port de Domínio</span>
+        <span class="badge bs">Domain Port</span>
       </div>
       <div class="fc-body">
-        <div class="fc-desc">Define uma etapa de fluxo multi-step — o que perguntar, como validar e como processar a resposta do usuário.</div>
+        <div class="fc-desc">Defines one step of a multi-step flow — what to ask, how to validate and how to process the user's reply.</div>
         <div class="code-wrap"><pre><span class="kw">namespace</span> <span class="tp">BotFoundry.Telegram.Abstractions.Ports</span>;
 
 <span class="kw">public interface</span> <span class="tp">IConversationStep</span>
 {
-    <span class="cm">/// Identificador único do step dentro do fluxo</span>
+    <span class="cm">/// Unique identifier of the step within the flow</span>
     <span class="kw">string</span> StepId { <span class="kw">get</span>; }
 
-    <span class="cm">/// Envia a pergunta ao usuário</span>
+    <span class="cm">/// Sends the question to the user</span>
     <span class="tp">Task</span> <span class="fn">AskAsync</span>(
         <span class="tp">BotContext</span> context,
         <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
 
-    <span class="cm">/// Valida a resposta recebida — retorna false para repetir a pergunta</span>
+    <span class="cm">/// Validates the received reply — returns false to repeat the question</span>
     <span class="tp">Task</span>&lt;<span class="kw">bool</span>&gt; <span class="fn">ValidateAsync</span>(
         <span class="tp">BotContext</span> context,
         <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
 
-    <span class="cm">/// Processa a resposta válida e decide o próximo passo</span>
+    <span class="cm">/// Processes the valid reply and decides the next step</span>
     <span class="tp">Task</span>&lt;<span class="tp">StepResult</span>&gt; <span class="fn">ProcessAsync</span>(
         <span class="tp">BotContext</span> context,
         <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
 }</pre></div>
         <div class="cb-box cb-s">
-          <div class="cb-label" style="color:var(--s)">Conceito — StepRunner (Fluxo 2)</div>
-          <div class="cb-text">O <code>StepRunner</code> do Core chama <code>ValidateAsync → ProcessAsync</code> a cada mensagem. <code>StepResult</code> retorna <code>Continue</code>, <code>Complete</code> ou <code>JumpTo</code> — o consumidor controla o fluxo; o núcleo executa a mecânica.</div>
+          <div class="cb-label" style="color:var(--s)">Concept — StepRunner (Flow 2)</div>
+          <div class="cb-text">The Core's <code>StepRunner</code> calls <code>ValidateAsync → ProcessAsync</code> on every message. <code>StepResult</code> returns <code>Continue</code>, <code>Complete</code> or <code>JumpTo</code> — the consumer controls the flow; the core runs the mechanics.</div>
         </div>
       </div>
     </div>
@@ -318,10 +318,10 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     <div class="file-card">
       <div class="fc-header">
         <div class="fc-path"><div class="fc-dot" style="background:var(--pu)"></div>Ports/IAuthMiddleware.cs</div>
-        <span class="badge bpu">Port Opcional</span>
+        <span class="badge bpu">Optional Port</span>
       </div>
       <div class="fc-body">
-        <div class="fc-desc">Decide se um usuário tem permissão para continuar no pipeline. Se não registrado no DI, o pipeline pula a verificação e todos os usuários passam.</div>
+        <div class="fc-desc">Decides whether a user is allowed to continue in the pipeline. If not registered in DI, the pipeline skips the check and every user gets through.</div>
         <div class="code-wrap"><pre><span class="kw">namespace</span> <span class="tp">BotFoundry.Telegram.Abstractions.Ports</span>;
 
 <span class="kw">public interface</span> <span class="tp">IAuthMiddleware</span>
@@ -331,8 +331,8 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
         <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
 }</pre></div>
         <div class="cb-box cb-pu">
-          <div class="cb-label" style="color:var(--pu)">Conceito — Gancho Opcional</div>
-          <div class="cb-text">A lib não impõe regras de acesso — expõe o gancho. O consumidor decide se implementa (lista de admins, token JWT, etc.). Se não registrar, o pipeline segue sem verificação.</div>
+          <div class="cb-label" style="color:var(--pu)">Concept — Optional Hook</div>
+          <div class="cb-text">The library does not impose access rules — it exposes the hook. The consumer decides whether to implement it (admin list, JWT token, etc.). If not registered, the pipeline proceeds without a check.</div>
         </div>
       </div>
     </div>
@@ -341,10 +341,10 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     <div class="file-card">
       <div class="fc-header">
         <div class="fc-path"><div class="fc-dot" style="background:var(--bl)"></div>Ports/ILlmBridge.cs</div>
-        <span class="badge bb">Port de Extensão</span>
+        <span class="badge bb">Extension Port</span>
       </div>
       <div class="fc-body">
-        <div class="fc-desc">Repassa mensagens de texto livre (sem comando ativo) a um agente de linguagem externo. Ativado apenas no Fluxo 3 — quando não há comando e não há step ativo.</div>
+        <div class="fc-desc">Forwards free-text messages (with no active command) to an external language agent. Activated only in Flow 3 — when there is no command and no active step.</div>
         <div class="code-wrap"><pre><span class="kw">namespace</span> <span class="tp">BotFoundry.Telegram.Abstractions.Ports</span>;
 
 <span class="kw">public interface</span> <span class="tp">ILlmBridge</span>
@@ -355,8 +355,8 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
         <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
 }</pre></div>
         <div class="cb-box cb-bl">
-          <div class="cb-label" style="color:var(--bl)">Conceito — Extensão (Fluxo 3)</div>
-          <div class="cb-text">A integração real com OpenAI, Gemini ou outro LLM é 100% responsabilidade do consumidor. A lib só verifica se o port foi registrado e, se sim, delega a mensagem.</div>
+          <div class="cb-label" style="color:var(--bl)">Concept — Extension (Flow 3)</div>
+          <div class="cb-text">The actual integration with OpenAI, Gemini or another LLM is 100% the consumer's responsibility. The library only checks whether the port was registered and, if so, delegates the message.</div>
         </div>
       </div>
     </div>
@@ -370,10 +370,10 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     <div class="file-card">
       <div class="fc-header">
         <div class="fc-path"><div class="fc-dot" style="background:var(--p)"></div>Models/BotContext.cs</div>
-        <span class="badge bp">Modelo de Fronteira</span>
+        <span class="badge bp">Boundary Model</span>
       </div>
       <div class="fc-body">
-        <div class="fc-desc">Objeto criado pelo <code>TelegramPollingAdapter</code> a partir do objeto do SDK e injetado no pipeline. Não contém nenhum tipo do <code>Telegram.Bot</code> — é a "tradução" do mundo externo para o vocabulário interno da lib.</div>
+        <div class="fc-desc">Object created by <code>TelegramPollingAdapter</code> from the SDK object and injected into the pipeline. It contains no <code>Telegram.Bot</code> type — it is the "translation" from the outside world to the library's internal vocabulary.</div>
         <div class="code-wrap"><pre><span class="kw">namespace</span> <span class="tp">BotFoundry.Telegram.Abstractions.Models</span>;
 
 <span class="kw">public sealed class</span> <span class="tp">BotContext</span>
@@ -383,7 +383,7 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     <span class="kw">public required</span> <span class="tp">UserSession</span>    Session  { <span class="kw">get</span>; <span class="kw">init</span>; }
     <span class="kw">public required</span> <span class="tp">IMessageSender</span> Sender   { <span class="kw">get</span>; <span class="kw">init</span>; }
 
-    <span class="cm">/// Atalho para o consumidor enviar respostas sem acessar Sender diretamente</span>
+    <span class="cm">/// Shortcut for the consumer to send replies without accessing Sender directly</span>
     <span class="kw">public</span> <span class="tp">Task</span> <span class="fn">SendAsync</span>(
         <span class="kw">string</span> text,
         <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>)
@@ -396,8 +396,8 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
         => Sender.<span class="fn">SendTextAsync</span>(ChatId, text, quickReplies, ct);
 }</pre></div>
         <div class="cb-box cb-p">
-          <div class="cb-label" style="color:var(--p)">Conceito — Modelo de Fronteira</div>
-          <div class="cb-text"><code>BotContext</code> é o contrato de entrada de todos os Ports de domínio. O consumidor recebe um <code>BotContext</code> nos seus handlers — nunca objetos do SDK. Isso garante que o código do bot seja testável sem Telegram.</div>
+          <div class="cb-label" style="color:var(--p)">Concept — Boundary Model</div>
+          <div class="cb-text"><code>BotContext</code> is the input contract of every domain Port. The consumer receives a <code>BotContext</code> in their handlers — never SDK objects. This guarantees the bot's code is testable without Telegram.</div>
         </div>
       </div>
     </div>
@@ -406,25 +406,25 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     <div class="file-card">
       <div class="fc-header">
         <div class="fc-path"><div class="fc-dot" style="background:var(--o)"></div>Models/UserSession.cs</div>
-        <span class="badge bo">Modelo de Estado</span>
+        <span class="badge bo">State Model</span>
       </div>
       <div class="fc-body">
-        <div class="fc-desc">Estado do usuário persistido entre mensagens — qual fluxo está ativo, em qual step está e dados coletados ao longo da conversa.</div>
+        <div class="fc-desc">User state persisted between messages — which flow is active, which step it is on and data collected throughout the conversation.</div>
         <div class="code-wrap"><pre><span class="kw">namespace</span> <span class="tp">BotFoundry.Telegram.Abstractions.Models</span>;
 
 <span class="kw">public sealed class</span> <span class="tp">UserSession</span>
 {
     <span class="kw">public required long</span> ChatId { <span class="kw">get</span>; <span class="kw">init</span>; }
 
-    <span class="cm">/// Comando do fluxo ativo, ex: "cadastro". Null se nenhum fluxo ativo.</span>
+    <span class="cm">/// Command of the active flow, e.g. "signup". Null if no flow is active.</span>
     <span class="kw">public string</span>? ActiveTopic  { <span class="kw">get</span>; <span class="kw">set</span>; }
 
-    <span class="cm">/// StepId do step atual dentro do fluxo ativo.</span>
+    <span class="cm">/// StepId of the current step within the active flow.</span>
     <span class="kw">public string</span>? ActiveStepId { <span class="kw">get</span>; <span class="kw">set</span>; }
 
     <span class="kw">public</span> <span class="tp">DateTimeOffset</span> ExpiresAt { <span class="kw">get</span>; <span class="kw">set</span>; }
 
-    <span class="cm">/// Dados coletados durante a conversa (chave livre por step)</span>
+    <span class="cm">/// Data collected during the conversation (free key per step)</span>
     <span class="kw">public</span> <span class="tp">Dictionary</span>&lt;<span class="kw">string</span>, <span class="kw">string</span>&gt; Data { <span class="kw">get</span>; }
         = <span class="kw">new</span>();
 
@@ -448,27 +448,27 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     <div class="file-card">
       <div class="fc-header">
         <div class="fc-path"><div class="fc-dot" style="background:var(--s)"></div>Models/FlowResult.cs</div>
-        <span class="badge bs">Modelo de Resultado</span>
+        <span class="badge bs">Result Model</span>
       </div>
       <div class="fc-body">
-        <div class="fc-desc">Retorno do <code>ITopicHandler.HandleAsync</code> — indica ao pipeline se o fluxo deve continuar aguardando input ou se encerrou na mesma mensagem.</div>
+        <div class="fc-desc">Return of <code>ITopicHandler.HandleAsync</code> — tells the pipeline whether the flow should keep waiting for input or finished in the same message.</div>
         <div class="code-wrap"><pre><span class="kw">namespace</span> <span class="tp">BotFoundry.Telegram.Abstractions.Models</span>;
 
 <span class="kw">public sealed class</span> <span class="tp">FlowResult</span>
 {
     <span class="kw">public bool</span> IsComplete { <span class="kw">get</span>; <span class="kw">private set</span>; }
 
-    <span class="cm">/// Fluxo iniciado — aguarda próxima mensagem do usuário</span>
+    <span class="cm">/// Flow started — waits for the user's next message</span>
     <span class="kw">public static</span> <span class="tp">FlowResult</span> <span class="fn">Continue</span>()
         => <span class="kw">new</span>() { IsComplete = <span class="kw">false</span> };
 
-    <span class="cm">/// Fluxo encerrado na mesma mensagem — sem step ativo</span>
+    <span class="cm">/// Flow ended in the same message — no active step</span>
     <span class="kw">public static</span> <span class="tp">FlowResult</span> <span class="fn">Complete</span>()
         => <span class="kw">new</span>() { IsComplete = <span class="kw">true</span> };
 }</pre></div>
         <div class="cb-box cb-s">
-          <div class="cb-label" style="color:var(--s)">Conceito — Static Factory Methods</div>
-          <div class="cb-text">O padrão <code>FlowResult.Continue()</code> e <code>FlowResult.Complete()</code> torna o código do consumidor expressivo e auto-documentado — é imediatamente legível o que o handler está sinalizando ao pipeline.</div>
+          <div class="cb-label" style="color:var(--s)">Concept — Static Factory Methods</div>
+          <div class="cb-text">The <code>FlowResult.Continue()</code> and <code>FlowResult.Complete()</code> pattern makes the consumer's code expressive and self-documenting — it is immediately readable what the handler is signaling to the pipeline.</div>
         </div>
       </div>
     </div>
@@ -477,10 +477,10 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     <div class="file-card">
       <div class="fc-header">
         <div class="fc-path"><div class="fc-dot" style="background:var(--s)"></div>Models/StepResult.cs</div>
-        <span class="badge bs">Modelo de Resultado</span>
+        <span class="badge bs">Result Model</span>
       </div>
       <div class="fc-body">
-        <div class="fc-desc">Retorno de <code>IConversationStep.ProcessAsync</code> — instrui o <code>StepRunner</code> sobre o que fazer após processar o input do usuário.</div>
+        <div class="fc-desc">Return of <code>IConversationStep.ProcessAsync</code> — instructs the <code>StepRunner</code> on what to do after processing the user's input.</div>
         <div class="code-wrap"><pre><span class="kw">namespace</span> <span class="tp">BotFoundry.Telegram.Abstractions.Models</span>;
 
 <span class="kw">public sealed class</span> <span class="tp">StepResult</span>
@@ -488,15 +488,15 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     <span class="kw">public</span> <span class="tp">StepResultKind</span> Kind     { <span class="kw">get</span>; <span class="kw">private set</span>; }
     <span class="kw">public string</span>?        TargetId { <span class="kw">get</span>; <span class="kw">private set</span>; }
 
-    <span class="cm">/// Avança para o próximo step em sequência</span>
+    <span class="cm">/// Advances to the next step in sequence</span>
     <span class="kw">public static</span> <span class="tp">StepResult</span> <span class="fn">Continue</span>()
         => <span class="kw">new</span>() { Kind = <span class="tp">StepResultKind</span>.Continue };
 
-    <span class="cm">/// Encerra o fluxo — limpa o estado da sessão</span>
+    <span class="cm">/// Ends the flow — clears the session state</span>
     <span class="kw">public static</span> <span class="tp">StepResult</span> <span class="fn">Complete</span>()
         => <span class="kw">new</span>() { Kind = <span class="tp">StepResultKind</span>.Complete };
 
-    <span class="cm">/// Redireciona para um step específico pelo StepId</span>
+    <span class="cm">/// Redirects to a specific step by StepId</span>
     <span class="kw">public static</span> <span class="tp">StepResult</span> <span class="fn">JumpTo</span>(<span class="kw">string</span> stepId)
         => <span class="kw">new</span>() { Kind = <span class="tp">StepResultKind</span>.JumpTo, TargetId = stepId };
 }
@@ -508,8 +508,8 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
     JumpTo
 }</pre></div>
         <div class="cb-box cb-s">
-          <div class="cb-label" style="color:var(--s)">Conceito — JumpTo e bifurcação condicional</div>
-          <div class="cb-text"><code>JumpTo</code> é o mecanismo de bifurcação do fluxo multi-step. O consumidor pode redirecionar para qualquer step pelo <code>StepId</code> — o StepRunner não precisa conhecer a lógica da bifurcação, só executa o destino.</div>
+          <div class="cb-label" style="color:var(--s)">Concept — JumpTo and conditional branching</div>
+          <div class="cb-text"><code>JumpTo</code> is the branching mechanism of the multi-step flow. The consumer can redirect to any step by <code>StepId</code> — the StepRunner does not need to know the branching logic, it just runs the destination.</div>
         </div>
       </div>
     </div>
@@ -517,23 +517,23 @@ code{font-family:var(--mono);font-size:.88em;padding:1px 4px;border-radius:3px;b
   </div><!-- /panel-models -->
 
   <!-- RELATIONS -->
-  <div class="divider"><h2>Como os Modelos se Relacionam</h2></div>
+  <div class="divider"><h2>How the Models Relate</h2></div>
   <div class="rel-grid">
     <div class="rel-card">
       <div class="rel-title">BotContext → IMessageSender</div>
-      <div class="rel-desc"><code>BotContext</code> expõe <code>SendAsync</code> como atalho, delegando para <code>IMessageSender</code>. O consumidor nunca precisa injetar <code>IMessageSender</code> diretamente no seu handler.</div>
+      <div class="rel-desc"><code>BotContext</code> exposes <code>SendAsync</code> as a shortcut, delegating to <code>IMessageSender</code>. The consumer never needs to inject <code>IMessageSender</code> directly into their handler.</div>
     </div>
     <div class="rel-card">
       <div class="rel-title">BotContext → UserSession</div>
-      <div class="rel-desc">A sessão está sempre disponível em <code>context.Session</code>. O step pode gravar dados em <code>Session.Data["nome"] = value</code> e lê-los nos steps seguintes.</div>
+      <div class="rel-desc">The session is always available in <code>context.Session</code>. A step can store data in <code>Session.Data["name"] = value</code> and read it in the following steps.</div>
     </div>
     <div class="rel-card">
       <div class="rel-title">ITopicHandler → FlowResult</div>
-      <div class="rel-desc">O handler retorna <code>FlowResult.Continue()</code> se iniciou um fluxo multi-step ou <code>FlowResult.Complete()</code> se respondeu e encerrou tudo na mesma mensagem.</div>
+      <div class="rel-desc">The handler returns <code>FlowResult.Continue()</code> if it started a multi-step flow or <code>FlowResult.Complete()</code> if it replied and finished everything in the same message.</div>
     </div>
     <div class="rel-card">
       <div class="rel-title">IConversationStep → StepResult</div>
-      <div class="rel-desc">Cada step retorna <code>Continue</code>, <code>Complete</code> ou <code>JumpTo(stepId)</code>. O <code>StepRunner</code> usa esses valores para avançar, encerrar ou redirecionar o fluxo.</div>
+      <div class="rel-desc">Each step returns <code>Continue</code>, <code>Complete</code> or <code>JumpTo(stepId)</code>. The <code>StepRunner</code> uses these values to advance, end or redirect the flow.</div>
     </div>
   </div>
 

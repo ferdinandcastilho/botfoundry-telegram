@@ -6,6 +6,12 @@ name: Publish alpha
 on:
   push:
     branches: [qa]
+    # Documentation-only merges must not publish an alpha.
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/instructions/**'
 
 permissions:
   contents: read
