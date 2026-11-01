@@ -24,11 +24,11 @@ public sealed class BotPipelineTests
         handler.CallCount.Should().Be(0);
         step.ValidateCallCount.Should().Be(0);
         llm.CallCount.Should().Be(0);
-        store.SaveCallCount.Should().Be(1);
+        store.SaveCallCount.Should().Be(0);
     }
 
     [Fact]
-    public async Task ProcessAsync_AuthDenies_StillPersistsSession()
+    public async Task ProcessAsync_AuthDenies_DoesNotPersistSession()
     {
         var store = new SpySessionStore();
         var session = CreateSession();
@@ -37,7 +37,7 @@ public sealed class BotPipelineTests
 
         await pipeline.ProcessAsync(context);
 
-        store.SavedSessions.Should().ContainSingle().Which.Should().BeSameAs(session);
+        store.SavedSessions.Should().BeEmpty();
     }
 
     [Fact]

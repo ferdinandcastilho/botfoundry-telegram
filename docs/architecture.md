@@ -1,269 +1,276 @@
 # BotFoundry.Telegram — Architecture Document
 
-> **Nota:** Este é o documento arquitetural do projeto. Ele descreve o problema, requisitos, estrutura e decisões de design de forma agnóstica — sem código ou detalhes de implementação. Para contratos de interface, estrutura de pastas e exemplos de uso, consulte o Design Doc.
+> **Note:** This is the project's architecture document. It describes the problem, requirements, structure and design decisions in an agnostic way — with no code or implementation details. For interface contracts, folder structure and usage examples, see the Design Doc.
 
 ---
 
-## 1. Contexto e Problema
+## 1. Context and Problem
 
-Desenvolvedores que produzem múltiplos bots Telegram em C# enfrentam um problema recorrente: a cada novo projeto, a mesma infraestrutura é reimplementada do zero — gerenciamento de sessão por usuário, roteamento de comandos, fluxos de conversa multi-step e controle de acesso administrativo.
+Developers who build multiple Telegram bots in C# face a recurring problem: with every new project, the same infrastructure is reimplemented from scratch — per-user session management, command routing, multi-step conversation flows and administrative access control.
 
-Essa repetição gera três consequências diretas:
+This repetition has three direct consequences:
 
-- **Ineficiência:** tempo de desenvolvimento consumido por código não-diferenciador
-- **Inconsistência:** cada bot resolve o mesmo problema de forma ligeiramente diferente, aumentando a carga cognitiva ao alternar entre projetos
-- **Fragilidade:** sem uma base comum testada, bugs de infraestrutura se repetem em todos os bots
+- **Inefficiency:** development time spent on non-differentiating code
+- **Inconsistency:** each bot solves the same problem slightly differently, increasing the cognitive load when switching between projects
+- **Fragility:** without a common, tested foundation, infrastructure bugs repeat in every bot
 
-**BotFoundry.Telegram** existe para eliminar esse problema: fornece a infraestrutura comum como uma biblioteca reutilizável, permitindo que o desenvolvedor foque exclusivamente na lógica de domínio de cada bot, amparado por uma base padronizada e resiliente.
-
----
-
-## 2. Requisitos
-
-### Funcionais
-
-1. Rotear mensagens de comando (`/comando`) para handlers registrados
-2. Gerenciar sessão individual por usuário — criar, recuperar e expirar
-3. Executar fluxos de conversa multi-step com suporte a bifurcações condicionais
-4. Controlar acesso administrativo por lista de identificadores de usuário
-5. Expor ponto de extensão para integração com agentes de linguagem (LLM)
-6. Permitir troca da estratégia de persistência de sessão sem alterar o código do bot
-
-### Não-Funcionais
-
-1. **Leveza:** footprint de memória e CPU compatível com hardware de baixo custo; escala vertical é responsabilidade da infraestrutura do consumidor
-2. **Padronização:** todos os bots construídos com a lib seguem a mesma estrutura de entrada e fluxo
-3. **Extensibilidade controlada:** o consumidor estende apenas comportamento de domínio; infraestrutura não é exposta
-4. **Testabilidade:** handlers e steps de negócio devem ser testáveis sem dependência do SDK do Telegram
-
-### Operacionais
-
-1. Comunicação via long polling — sem necessidade de endpoint público
-2. Um processo por bot — isolamento total entre projetos
-
-### Fora do Escopo (v0.1)
-
-1. Store de sessão externo nativo — a lib fornece `InMemorySessionStore`; implementações externas (Redis, SQL) são responsabilidade do consumidor via contrato plugável
-2. Suporte a múltiplos bots no mesmo processo
-3. Processamento de callbacks de botões inline, edições de mensagem e mídia enviada pelo usuário — planejados para versões futuras
+**BotFoundry.Telegram** exists to eliminate this problem: it provides the common infrastructure as a reusable library, letting the developer focus exclusively on each bot's domain logic, backed by a standardized and resilient foundation.
 
 ---
 
-## 3. Restrições e Premissas
+## 2. Requirements
 
-### Restrições
+### Functional
 
-Fatores externos que a arquitetura não controla mas deve respeitar:
+1. Route command messages (`/command`) to registered handlers
+2. Manage an individual session per user — create, retrieve and expire
+3. Run multi-step conversation flows with support for conditional branching
+4. Control administrative access through a list of user identifiers
+5. Expose an extension point for integration with language agents (LLM)
+6. Allow swapping the session persistence strategy without changing the bot's code
 
-1. **SDK do Telegram:** a lib depende do pacote `Telegram.Bot` para comunicação com a API do Telegram. Breaking changes entre versões major do SDK são um risco externo gerenciado pelo isolamento arquitetural (ver ADR-003)
-2. **Ecossistema .NET:** a lib segue as convenções do ecossistema — injeção de dependência via `Microsoft.Extensions.DependencyInjection`, hosted services via `IHostedService`, e opções via `IOptions<T>`
-3. **Long polling:** a comunicação com o Telegram é feita exclusivamente via polling. Ambientes que exigem webhook estão fora do suporte desta versão
+### Non-Functional
 
-### Premissas
+1. **Lightness:** memory and CPU footprint compatible with low-cost hardware; vertical scaling is the responsibility of the consumer's infrastructure
+2. **Standardization:** all bots built with the library follow the same entry point and flow structure
+3. **Controlled extensibility:** the consumer extends only domain behavior; infrastructure is not exposed
+4. **Testability:** business handlers and steps must be testable without depending on the Telegram SDK
 
-Verdades assumidas sobre o contexto de uso que, se mudarem, podem exigir revisão arquitetural:
+### Operational
 
-1. **Uso pessoal:** o consumidor primário é o próprio autor da lib — decisões de DX (Developer Experience) são otimizadas para esse perfil
-2. **Um bot por processo:** cada instância da lib serve exatamente um bot com um token de acesso
-3. **Mensagens de texto como input primário:** o fluxo de processamento é otimizado para mensagens textuais; outros tipos de input são tratados como secundários
-4. **Sessão por `chatId`:** a identidade de um usuário é seu `chatId` do Telegram — não há autenticação externa ou federação de identidade
+1. Communication via long polling — no public endpoint required
+2. One process per bot — full isolation between projects
+
+### Out of Scope (v0.1)
+
+1. Native external session store — the library provides `InMemorySessionStore`; external implementations (Redis, SQL) are the consumer's responsibility through a pluggable contract
+2. Support for multiple bots in the same process
+3. Processing of inline button callbacks, message edits and user-sent media — planned for future versions
 
 ---
 
-## 4. Visão Arquitetural
+## 3. Constraints and Assumptions
 
-**BotFoundry.Telegram** é organizada em duas zonas com responsabilidades distintas e fronteiras explícitas.
+### Constraints
 
-### Zona 1 — Infraestrutura (gerenciada pela lib)
+External factors the architecture does not control but must respect:
 
-Conjunto fixo de módulos que operam de forma transparente ao consumidor. Não pode ser alterado, apenas configurado via opções declarativas no momento do registro.
+1. **Telegram SDK:** the library depends on the `Telegram.Bot` package to talk to the Telegram API. Breaking changes between major SDK versions are an external risk managed by architectural isolation (see ADR-003)
+2. **.NET ecosystem:** the library follows the ecosystem's conventions — dependency injection through `Microsoft.Extensions.DependencyInjection`, hosted services through `IHostedService`, and options through `IOptions<T>`
+3. **Long polling:** communication with Telegram is done exclusively through polling. Environments that require webhooks are not supported in this version
 
-| Módulo | Responsabilidade |
+### Assumptions
+
+Truths assumed about the usage context that, if they change, may require an architectural review:
+
+1. **Personal use:** the primary consumer is the library's own author — DX (Developer Experience) decisions are optimized for that profile
+2. **One bot per process:** each library instance serves exactly one bot with one access token
+3. **Text messages as the primary input:** the processing flow is optimized for text messages; other input types are treated as secondary
+4. **Session per `chatId`:** a user's identity is their Telegram `chatId` — there is no external authentication or identity federation
+
+---
+
+## 4. Architectural Overview
+
+**BotFoundry.Telegram** is organized into two zones with distinct responsibilities and explicit boundaries.
+
+### Zone 1 — Infrastructure (managed by the library)
+
+A fixed set of modules that operate transparently to the consumer. It cannot be changed, only configured through declarative options at registration time.
+
+| Module | Responsibility |
 |---|---|
-| **Hosting** | Inicializa e mantém a conexão com a API do Telegram via long polling |
-| **Pipeline** | Orquestra o fluxo de processamento de cada mensagem recebida |
-| **Sessão** | Resolve, cria e persiste o estado do usuário a cada interação |
-| **Roteamento** | Identifica se a mensagem é um comando novo ou continuação de fluxo ativo |
-| **Step Runner** | Executa os steps de um fluxo multi-step, gerenciando transições de estado |
-| **Mensageria** | Abstrai o envio de respostas, isolando o SDK do Telegram do restante da lib |
+| **Hosting** | Starts and maintains the connection to the Telegram API through long polling |
+| **Pipeline** | Orchestrates the processing flow of each received message |
+| **Session** | Resolves, creates and persists the user's state on every interaction |
+| **Routing** | Identifies whether the message is a new command or the continuation of an active flow |
+| **Step Runner** | Runs the steps of a multi-step flow, managing state transitions |
+| **Messaging** | Abstracts sending replies, isolating the Telegram SDK from the rest of the library |
 
-### Zona 2 — Domínio (implementada pelo consumidor)
+### Zone 2 — Domain (implemented by the consumer)
 
-Conjunto de contratos públicos que o consumidor implementa para expressar a lógica de negócio do seu bot. A lib invoca esses contratos nos momentos adequados do pipeline.
+A set of public contracts that the consumer implements to express their bot's business logic. The library invokes these contracts at the right moments of the pipeline.
 
-| Contrato | Responsabilidade do consumidor |
+| Contract | Consumer's responsibility |
 |---|---|
-| **Topic Handler** | Define o que acontece quando um comando é acionado |
-| **Conversation Step** | Define uma etapa de um fluxo — o que perguntar, como validar, como processar |
-| **Session Store** | Define onde e como a sessão é persistida |
-| **Auth Middleware** | Define se um usuário tem permissão para continuar em um dado contexto |
-| **LLM Bridge** | Define como repassar mensagens sem comando ativo para um agente externo |
+| **Topic Handler** | Defines what happens when a command is triggered |
+| **Conversation Step** | Defines one step of a flow — what to ask, how to validate, how to process |
+| **Session Store** | Defines where and how the session is persisted |
+| **Auth Middleware** | Defines whether a user is allowed to continue in a given context |
+| **LLM Bridge** | Defines how to forward messages without an active command to an external agent |
 
-### Princípio de fronteira
+### Boundary principle
 
-Nenhum tipo da Zona 1 é exposto na API pública da lib. A comunicação entre zonas acontece exclusivamente via contratos da Zona 2. Isso garante que o consumidor nunca depende de detalhes de implementação da infraestrutura — e que a lib pode evoluir internamente sem impacto nos bots existentes.
+No Zone 1 type is exposed in the library's public API. Communication between zones happens exclusively through Zone 2 contracts. This guarantees that the consumer never depends on infrastructure implementation details — and that the library can evolve internally without affecting existing bots.
 
 ---
 
-## 5. Fluxos Principais
+## 5. Main Flows
 
-### Fluxo 1 — Comando novo (`/comando`)
+### Flow 1 — New command (`/command`)
 
-Acionado quando o usuário envia uma mensagem iniciada com `/`.
-
-```
-Mensagem recebida pelo Hosting
-  → Pipeline filtra: é mensagem de texto? Não → descarta
-  → Sessão é resolvida (existe?) ou criada (não existe?)
-  → Sessão expirada? Sim → recria. Não → continua
-  → BotContext é construído com sessão + mensagem
-  → Auth Middleware (se configurado): permitido? Não → descarta
-  → Roteamento detecta "/" → busca Topic Handler no registro
-  → Handler encontrado? Não → ignora. Sim → inicia fluxo
-  → Step Runner executa o primeiro step do handler
-  → Resposta enviada via Mensageria
-  → Sessão persistida com novo estado
-```
-
-### Fluxo 2 — Continuação de fluxo ativo (multi-step)
-
-Acionado quando o usuário já está no meio de um fluxo iniciado anteriormente.
+Triggered when the user sends a message starting with `/`.
 
 ```
-Mensagem recebida pelo Hosting
-  → Pipeline filtra e resolve sessão (sessão já existe com estado ativo)
-  → BotContext construído
-  → Auth Middleware (se configurado)
-  → Roteamento detecta topic ativo na sessão → delega ao Step Runner
-  → Step Runner executa ValidateAsync: válido? Não → repete pergunta
-  → Válido → ProcessAsync → Continue | Complete | JumpTo
-  → Continue: avança para próximo step, executa AskAsync
-  → Complete: limpa estado da sessão, fluxo encerrado
-  → JumpTo: redireciona para step nomeado
-  → Resposta enviada via Mensageria
-  → Sessão persistida com estado atualizado
+Message received by Hosting
+  → Pipeline filters: is it a text message? No → discard
+  → Session is resolved (exists?) or created (does not exist?)
+  → Session expired? Yes → discarded and recreated. No → expiration renewed
+  → BotContext is built with session + message
+  → Auth Middleware (if configured): allowed? No → discard (session is not persisted)
+  → Routing detects "/" → looks up the Topic Handler in the registry
+  → Handler found? No → ignore. Yes → start flow
+  → Step Runner runs the handler's first step
+  → Reply sent through Messaging
+  → Session persisted with the new state
 ```
 
-### Fluxo 3 — Mensagem sem comando e sem fluxo ativo (LLM Bridge)
+### Flow 2 — Continuation of an active flow (multi-step)
 
-Acionado quando o usuário envia texto livre sem contexto de fluxo ativo.
+Triggered when the user is already in the middle of a previously started flow.
 
 ```
-Mensagem recebida pelo Hosting
-  → Pipeline filtra e resolve sessão (sem estado ativo)
-  → BotContext construído
-  → Auth Middleware (se configurado)
-  → Roteamento: sem "/" e sem topic ativo → verifica LLM Bridge
-  → LLM Bridge configurado? Não → descarta silenciosamente
-  → Sim → consumidor repassa mensagem ao agente externo
-  → Resposta enviada via Mensageria
-  → Sessão persistida
+Message received by Hosting
+  → Pipeline filters and resolves the session (session already exists with active state)
+  → BotContext built
+  → Auth Middleware (if configured)
+  → Routing detects an active topic in the session → delegates to the Step Runner
+  → Step Runner runs ValidateAsync: valid? No → repeat the question
+  → Valid → ProcessAsync → Continue | Complete | JumpTo
+  → Continue: advances to the next step, runs AskAsync
+  → Complete: clears the session state, flow ends
+  → JumpTo: redirects to the named step
+  → Reply sent through Messaging
+  → Session persisted with the updated state
 ```
+
+### Flow 3 — Message without a command and without an active flow (LLM Bridge)
+
+Triggered when the user sends free text with no active flow context.
+
+```
+Message received by Hosting
+  → Pipeline filters and resolves the session (no active state)
+  → BotContext built
+  → Auth Middleware (if configured)
+  → Routing: no "/" and no active topic → checks the LLM Bridge
+  → LLM Bridge configured? No → silently discard
+  → Yes → consumer forwards the message to the external agent
+  → Reply sent through Messaging
+  → Session persisted
+```
+
+### Session lifecycle
+
+- The session lifetime is `BotFoundryOptions.SessionExpiry` (24 hours by default) and is renewed on every accepted interaction (sliding expiration).
+- An expired session is deleted and replaced by a new one before the `BotContext` is built, so it can never resume an old flow.
+- A chat denied by the Auth Middleware does not get a stored session.
+- `InMemorySessionStore` drops expired sessions when they are read, and a hosted service (`SessionCleanupService`) removes the remaining ones every `BotFoundryOptions.SessionCleanupIntervalSeconds` seconds (60 by default), so chats that never come back do not accumulate. It is registered only together with the default store; a custom `ISessionStore` handles its own expiration.
 
 ---
 
 ## 6. ADRs (Architecture Decision Records)
 
-### ADR-001 — Modelo de Pipeline
+### ADR-001 — Pipeline Model
 
-**Contexto:** A lib precisa processar mensagens de forma padronizada em todos os bots, mas permitir que o consumidor injete comportamento de negócio sem conhecer a infraestrutura interna.
+**Context:** The library must process messages in a standardized way across all bots, but allow the consumer to inject business behavior without knowing the internal infrastructure.
 
-**Opções consideradas:**
-- Pipeline linear fixo — sem extensibilidade
-- Chain de middlewares pura — extensibilidade total, alta complexidade para o consumidor
-- Pipeline híbrido — infraestrutura fixa com ganchos opcionais de domínio
+**Options considered:**
+- Fixed linear pipeline — no extensibility
+- Pure middleware chain — full extensibility, high complexity for the consumer
+- Hybrid pipeline — fixed infrastructure with optional domain hooks
 
-**Decisão:** Pipeline híbrido.
+**Decision:** Hybrid pipeline.
 
-**Rationale:** O consumidor quer padronização, não flexibilidade infinita. A infraestrutura fixa elimina decisões repetitivas a cada bot; os ganchos cobrem os casos reais de extensão sem expor o pipeline interno.
+**Rationale:** The consumer wants standardization, not infinite flexibility. The fixed infrastructure removes repetitive decisions in every bot; the hooks cover the real extension cases without exposing the internal pipeline.
 
-**Trade-off aceito:** Comportamentos fora dos ganchos definidos exigem evolução da lib, não do consumidor.
+**Accepted trade-off:** Behaviors outside the defined hooks require evolving the library, not the consumer.
 
-**Gatilho de revisão:** Se surgir caso de uso legítimo que não se encaixa em nenhum gancho existente por duas vezes consecutivas.
-
----
-
-### ADR-002 — Estratégia de Persistência de Sessão
-
-**Contexto:** Bots de interação rápida não precisam de persistência durável; bots de conversa contínua precisam sobreviver a reinicializações. Ambos os casos coexistem no ecossistema do consumidor.
-
-**Opções consideradas:**
-- Sempre in-memory — simples, sem resiliência a reinicializações
-- Sempre persistido — robusto, mas com overhead desnecessário para casos simples
-- Plugável via contrato `ISessionStore`, com in-memory como padrão por convenção DI
-
-**Decisão:** `ISessionStore` plugável; `InMemorySessionStore` registrado automaticamente apenas se nenhuma implementação foi registrada antes pelo consumidor.
-
-**Rationale:** O consumidor escolhe a estratégia adequada para cada bot sem que a lib imponha overhead. A convenção DI é o padrão idiomático do ecossistema .NET.
-
-**Trade-off aceito:** A lib não fornece implementação de store externo — o consumidor é responsável por implementar quando necessário.
-
-**Gatilho de revisão:** Se o consumidor implementar store durável em dois ou mais bots, avaliar pacote complementar oficial.
+**Review trigger:** If a legitimate use case that fits none of the existing hooks shows up twice in a row.
 
 ---
 
-### ADR-003 — Isolamento do SDK Telegram.Bot
+### ADR-002 — Session Persistence Strategy
 
-**Contexto:** O pacote `Telegram.Bot` tem histórico de breaking changes entre versões major. Expor seus tipos na API pública amarraria o consumidor a uma versão específica e tornaria handlers não-testáveis.
+**Context:** Quick-interaction bots do not need durable persistence; continuous-conversation bots need to survive restarts. Both cases coexist in the consumer's ecosystem.
 
-**Opções consideradas:**
-- Usar `Telegram.Bot` diretamente em toda a lib
-- Isolar em dois componentes internos dedicados, expondo apenas abstrações próprias
+**Options considered:**
+- Always in-memory — simple, no resilience to restarts
+- Always persisted — robust, but with unnecessary overhead for simple cases
+- Pluggable through the `ISessionStore` contract, with in-memory as the default by DI convention
 
-**Decisão:** Apenas dois componentes internos de infraestrutura referenciam `Telegram.Bot`: o adapter de mensageria (`TelegramMessageSender`) e o adapter de polling (`TelegramPollingAdapter`). Todo o restante da lib e toda a API pública usam tipos agnósticos.
+**Decision:** Pluggable `ISessionStore`; `InMemorySessionStore` is registered automatically only if the consumer has not registered an implementation beforehand.
 
-**Rationale:** Atualizações do SDK ficam contidas em dois pontos bem definidos. Handlers e steps do consumidor são 100% testáveis sem depender do Telegram.
+**Rationale:** The consumer picks the right strategy for each bot without the library imposing overhead. The DI convention is the idiomatic standard of the .NET ecosystem.
 
-**Trade-off aceito:** Funcionalidades avançadas do SDK precisam ser explicitamente expostas via contrato de mensageria — não estão disponíveis automaticamente.
+**Accepted trade-off:** The library does not ship an external store implementation — the consumer is responsible for implementing one when needed.
 
-**Gatilho de revisão:** Quando o consumidor precisar de capacidade do SDK não exposta pelo contrato de mensageria por duas vezes consecutivas.
-
----
-
-### ADR-004 — Um Processo por Bot
-
-**Contexto:** O consumidor opera múltiplos bots independentes, cada um com domínio, log e ciclo de vida próprios.
-
-**Opções consideradas:**
-- Suporte a múltiplos bots no mesmo processo
-- Um processo por bot
-
-**Decisão:** Um processo por bot. A lib não suporta múltiplos tokens ou clientes Telegram na mesma instância.
-
-**Rationale:** Isolamento total entre bots — falha em um não afeta os demais. Deployment e ciclo de vida independentes. A complexidade de múltiplos bots no mesmo processo não tem retorno real para o caso de uso atual.
-
-**Trade-off aceito:** Sem economia de recursos por colocação de processos.
-
-**Gatilho de revisão:** Se o consumidor precisar colocar múltiplos bots no mesmo processo por restrição de recursos de hardware.
+**Review trigger:** If the consumer implements a durable store in two or more bots, evaluate an official companion package.
 
 ---
 
-## 7. Fora do Escopo
+### ADR-003 — Telegram.Bot SDK Isolation
 
-Esta seção define explicitamente o que **BotFoundry.Telegram** não faz na v0.1. Seu propósito é evitar suposições incorretas sobre as capacidades da lib e orientar decisões de evolução futura.
+**Context:** The `Telegram.Bot` package has a history of breaking changes between major versions. Exposing its types in the public API would tie the consumer to a specific version and make handlers untestable.
 
-### Fora do escopo permanente
+**Options considered:**
+- Use `Telegram.Bot` directly throughout the library
+- Isolate it in two dedicated internal components, exposing only the library's own abstractions
 
-Capacidades que contradizem decisões arquiteturais fundamentais e não serão incorporadas sem revisão de ADR:
+**Decision:** Only two internal infrastructure components reference `Telegram.Bot`: the messaging adapter (`TelegramMessageSender`) and the polling adapter (`TelegramPollingAdapter`). The rest of the library and the whole public API use agnostic types.
 
-1. **Múltiplos bots no mesmo processo** — viola o princípio de isolamento por processo (ADR-004)
-2. **Exposição direta de tipos do SDK Telegram.Bot** — viola o isolamento de SDK (ADR-003)
-3. **Webhook** — requer endpoint HTTP público, fora das restrições operacionais definidas
+**Rationale:** SDK updates stay contained in two well-defined places. The consumer's handlers and steps are 100% testable without depending on Telegram.
 
-### Fora do escopo da v0.1 — planejados para versões futuras
+**Accepted trade-off:** Advanced SDK features must be explicitly exposed through the messaging contract — they are not available automatically.
 
-Capacidades válidas e desejadas, adiadas por não serem essenciais ao núcleo da lib:
+**Review trigger:** When the consumer needs an SDK capability not exposed by the messaging contract twice in a row.
 
-1. Processamento de callbacks de botões inline
-2. Processamento de edições de mensagem
-3. Processamento de mídia enviada pelo usuário (imagens, áudio, documentos)
-4. Implementações nativas de store externo (Redis, SQLite) — entregues como pacotes complementares quando houver demanda recorrente
+---
 
-### Fora do escopo por design
+### ADR-004 — One Process per Bot
 
-Responsabilidades que pertencem ao domínio do consumidor, não à lib:
+**Context:** The consumer operates multiple independent bots, each with its own domain, log and lifecycle.
 
-1. **Lógica de negócio de qualquer bot** — handlers, steps e regras de domínio são sempre responsabilidade do consumidor
-2. **Integração interna com LLMs** — a lib expõe o gancho; a integração real é implementada pelo consumidor
-3. **Autenticação externa** — a lib expõe o middleware de auth; a fonte de verdade é responsabilidade do consumidor
-4. **Escala horizontal** — a lib é projetada para instância única; balanceamento e orquestração são responsabilidade da infraestrutura do consumidor
+**Options considered:**
+- Support for multiple bots in the same process
+- One process per bot
+
+**Decision:** One process per bot. The library does not support multiple tokens or Telegram clients in the same instance.
+
+**Rationale:** Full isolation between bots — a failure in one does not affect the others. Independent deployment and lifecycle. The complexity of multiple bots in the same process has no real return for the current use case.
+
+**Accepted trade-off:** No resource savings from process co-location.
+
+**Review trigger:** If the consumer needs to co-locate multiple bots in the same process because of hardware resource constraints.
+
+---
+
+## 7. Out of Scope
+
+This section explicitly defines what **BotFoundry.Telegram** does not do in v0.1. Its purpose is to avoid wrong assumptions about the library's capabilities and to guide future evolution decisions.
+
+### Permanently out of scope
+
+Capabilities that contradict fundamental architectural decisions and will not be incorporated without an ADR review:
+
+1. **Multiple bots in the same process** — violates the process isolation principle (ADR-004)
+2. **Direct exposure of Telegram.Bot SDK types** — violates SDK isolation (ADR-003)
+3. **Webhook** — requires a public HTTP endpoint, outside the defined operational constraints
+
+### Out of scope for v0.1 — planned for future versions
+
+Valid and desired capabilities, postponed because they are not essential to the library's core:
+
+1. Processing of inline button callbacks
+2. Processing of message edits
+3. Processing of user-sent media (images, audio, documents)
+4. Native external store implementations (Redis, SQLite) — delivered as companion packages when there is recurring demand
+
+### Out of scope by design
+
+Responsibilities that belong to the consumer's domain, not to the library:
+
+1. **Business logic of any bot** — handlers, steps and domain rules are always the consumer's responsibility
+2. **Internal integration with LLMs** — the library exposes the hook; the actual integration is implemented by the consumer
+3. **External authentication** — the library exposes the auth middleware; the source of truth is the consumer's responsibility
+4. **Horizontal scaling** — the library is designed for a single instance; balancing and orchestration are the responsibility of the consumer's infrastructure

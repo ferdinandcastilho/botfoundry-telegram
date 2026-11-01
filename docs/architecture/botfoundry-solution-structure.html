@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BotFoundry — Estrutura da Solution</title>
+<title>BotFoundry — Solution Structure</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -148,7 +148,7 @@ code{font-family:var(--mono);font-size:.9em;padding:1px 4px;border-radius:3px;ba
     </svg>
     <div>
       <div class="logo-text">BotFoundry.Telegram</div>
-      <div class="logo-sub">Estrutura da Solution — Referência</div>
+      <div class="logo-sub">Solution Structure — Reference</div>
     </div>
   </div>
   <button class="theme-btn" data-tt aria-label="Tema">
@@ -159,16 +159,16 @@ code{font-family:var(--mono);font-size:.9em;padding:1px 4px;border-radius:3px;ba
 <main class="page">
   <div class="sec-hdr">
     <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem">
-      <span class="badge bp">Estrutura</span>
+      <span class="badge bp">Structure</span>
       <span class="badge bo">Solution</span>
       <span class="badge bpu">Ports &amp; Adapters</span>
     </div>
-    <h1>Esqueleto da Solution</h1>
-    <p>Organização dos projetos <code>.csproj</code>, referências entre eles e pacotes NuGet. Nenhum arquivo de código ainda — apenas a estrutura que sustenta tudo que vem depois.</p>
+    <h1>Solution Skeleton</h1>
+    <p>Project organization <code>.csproj</code>, references between them and NuGet packages. No code files yet — only the structure that supports everything that comes after.</p>
   </div>
 
   <!-- TREE -->
-  <div class="divider"><h2>Árvore de Diretórios</h2></div>
+  <div class="divider"><h2>Directory Tree</h2></div>
 
   <div class="tree-container">
     <div class="tree-header">
@@ -180,10 +180,10 @@ code{font-family:var(--mono);font-size:.9em;padding:1px 4px;border-radius:3px;ba
 │
 ├── <span class="t-dir">src/</span>
 │   │
-│   ├── <span class="t-dir">BotFoundry.Telegram.Abstractions/</span>           <span class="t-cm">← ports + modelos</span>
+│   ├── <span class="t-dir">BotFoundry.Telegram.Abstractions/</span>           <span class="t-cm">← ports + models</span>
 │   │   └── <span class="t-csproj">BotFoundry.Telegram.Abstractions.csproj</span>
 │   │
-│   ├── <span class="t-dir">BotFoundry.Telegram.Core/</span>                   <span class="t-cm">← núcleo (hexágono)</span>
+│   ├── <span class="t-dir">BotFoundry.Telegram.Core/</span>                   <span class="t-cm">← core (hexagon)</span>
 │   │   └── <span class="t-csproj">BotFoundry.Telegram.Core.csproj</span>
 │   │
 │   └── <span class="t-dir">BotFoundry.Telegram/</span>                        <span class="t-cm">← adapters + DI entry point</span>
@@ -191,16 +191,16 @@ code{font-family:var(--mono);font-size:.9em;padding:1px 4px;border-radius:3px;ba
 │
 └── <span class="t-dir">tests/</span>
     │
-    ├── <span class="t-dir">BotFoundry.Telegram.Core.Tests/</span>             <span class="t-cm">← testa núcleo com fakes</span>
+    ├── <span class="t-dir">BotFoundry.Telegram.Core.Tests/</span>             <span class="t-cm">← tests the core with fakes</span>
     │   └── <span class="t-csproj">BotFoundry.Telegram.Core.Tests.csproj</span>
     │
-    └── <span class="t-dir">BotFoundry.Telegram.Integration.Tests/</span>     <span class="t-cm">← testa adapters reais</span>
+    └── <span class="t-dir">BotFoundry.Telegram.Integration.Tests/</span>     <span class="t-cm">← tests real adapters</span>
         └── <span class="t-csproj">BotFoundry.Telegram.Integration.Tests.csproj</span></pre>
     </div>
   </div>
 
   <!-- DEP DIAGRAM -->
-  <div class="divider"><h2>Diagrama de Dependências</h2></div>
+  <div class="divider"><h2>Dependency Diagram</h2></div>
 
   <div class="dep-diagram">
     <div class="dep-inner">
@@ -229,15 +229,15 @@ code{font-family:var(--mono);font-size:.9em;padding:1px 4px;border-radius:3px;ba
       </div>
     </div>
     <div class="dep-leg">
-      <div class="leg-item"><div class="leg-dot" style="background:var(--primary)"></div>Abstractions — sem dependências externas</div>
-      <div class="leg-item"><div class="leg-dot" style="background:var(--purple)"></div>Core — só depende de Abstractions</div>
-      <div class="leg-item"><div class="leg-dot" style="background:var(--orange)"></div>BotFoundry — depende de Core + Abstractions + Telegram.Bot SDK</div>
-      <div class="leg-item"><div class="leg-dot" style="background:var(--success)"></div>Tests — dependem de Core ou BotFoundry conforme o tipo de teste</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--primary)"></div>Abstractions — no external dependencies</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--purple)"></div>Core — depends only on Abstractions</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--orange)"></div>BotFoundry — depends on Core + Abstractions + Telegram.Bot SDK</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--success)"></div>Tests — depend on Core or BotFoundry depending on the test type</div>
     </div>
   </div>
 
   <!-- PROJECTS DETAIL -->
-  <div class="divider"><h2>Detalhes de Cada Projeto</h2></div>
+  <div class="divider"><h2>Details of Each Project</h2></div>
 
   <div class="projects-grid">
 
@@ -246,19 +246,19 @@ code{font-family:var(--mono);font-size:.9em;padding:1px 4px;border-radius:3px;ba
       <div class="proj-header">
         <div>
           <div class="proj-name">BotFoundry.Telegram.Abstractions</div>
-          <div class="proj-desc">Interfaces (Ports) e modelos agnósticos. Nenhuma lógica, nenhuma dependência.</div>
+          <div class="proj-desc">Interfaces (Ports) and agnostic models. No logic, no dependency.</div>
         </div>
         <span class="badge bp">Abstractions</span>
       </div>
       <div class="proj-body">
         <div>
-          <div class="proj-section-label">Referências de Projeto</div>
+          <div class="proj-section-label">Project References</div>
           <div class="ref-list">
-            <div class="empty-state">Nenhuma — é a base do grafo</div>
+            <div class="empty-state">None — it is the base of the graph</div>
           </div>
         </div>
         <div>
-          <div class="proj-section-label">Pacotes NuGet</div>
+          <div class="proj-section-label">NuGet Packages</div>
           <div class="pkg-list">
             <div class="pkg-item"><div class="ref-dot" style="background:var(--blue)"></div><span class="pkg-ms">Microsoft.Extensions.DependencyInjection.Abstractions</span></div>
             <div class="pkg-item"><div class="ref-dot" style="background:var(--blue)"></div><span class="pkg-ms">Microsoft.Extensions.Options</span></div>
@@ -267,8 +267,8 @@ code{font-family:var(--mono);font-size:.9em;padding:1px 4px;border-radius:3px;ba
       </div>
       <div style="padding:0 1.25rem 1.25rem">
         <div class="cb cb-p">
-          <div class="cb-label" style="color:var(--primary)">Conceito — Regra 03</div>
-          <div class="cb-text">Este projeto não pode referenciar nenhum outro projeto da lib. Todos dependem dele; ele não depende de ninguém. É o vocabulário compartilhado do sistema.</div>
+          <div class="cb-label" style="color:var(--primary)">Concept — Rule 03</div>
+          <div class="cb-text">This project cannot reference any other project in the library. Everyone depends on it; it depends on no one. It is the system's shared vocabulary.</div>
         </div>
       </div>
     </div>
@@ -278,19 +278,19 @@ code{font-family:var(--mono);font-size:.9em;padding:1px 4px;border-radius:3px;ba
       <div class="proj-header">
         <div>
           <div class="proj-name">BotFoundry.Telegram.Core</div>
-          <div class="proj-desc">Núcleo do hexágono — Pipeline, Routing, Session, StepRunner, Messaging. Sem lógica de infraestrutura.</div>
+          <div class="proj-desc">Core of the hexagon — Pipeline, Routing, Session, StepRunner, Messaging. No infrastructure logic.</div>
         </div>
         <span class="badge bpu">Core</span>
       </div>
       <div class="proj-body">
         <div>
-          <div class="proj-section-label">Referências de Projeto</div>
+          <div class="proj-section-label">Project References</div>
           <div class="ref-list">
             <div class="ref-item"><div class="ref-dot" style="background:var(--primary)"></div>BotFoundry.Telegram.Abstractions</div>
           </div>
         </div>
         <div>
-          <div class="proj-section-label">Pacotes NuGet</div>
+          <div class="proj-section-label">NuGet Packages</div>
           <div class="pkg-list">
             <div class="pkg-item"><div class="ref-dot" style="background:var(--blue)"></div><span class="pkg-ms">Microsoft.Extensions.Logging.Abstractions</span></div>
           </div>
@@ -298,8 +298,8 @@ code{font-family:var(--mono);font-size:.9em;padding:1px 4px;border-radius:3px;ba
       </div>
       <div style="padding:0 1.25rem 1.25rem">
         <div class="cb cb-pu">
-          <div class="cb-label" style="color:var(--purple)">Conceito — Regra 01</div>
-          <div class="cb-text">Core só conhece <code>Abstractions</code>. Nunca referencia <code>Telegram.Bot</code> nem o projeto de adapters. Essa restrição garante testabilidade total e isolamento do SDK.</div>
+          <div class="cb-label" style="color:var(--purple)">Concept — Rule 01</div>
+          <div class="cb-text">Core only knows <code>Abstractions</code>. It never references <code>Telegram.Bot</code> nor the adapters project. This restriction guarantees full testability and SDK isolation.</div>
         </div>
       </div>
     </div>
@@ -309,20 +309,20 @@ code{font-family:var(--mono);font-size:.9em;padding:1px 4px;border-radius:3px;ba
       <div class="proj-header">
         <div>
           <div class="proj-name">BotFoundry.Telegram</div>
-          <div class="proj-desc">Casca do hexágono — adapters concretos, registro no DI e entry point público da lib.</div>
+          <div class="proj-desc">Shell of the hexagon — concrete adapters, DI registration and the library's public entry point.</div>
         </div>
         <span class="badge bo">Adapters</span>
       </div>
       <div class="proj-body">
         <div>
-          <div class="proj-section-label">Referências de Projeto</div>
+          <div class="proj-section-label">Project References</div>
           <div class="ref-list">
             <div class="ref-item"><div class="ref-dot" style="background:var(--primary)"></div>BotFoundry.Telegram.Abstractions</div>
             <div class="ref-item"><div class="ref-dot" style="background:var(--purple)"></div>BotFoundry.Telegram.Core</div>
           </div>
         </div>
         <div>
-          <div class="proj-section-label">Pacotes NuGet</div>
+          <div class="proj-section-label">NuGet Packages</div>
           <div class="pkg-list">
             <div class="pkg-item"><div class="ref-dot" style="background:var(--primary)"></div><span class="pkg-tg">Telegram.Bot</span></div>
             <div class="pkg-item"><div class="ref-dot" style="background:var(--blue)"></div><span class="pkg-ms">Microsoft.Extensions.Hosting</span></div>
@@ -333,8 +333,8 @@ code{font-family:var(--mono);font-size:.9em;padding:1px 4px;border-radius:3px;ba
       </div>
       <div style="padding:0 1.25rem 1.25rem">
         <div class="cb cb-o">
-          <div class="cb-label" style="color:var(--orange)">Conceito — Regra 02 (ADR-003)</div>
-          <div class="cb-text">Este é o único projeto que pode referenciar <code>Telegram.Bot</code>. Todo o SDK fica isolado aqui — nunca vaza para Core ou Abstractions.</div>
+          <div class="cb-label" style="color:var(--orange)">Concept — Rule 02 (ADR-003)</div>
+          <div class="cb-text">This is the only project allowed to reference <code>Telegram.Bot</code>. The whole SDK stays isolated here — it never leaks into Core or Abstractions.</div>
         </div>
       </div>
     </div>
@@ -344,20 +344,20 @@ code{font-family:var(--mono);font-size:.9em;padding:1px 4px;border-radius:3px;ba
       <div class="proj-header">
         <div>
           <div class="proj-name">BotFoundry.Telegram.Core.Tests</div>
-          <div class="proj-desc">Testa o núcleo isolado usando fakes dos Ports. Sem Telegram, sem rede.</div>
+          <div class="proj-desc">Tests the isolated core using fakes of the Ports. No Telegram, no network.</div>
         </div>
-        <span class="badge bs">Testes</span>
+        <span class="badge bs">Tests</span>
       </div>
       <div class="proj-body">
         <div>
-          <div class="proj-section-label">Referências de Projeto</div>
+          <div class="proj-section-label">Project References</div>
           <div class="ref-list">
             <div class="ref-item"><div class="ref-dot" style="background:var(--primary)"></div>BotFoundry.Telegram.Abstractions</div>
             <div class="ref-item"><div class="ref-dot" style="background:var(--purple)"></div>BotFoundry.Telegram.Core</div>
           </div>
         </div>
         <div>
-          <div class="proj-section-label">Pacotes NuGet</div>
+          <div class="proj-section-label">NuGet Packages</div>
           <div class="pkg-list">
             <div class="pkg-item"><div class="ref-dot" style="background:var(--orange)"></div><span class="pkg-xunit">xunit</span></div>
             <div class="pkg-item"><div class="ref-dot" style="background:var(--orange)"></div><span class="pkg-xunit">xunit.runner.visualstudio</span></div>
@@ -368,8 +368,8 @@ code{font-family:var(--mono);font-size:.9em;padding:1px 4px;border-radius:3px;ba
       </div>
       <div style="padding:0 1.25rem 1.25rem">
         <div class="cb cb-s">
-          <div class="cb-label" style="color:var(--success)">Conceito — Ports &amp; Adapters em ação</div>
-          <div class="cb-text">Não referencia <code>BotFoundry.Telegram</code> (adapters reais). Usa apenas <code>Core</code> e implementa fakes dos Ports localmente. Resultado: testes rápidos, sem IO e sem dependência do SDK.</div>
+          <div class="cb-label" style="color:var(--success)">Concept — Ports &amp; Adapters in action</div>
+          <div class="cb-text">Does not reference <code>BotFoundry.Telegram</code> (real adapters). Uses only <code>Core</code> and implements fakes of the Ports locally. Result: fast tests, no IO and no SDK dependency.</div>
         </div>
       </div>
     </div>
@@ -379,20 +379,20 @@ code{font-family:var(--mono);font-size:.9em;padding:1px 4px;border-radius:3px;ba
       <div class="proj-header">
         <div>
           <div class="proj-name">BotFoundry.Telegram.Integration.Tests</div>
-          <div class="proj-desc">Valida que os adapters reais se comportam conforme os contratos dos Ports.</div>
+          <div class="proj-desc">Validates that the real adapters behave according to the Ports' contracts.</div>
         </div>
-        <span class="badge bs">Testes</span>
+        <span class="badge bs">Tests</span>
       </div>
       <div class="proj-body">
         <div>
-          <div class="proj-section-label">Referências de Projeto</div>
+          <div class="proj-section-label">Project References</div>
           <div class="ref-list">
             <div class="ref-item"><div class="ref-dot" style="background:var(--primary)"></div>BotFoundry.Telegram.Abstractions</div>
             <div class="ref-item"><div class="ref-dot" style="background:var(--orange)"></div>BotFoundry.Telegram</div>
           </div>
         </div>
         <div>
-          <div class="proj-section-label">Pacotes NuGet</div>
+          <div class="proj-section-label">NuGet Packages</div>
           <div class="pkg-list">
             <div class="pkg-item"><div class="ref-dot" style="background:var(--orange)"></div><span class="pkg-xunit">xunit</span></div>
             <div class="pkg-item"><div class="ref-dot" style="background:var(--orange)"></div><span class="pkg-xunit">xunit.runner.visualstudio</span></div>
@@ -406,21 +406,21 @@ code{font-family:var(--mono);font-size:.9em;padding:1px 4px;border-radius:3px;ba
   </div>
 
   <!-- STEPS -->
-  <div class="divider"><h2>O que Executar</h2></div>
-  <p style="color:var(--muted);font-size:var(--sm);margin-bottom:.5rem">Sequência para montar o esqueleto do zero com a CLI do .NET.</p>
+  <div class="divider"><h2>What to Run</h2></div>
+  <p style="color:var(--muted);font-size:var(--sm);margin-bottom:.5rem">Sequence to build the skeleton from scratch with the .NET CLI.</p>
 
   <div class="steps">
     <div class="step">
       <div class="step-num">1</div>
       <div class="step-content">
-        <div class="step-title">Criar a solution</div>
+        <div class="step-title">Create the solution</div>
         <div class="step-desc"><code>dotnet new sln -n BotFoundry.Telegram</code></div>
       </div>
     </div>
     <div class="step">
       <div class="step-num">2</div>
       <div class="step-content">
-        <div class="step-title">Criar os 5 projetos <code>classlib</code> / <code>xunit</code></div>
+        <div class="step-title">Create the 5 projects <code>classlib</code> / <code>xunit</code></div>
         <div class="step-desc">
           <code>dotnet new classlib -n BotFoundry.Telegram.Abstractions -o src/BotFoundry.Telegram.Abstractions</code><br>
           <code>dotnet new classlib -n BotFoundry.Telegram.Core -o src/BotFoundry.Telegram.Core</code><br>
@@ -433,36 +433,36 @@ code{font-family:var(--mono);font-size:.9em;padding:1px 4px;border-radius:3px;ba
     <div class="step">
       <div class="step-num">3</div>
       <div class="step-content">
-        <div class="step-title">Adicionar projetos à solution</div>
+        <div class="step-title">Add projects to the solution</div>
         <div class="step-desc"><code>dotnet sln add src/**/*.csproj tests/**/*.csproj</code></div>
       </div>
     </div>
     <div class="step">
       <div class="step-num">4</div>
       <div class="step-content">
-        <div class="step-title">Adicionar referências entre projetos</div>
-        <div class="step-desc">Conforme o diagrama de dependências acima — usando <code>dotnet add reference</code></div>
+        <div class="step-title">Add references between projects</div>
+        <div class="step-desc">According to the dependency diagram above — using <code>dotnet add reference</code></div>
       </div>
     </div>
     <div class="step">
       <div class="step-num">5</div>
       <div class="step-content">
-        <div class="step-title">Adicionar pacotes NuGet</div>
-        <div class="step-desc">Conforme a tabela de cada projeto acima — usando <code>dotnet add package</code></div>
+        <div class="step-title">Add NuGet packages</div>
+        <div class="step-desc">According to the table of each project above — using <code>dotnet add package</code></div>
       </div>
     </div>
     <div class="step">
       <div class="step-num">6</div>
       <div class="step-content">
-        <div class="step-title">Remover arquivos gerados automaticamente</div>
-        <div class="step-desc">Deletar os <code>Class1.cs</code> e <code>UnitTest1.cs</code> gerados pelo template — a solution deve compilar vazia.</div>
+        <div class="step-title">Remove automatically generated files</div>
+        <div class="step-desc">Delete the <code>Class1.cs</code> e <code>UnitTest1.cs</code> generated by the template — the solution must build empty.</div>
       </div>
     </div>
     <div class="step">
       <div class="step-num">7</div>
       <div class="step-content">
-        <div class="step-title">Validar com <code>dotnet build</code></div>
-        <div class="step-desc">A solution deve compilar sem erros e sem warnings. <code>dotnet test</code> deve passar (zero testes é OK neste estágio).</div>
+        <div class="step-title">Validate with <code>dotnet build</code></div>
+        <div class="step-desc">The solution must build with no errors and no warnings. <code>dotnet test</code> must pass (zero tests is OK at this stage).</div>
       </div>
     </div>
   </div>

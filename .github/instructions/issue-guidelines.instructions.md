@@ -5,33 +5,33 @@ applyTo: '**/*'
 
 # Issue Guidelines
 
-## Título
+## Title
 
-- Frase direta em português (pt-BR) descrevendo a ação
-- Sem prefixo de categoria no título
-- Exemplos:
-  - `Remover testes redundantes do BotFoundry.Telegram.Tests`
-  - `Implementar workflow de publish do NuGet`
-  - `Corrigir comportamento do TelegramMessageSender`
+- Direct sentence in US English describing the action
+- No category prefix in the title
+- Examples:
+  - `Remove redundant tests from BotFoundry.Telegram.Tests`
+  - `Implement the NuGet publish workflow`
+  - `Fix the TelegramMessageSender behavior`
 
-## Labels obrigatórias
+## Required labels
 
-Cada issue deve ter ao menos **uma label de tipo** e, quando aplicável, **uma label de escopo**.
+Every issue must have at least **one type label** and, when applicable, **one scope label**.
 
-### Labels de tipo
+### Type labels
 
-| Label | Uso |
+| Label | Use |
 |---|---|
-| `feat` | Nova funcionalidade |
-| `fix` | Correção de comportamento incorreto |
-| `chore` | Tarefa técnica sem impacto funcional (ex: reorganização, remoção) |
-| `docs` | Documentação |
-| `refactor` | Refatoração sem mudança de comportamento |
-| `test` | Adição ou manutenção de testes |
+| `feat` | New feature |
+| `fix` | Fix for incorrect behavior |
+| `chore` | Technical task with no functional impact (e.g. reorganization, removal) |
+| `docs` | Documentation |
+| `refactor` | Refactoring with no behavior change |
+| `test` | Adding or maintaining tests |
 
-### Labels de escopo (quando a issue referencia um projeto específico)
+### Scope labels (when the issue references a specific project)
 
-| Label | Projeto |
+| Label | Project |
 |---|---|
 | `BotFoundry.Telegram` | `src/BotFoundry.Telegram` |
 | `BotFoundry.Telegram.Core` | `src/BotFoundry.Telegram.Core` |
@@ -40,28 +40,22 @@ Cada issue deve ter ao menos **uma label de tipo** e, quando aplicável, **uma l
 | `BotFoundry.Telegram.Core.Tests` | `tests/UnitTests/BotFoundry.Telegram.Core.Tests` |
 | `BotFoundry.Telegram.Integration.Tests` | `tests/IntegrationTests/BotFoundry.Telegram.Integration.Tests` |
 
-## Idioma
+## Language
 
-Todo o conteúdo da issue (título, corpo, critérios de aceite) deve ser escrito em **português pt-BR**.
+All issue content (title, body, acceptance criteria) must be written in **US English**.
 
-## Estrutura recomendada do corpo
+## Recommended body structure
 
 ```
-## Contexto
+## Context
 
 
 ## Branch
-`/` (a partir de `main`)
+`<type>/<short-name>` (from `main`)
 
-## O que deve ser feito
+## What to do
 
 
-## Critérios de Aceite
+## Acceptance Criteria
 - [ ] ...
 ```
-
-## Critérios de Aceite
-
-- [ ] Arquivo `.github/instructions/issue-guidelines.instructions.md` criado
-- [ ] Conteúdo cobre: formato do título, labels de tipo, labels de escopo e idioma
-- [ ] Arquivo segue o mesmo frontmatter dos demais arquivos da pasta (`description`, `applyTo`)

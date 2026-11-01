@@ -14,6 +14,14 @@ namespace BotFoundry.Telegram.DependencyInjection
             var options = new BotFoundryOptions();
             configure?.Invoke(options);
 
+            if (options.SessionCleanupIntervalSeconds <= 0)
+                throw new ArgumentOutOfRangeException(
+                    nameof(configure),
+                    options.SessionCleanupIntervalSeconds,
+                    $"{nameof(BotFoundryOptions.SessionCleanupIntervalSeconds)} must be greater than zero.");
+
+            services.AddSingleton(options);
+
             // Instantiate TelegramBotClient without an explicit using for Telegram.Bot
             var botClient = new global::Telegram.Bot.TelegramBotClient(token);
             services.AddSingleton(botClient);
@@ -21,7 +29,11 @@ namespace BotFoundry.Telegram.DependencyInjection
             services.AddSingleton<IMessageSender, TelegramMessageSender>();
 
             if (!services.Any(d => d.ServiceType == typeof(ISessionStore)))
-                services.AddSingleton<ISessionStore, InMemorySessionStore>();
+            {
+                services.AddSingleton<InMemorySessionStore>();
+                services.AddSingleton<ISessionStore>(sp => sp.GetRequiredService<InMemorySessionStore>());
+                services.AddHostedService<SessionCleanupService>();
+            }
 
             // Core
             services.AddSingleton<IBotPipeline, Core.BotPipeline>();
@@ -36,5 +48,11 @@ namespace BotFoundry.Telegram.DependencyInjection
     public sealed class BotFoundryOptions
     {
         public TimeSpan SessionExpiry { get; set; } = TimeSpan.FromHours(24);
+
+        /// <summary>
+        /// How often, in seconds, expired sessions are removed from the default in-memory session store.
+        /// Must be greater than zero. Ignored when a custom <c>ISessionStore</c> is registered.
+        /// </summary>
+        public int SessionCleanupIntervalSeconds { get; set; } = 60;
     }
 }
