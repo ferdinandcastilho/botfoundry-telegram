@@ -281,6 +281,7 @@ feature branch ──squash──▶ qa ──merge commit──▶ main
 | `Publish alpha` (`publish-alpha.yml`) | Push to `qa` (documentation-only pushes are ignored) | Builds, tests and publishes an alpha package to nuget.org. |
 | `Publish stable` (`publish-stable.yml`) | Push to `main` (the merge of `qa`) | Computes the next stable version, builds, tests, publishes, tags the release and creates the GitHub release. |
 | `Delete merged branch` (`delete-merged-branch.yml`) | PR into `qa` closed | Deletes the source branch if the PR was merged and came from this repository. Never deletes `main` or `qa`. |
+| `Notify` (`notify.yml`) | `CI`, publish and cleanup workflows finish | Sends the result to the Telegram DevOps bot (see Notifications). |
 
 Dependabot opens weekly pull requests against `qa` for GitHub Actions and NuGet packages.
 
@@ -299,6 +300,16 @@ No NuGet API key is stored anywhere. The publish workflows request a short-lived
 - Two GitHub environments: `nuget-alpha` (deployments only from `qa`) and `nuget-stable` (only from `main`). Each has the secret `NUGET_USER` with the nuget.org profile name.
 - Two trusted publishing policies on nuget.org, one per workflow file (`publish-alpha.yml` with `nuget-alpha`, and `publish-stable.yml` with `nuget-stable`), scoped to the `BotFoundry.Telegram` package.
 - The workflows need `id-token: write`; third-party actions are pinned by commit SHA.
+
+### Notifications
+
+The `Notify` workflow (`notify.yml`) sends pipeline results to the maintainer's Telegram DevOps bot. It runs when `CI`, `Publish alpha`, `Publish stable` or `Delete merged branch` finish:
+
+- failures (and cancelled or timed-out publish runs) are always reported;
+- successful alpha and stable publishes are reported;
+- successful `CI` and `Delete merged branch` runs are silent.
+
+It uses the repository secrets `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` and skips silently when they are not available (forks, unconfigured clones). It never checks out or runs pull request code, and all values are escaped before they go into the message. Because `workflow_run` workflows always run from the default branch, changes to `notify.yml` only take effect after they reach `main`.
 
 ### Repository protections
 
