@@ -13,3 +13,16 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      # Updated together: bumping one Microsoft.Extensions package alone makes NuGet
+      # report a package downgrade (NU1605) against its siblings.
+      microsoft-extensions:
+        patterns:
+          - "Microsoft.Extensions.*"
+      test-tools:
+        patterns:
+          - "Microsoft.NET.Test.Sdk"
+          - "xunit*"
+          - "coverlet.*"
+          - "FluentAssertions"
+          - "NSubstitute"
