@@ -6,6 +6,14 @@
 # Required: WORKFLOW CONCLUSION REPO BRANCH ACTOR SHA RUN_URL RUN_NUMBER
 # Optional: PR (pull request number), BOT_TOKEN, CHAT_ID, GH_TOKEN (to read the latest release),
 #           DRY_RUN=1 (print the message instead of sending it)
+#
+# Every message has the same layout:
+#   <emoji> <title>
+#   <repository>
+#
+#   Workflow / Branch / Commit / By / PR / Version   (fields that apply)
+#
+#   <links>
 set -euo pipefail
 
 if [ -z "${BOT_TOKEN:-}" ] || [ -z "${CHAT_ID:-}" ]; then
@@ -15,64 +23,53 @@ fi
 
 esc() { printf '%s' "$1" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'; }
 
-is_publish=false
-case "$WORKFLOW" in "Publish alpha"|"Publish stable") is_publish=true ;; esac
+# Long branch names (Dependabot) are shortened in the middle.
+short() {
+  local s="$1"
+  if [ "${#s}" -gt 40 ]; then printf '%s…%s' "${s:0:18}" "${s: -18}"; else printf '%s' "$s"; fi
+}
 
-repo="$(esc "$REPO")"
-workflow="$(esc "$WORKFLOW")"
-branch="$(esc "$BRANCH")"
-actor="$(esc "$ACTOR")"
-sha7="${SHA:0:7}"
-link="<a href=\"${RUN_URL}\">View run #${RUN_NUMBER}</a>"
+NL=$'\n'
+emoji=""; title=""; version=""; release_url=""
 
 case "$CONCLUSION" in
   success)
-    if [ "$WORKFLOW" = "Publish alpha" ]; then
-      msg="🧪 <b>${repo}</b> — alpha published
-Branch: <code>${branch}</code> · commit <code>${sha7}</code>
-By: ${actor}
-${link}"
-    elif [ "$WORKFLOW" = "Publish stable" ]; then
-      tag=""; release_url=""
-      if [ -n "${GH_TOKEN:-}" ]; then
-        tag="$(gh api "repos/${REPO}/releases/latest" --jq .tag_name 2>/dev/null || true)"
-        release_url="$(gh api "repos/${REPO}/releases/latest" --jq .html_url 2>/dev/null || true)"
-      fi
-      title="stable release"
-      [ -n "$tag" ] && title="stable release <b>$(esc "$tag")</b>"
-      msg="🚀 <b>${repo}</b> — ${title}
-Commit: <code>${sha7}</code> · by ${actor}"
-      if [ -n "$release_url" ]; then
-        msg="${msg}
-<a href=\"${release_url}\">GitHub release</a> · ${link}"
-      else
-        msg="${msg}
-${link}"
-      fi
-    else
-      exit 0
-    fi
+    case "$WORKFLOW" in
+      "Publish alpha")
+        emoji="🧪"; title="Alpha published"
+        ;;
+      "Publish stable")
+        emoji="🚀"; title="Stable release published"
+        if [ -n "${GH_TOKEN:-}" ]; then
+          version="$(gh api "repos/${REPO}/releases/latest" --jq .tag_name 2>/dev/null || true)"
+          release_url="$(gh api "repos/${REPO}/releases/latest" --jq .html_url 2>/dev/null || true)"
+        fi
+        ;;
+      *) exit 0 ;;
+    esac
     ;;
   failure|startup_failure)
-    msg="❌ <b>${repo}</b> — ${workflow} failed
-Branch: <code>${branch}</code>
-By: ${actor}"
-    if [ -n "${PR:-}" ]; then msg="${msg}
-PR: #$(esc "$PR")"; fi
-    msg="${msg}
-${link}"
+    emoji="❌"; title="$WORKFLOW failed"
     ;;
   cancelled|timed_out)
-    if [ "$is_publish" != true ]; then exit 0; fi
-    state="cancelled"; [ "$CONCLUSION" = "timed_out" ] && state="timed out"
-    msg="⚠️ <b>${repo}</b> — ${workflow} ${state}
-Branch: <code>${branch}</code>
-${link}"
+    case "$WORKFLOW" in "Publish alpha"|"Publish stable") ;; *) exit 0 ;; esac
+    emoji="⚠️"; title="$WORKFLOW ${CONCLUSION/_/ }"
     ;;
-  *)
-    exit 0
-    ;;
+  *) exit 0 ;;
 esac
+
+msg="${emoji} <b>$(esc "$title")</b>${NL}<i>$(esc "$REPO")</i>${NL}"
+msg+="${NL}<b>Workflow:</b> $(esc "$WORKFLOW")"
+msg+="${NL}<b>Branch:</b> <code>$(esc "$(short "$BRANCH")")</code>"
+msg+="${NL}<b>Commit:</b> <code>${SHA:0:7}</code>"
+msg+="${NL}<b>By:</b> $(esc "$ACTOR")"
+[ -n "${PR:-}" ] && msg+="${NL}<b>PR:</b> #$(esc "$PR")"
+[ -n "$version" ] && msg+="${NL}<b>Version:</b> <code>$(esc "$version")</code>"
+
+links="🔗 <a href=\"${RUN_URL}\">Run #${RUN_NUMBER}</a>"
+[ -n "${PR:-}" ] && links+=" · <a href=\"https://github.com/${REPO}/pull/$(esc "$PR")\">PR #$(esc "$PR")</a>"
+[ -n "$release_url" ] && links+=" · <a href=\"${release_url}\">Release</a>"
+msg+="${NL}${NL}${links}"
 
 if [ "${DRY_RUN:-}" = "1" ]; then
   printf '%s\n' "$msg"

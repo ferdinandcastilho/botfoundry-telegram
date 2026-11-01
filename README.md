@@ -316,6 +316,8 @@ It uses the repository secrets `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` and s
 - Rulesets `protect-main` and `protect-qa`: pull request required, checks `Build and test` and `Verify source branch` required, deletion and force push blocked, no bypass actors, no required approvals (the maintainer merges their own pull requests).
 - Merge methods: squash on `qa`, merge commit on `main`; rebase merge disabled. Wiki and Projects are disabled.
 - Default workflow token permissions are read-only, and workflows cannot approve pull requests.
+- **GitHub Actions policy:** only actions owned by GitHub (`actions/*`) and `NuGet/login` are allowed, and every `uses:` must be pinned to a full commit SHA (`sha_pinning_required`), with the version in a trailing comment. Dependabot proposes updates to the pinned SHAs. To use a new action, pin it by SHA and add it to the allowed list in Settings -> Actions -> General; a workflow that references an action by tag fails.
+- Secrets live in the repository: `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` (notifications) and, per environment, `NUGET_USER`. No NuGet API key exists.
 
 ---
 
