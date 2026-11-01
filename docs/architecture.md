@@ -245,6 +245,27 @@ Message received by Hosting
 
 ---
 
+### ADR-005 — Release and Versioning
+
+**Context:** The package is published to nuget.org. The first process pushed a manual `v*` tag from `main`, which had no pre-release stage, no protection against publishing from the wrong branch and relied on a stored API key.
+
+**Options considered:**
+- Manual tag pushed by the maintainer (previous process)
+- Single `main` branch with automatic stable publishing on every merge
+- Two long-lived branches: `qa` for homologation (alpha) and `main` for stable releases
+
+**Decision:** Two long-lived branches. Feature branches are squash-merged into `qa`, which publishes an alpha (`<next patch>-alpha.0.<height>`, computed by MinVer). A pull request from `qa` into `main` (merge commit only) publishes the stable version; the bump comes from the `major` and `minor` labels of that pull request, and no label means patch. The workflow tags the tip of `qa` as `v<version>` and creates the GitHub release. Publishing authenticates with nuget.org trusted publishing (OIDC), with no stored API key.
+
+**Rationale:** Alphas give a safe homologation stage on every merge. Requiring merge commits on `main` keeps `qa` reachable from `main`, which the tag step and MinVer depend on. Rulesets and a required source-branch check make the flow the only possible path.
+
+**Accepted trade-off:** A fix for `main` must go through `qa` first. The `qa` branch can never be deleted or force-pushed.
+
+**Tag rule:** published tags are immutable (never deleted, moved or forced). The only exception was moving `v1.0.0`, `v1.0.1` and `v1.0.2` once during the history rewrite that replaced e-mail addresses.
+
+**Review trigger:** If a hotfix needs to bypass `qa` more than twice.
+
+---
+
 ## 7. Out of Scope
 
 This section explicitly defines what **BotFoundry.Telegram** does not do in v0.1. Its purpose is to avoid wrong assumptions about the library's capabilities and to guide future evolution decisions.
