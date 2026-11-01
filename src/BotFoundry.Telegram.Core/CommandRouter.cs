@@ -15,7 +15,7 @@ namespace BotFoundry.Telegram.Core
 
             if (string.IsNullOrEmpty(command) || !_handlers.TryGetValue(command, out var handler))
             {
-                logger.LogWarning("Comando não registrado: {Command}", command);
+                logger.LogWarning("Command not registered: {Command}", command);
                 return;
             }
 

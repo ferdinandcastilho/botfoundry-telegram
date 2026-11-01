@@ -1,0 +1,30 @@
+name: Delete merged branch
+
+# Deletes the source branch of a pull request merged into qa.
+# The repository-wide "delete head branches" option is off because it would
+# also delete qa when qa is merged into main.
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [qa]
+
+permissions:
+  contents: write
+
+jobs:
+  delete:
+    name: Delete source branch
+    if: >-
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref != 'qa' &&
+      github.event.pull_request.head.ref != 'main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Delete branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/${HEAD_REF}"

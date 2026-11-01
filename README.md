@@ -4,7 +4,7 @@ Library for building Telegram bots in C# without reimplementing infrastructure f
 
 You write the handlers and steps. The library takes care of the pipeline, session, routing, and connection to Telegram.
 
-> **Repository status:** This repository is intended to be public once the CI/CD setup is complete.
+> **Contributing:** contributions come in through forks and pull requests; see [CONTRIBUTING.md](CONTRIBUTING.md). To report a vulnerability, see [SECURITY.md](SECURITY.md).
 
 ---
 
@@ -29,6 +29,38 @@ await app.RunAsync();
 ```
 
 The bot is already connected to Telegram via long polling. No additional configuration is required to get started.
+
+> **Security warning — open by default.** Without an `IAuthMiddleware`, **anyone who finds your bot can use every handler**. If the bot must not be public, register an allowlist (see [Example — restrict access with an allowlist](#example--restrict-access-with-an-allowlist)) before putting it online.
+
+### Keep the token out of your code
+
+Do not commit the bot token. Read it from configuration or user secrets instead of a literal:
+
+```bash
+dotnet user-secrets init
+dotnet user-secrets set "Telegram:Token" "<your bot token>"
+```
+
+```csharp
+builder.Services.AddBotFoundry(builder.Configuration["Telegram:Token"]!);
+```
+
+The examples below use `YOUR_TOKEN_HERE` only as a placeholder.
+
+### Options
+
+```csharp
+builder.Services.AddBotFoundry(token, options =>
+{
+    options.SessionExpiry = TimeSpan.FromHours(12);   // default: 24 hours, renewed on every interaction
+    options.SessionCleanupIntervalSeconds = 30;       // default: 60, must be greater than zero
+});
+```
+
+| Option | Default | Description |
+|---|---|---|
+| `SessionExpiry` | 24 hours | How long a session lives without interaction. An expired session is discarded and replaced by a new one. |
+| `SessionCleanupIntervalSeconds` | 60 | How often expired sessions are removed from the default in-memory store. Ignored when you register your own `ISessionStore`. |
 
 ---
 
@@ -226,6 +258,67 @@ builder.Services.AddBotFoundry("YOUR_TOKEN_HERE");
 
 ---
 
+## 🚢 CI/CD and release process
+
+Technical information about the repository (workflows, branches, versioning, protections) lives here. When it changes, update this section in the same pull request.
+
+### Branch flow
+
+```
+feature branch ──squash──▶ qa ──merge commit──▶ main
+```
+
+- Work happens on a branch created from `qa` and goes back through a pull request into `qa` (**squash merge only**).
+- Releases are a pull request from `qa` into `main` (**merge commit only**). Squash and rebase are not allowed on `main`: the stable workflow reads the second parent of the merge commit to tag the tip of `qa`, and a squash would make `qa` and `main` diverge.
+- The `qa` branch is never deleted, never force-pushed and never receives direct pushes. The same applies to `main`.
+- Merged feature branches are deleted automatically by the `Delete merged branch` workflow. The repository-wide "delete head branches" option stays off, because it would also delete `qa` when it is merged into `main`.
+
+### Workflows
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| `CI` (`ci.yml`) | Pull requests into `qa` or `main` | `Verify source branch` (a PR into `main` must come from `qa` of this repository) and `Build and test`. Both checks are required. |
+| `Publish alpha` (`publish-alpha.yml`) | Push to `qa` (documentation-only pushes are ignored) | Builds, tests and publishes an alpha package to nuget.org. |
+| `Publish stable` (`publish-stable.yml`) | Push to `main` (the merge of `qa`) | Computes the next stable version, builds, tests, publishes, tags the release and creates the GitHub release. |
+| `Delete merged branch` (`delete-merged-branch.yml`) | PR into `qa` closed | Deletes the source branch if the PR was merged and came from this repository. Never deletes `main` or `qa`. |
+| `Notify` (`notify.yml`) | `CI`, publish and cleanup workflows finish | Sends the result to the Telegram DevOps bot (see Notifications). |
+
+Dependabot opens weekly pull requests against `qa` for GitHub Actions and NuGet packages.
+
+### Versioning
+
+- **Alpha:** [MinVer](https://github.com/adamralph/minver) computes `<next patch>-alpha.0.<commit height>` from the last stable tag (tag prefix `v`).
+- **Stable:** the bump comes from the labels of the pull request merged into `main`: `major` > `minor` > none (patch). The script `.github/scripts/next-version.sh` takes the highest `vX.Y.Z` tag and applies the bump.
+- **Labels:** `minor` and `major` exist in the repository; put one of them on the `qa` -> `main` pull request. Use `minor` for backward compatible features (including new public options) and `major` for breaking changes to the public API. Without a label the release is a patch.
+- **Tags and releases:** the stable workflow creates the `v<version>` tag on the tip of `qa` and a GitHub release with generated notes.
+- **Tags are immutable:** never delete, move or force a published tag. To fix a wrong release, publish a new version. The only exception was moving `v1.0.0`, `v1.0.1` and `v1.0.2` once, when the history was rewritten to replace e-mail addresses (#75).
+
+### Publishing to nuget.org (trusted publishing)
+
+No NuGet API key is stored anywhere. The publish workflows request a short-lived key (valid for one hour) with [`NuGet/login`](https://github.com/NuGet/login) through GitHub OIDC.
+
+- Two GitHub environments: `nuget-alpha` (deployments only from `qa`) and `nuget-stable` (only from `main`). Each has the secret `NUGET_USER` with the nuget.org profile name.
+- Two trusted publishing policies on nuget.org, one per workflow file (`publish-alpha.yml` with `nuget-alpha`, and `publish-stable.yml` with `nuget-stable`), scoped to the `BotFoundry.Telegram` package.
+- The workflows need `id-token: write`; third-party actions are pinned by commit SHA.
+
+### Notifications
+
+The `Notify` workflow (`notify.yml`) sends pipeline results to the maintainer's Telegram DevOps bot. It runs when `CI`, `Publish alpha`, `Publish stable` or `Delete merged branch` finish:
+
+- failures (and cancelled or timed-out publish runs) are always reported;
+- successful alpha and stable publishes are reported;
+- successful `CI` and `Delete merged branch` runs are silent.
+
+It uses the repository secrets `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` and skips silently when they are not available (forks, unconfigured clones). It never checks out or runs pull request code, and all values are escaped before they go into the message. Because `workflow_run` workflows always run from the default branch, changes to `notify.yml` only take effect after they reach `main`.
+
+### Repository protections
+
+- Rulesets `protect-main` and `protect-qa`: pull request required, checks `Build and test` and `Verify source branch` required, deletion and force push blocked, no bypass actors, no required approvals (the maintainer merges their own pull requests).
+- Merge methods: squash on `qa`, merge commit on `main`; rebase merge disabled. Wiki and Projects are disabled.
+- Default workflow token permissions are read-only, and workflows cannot approve pull requests.
+
+---
+
 ## 📁 Repository structure
 
 ```
@@ -234,9 +327,16 @@ src/
 ├── BotFoundry.Telegram.Core/           # Pipeline, router, step runner
 └── BotFoundry.Telegram/                # Telegram.Bot adapters, DI registration
 tests/
-└── BotFoundry.Telegram.Tests/          # xUnit + NSubstitute + FluentAssertions
+├── UnitTests/                          # xUnit + NSubstitute + FluentAssertions
+└── IntegrationTests/
 docs/
-└── architecture/                       # Architecture docs, design docs, ADRs
+├── architecture.md                     # Architecture document and ADRs
+└── architecture/                       # Design docs (HTML)
+.github/
+├── workflows/                          # CI, publish alpha/stable, branch cleanup
+├── scripts/                            # next-version.sh
+├── ISSUE_TEMPLATE/                     # Bug and suggestion templates
+└── dependabot.yml
 ```
 
 ---

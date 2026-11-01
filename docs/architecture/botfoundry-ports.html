@@ -170,7 +170,7 @@ pre{padding:var(--space-4);overflow-x:auto;font-family:var(--font-mono);font-siz
     </svg>
     <div>
       <div class="logo-text">BotFoundry.Telegram</div>
-      <div class="logo-sub">Ports &amp; Adapters — Referência de Interfaces</div>
+      <div class="logo-sub">Ports &amp; Adapters — Interface Reference</div>
     </div>
   </div>
   <button class="theme-btn" data-theme-toggle aria-label="Alternar tema">
@@ -185,19 +185,19 @@ pre{padding:var(--space-4);overflow-x:auto;font-family:var(--font-mono);font-siz
       <span class="badge badge-primary">Ports &amp; Adapters</span>
       <span class="badge badge-purple">Hexagonal Architecture</span>
     </div>
-    <h1>Projeto Abstractions —<br>Os Contratos da Lib</h1>
-    <p>Cada interface abaixo é um <strong>Port</strong>: um contrato que o núcleo define sem saber quem vai implementar. Para cada Port, veja a assinatura C#, quem implementa e o conceito arquitetural aplicado.</p>
+    <h1>Abstractions Project —<br>The Library's Contracts</h1>
+    <p>Each interface below is a <strong>Port</strong>: a contract the core defines without knowing who will implement it. For each Port, see the C# signature, who implements it and the architectural concept applied.</p>
   </div>
 
   <div class="concept-strip">
-    <div class="concept-item"><div class="label">Projeto</div><div class="value">BotFoundry.Telegram.Abstractions</div></div>
-    <div class="concept-item"><div class="label">Tipo</div><div class="value">Interfaces + Modelos — sem lógica</div></div>
-    <div class="concept-item"><div class="label">Dependências</div><div class="value">Nenhuma — núcleo do sistema</div></div>
-    <div class="concept-item"><div class="label">Quem referencia</div><div class="value">Core, Adapters, Consumidor</div></div>
+    <div class="concept-item"><div class="label">Project</div><div class="value">BotFoundry.Telegram.Abstractions</div></div>
+    <div class="concept-item"><div class="label">Type</div><div class="value">Interfaces + Models — no logic</div></div>
+    <div class="concept-item"><div class="label">Dependencies</div><div class="value">None — core of the system</div></div>
+    <div class="concept-item"><div class="label">Who references it</div><div class="value">Core, Adapters, Consumer</div></div>
   </div>
 
   <!-- DIAGRAM -->
-  <div class="section-divider"><h2>Visão do Hexágono</h2></div>
+  <div class="section-divider"><h2>Hexagon View</h2></div>
 
   <div class="diagram-container">
     <div class="diagram">
@@ -206,7 +206,7 @@ pre{padding:var(--space-4);overflow-x:auto;font-family:var(--font-mono);font-siz
         <div style="width:var(--space-8)"></div>
         <div class="diag-box ext">Test / Fake</div>
         <div style="width:var(--space-8)"></div>
-        <div class="diag-box consumer">Consumidor<br><span style="font-size:0.65rem;opacity:0.8">(seu bot)</span></div>
+        <div class="diag-box consumer">Consumer<br><span style="font-size:0.65rem;opacity:0.8">(your bot)</span></div>
       </div>
       <div class="diag-row">
         <div class="diag-arrow"><div class="arrow-line"></div><span>▼</span></div>
@@ -218,9 +218,9 @@ pre{padding:var(--space-4);overflow-x:auto;font-family:var(--font-mono);font-siz
       <div class="diag-row">
         <div class="diag-box adapter">TelegramPollingAdapter<br><span style="font-size:0.65rem;opacity:0.8">Driving Adapter</span></div>
         <div style="width:var(--space-8)"></div>
-        <div class="diag-box adapter">FakeMessageSender<br><span style="font-size:0.65rem;opacity:0.8">Driven Adapter (teste)</span></div>
+        <div class="diag-box adapter">FakeMessageSender<br><span style="font-size:0.65rem;opacity:0.8">Driven Adapter (test)</span></div>
         <div style="width:var(--space-8)"></div>
-        <div class="diag-box consumer">ITopicHandler impl<br><span style="font-size:0.65rem;opacity:0.8">Driven Adapter (domínio)</span></div>
+        <div class="diag-box consumer">ITopicHandler impl<br><span style="font-size:0.65rem;opacity:0.8">Driven Adapter (domain)</span></div>
       </div>
       <div class="diag-row">
         <div class="diag-arrow"><div class="arrow-line"></div><span>▼</span></div>
@@ -234,19 +234,19 @@ pre{padding:var(--space-4);overflow-x:auto;font-family:var(--font-mono);font-siz
         <div style="width:var(--space-8)"></div>
         <div class="diag-box port">IMessageSender<br><span style="font-size:0.65rem;opacity:0.8">Driven Port</span></div>
         <div style="width:var(--space-8)"></div>
-        <div class="diag-box port">ITopicHandler<br><span style="font-size:0.65rem;opacity:0.8">Driven Port (domínio)</span></div>
+        <div class="diag-box port">ITopicHandler<br><span style="font-size:0.65rem;opacity:0.8">Driven Port (domain)</span></div>
       </div>
       <div class="diag-row">
         <div class="diag-arrow"><div class="arrow-line"></div><span>▼</span></div>
       </div>
-      <div class="diag-box core">NÚCLEO (Core)<br><span style="font-size:0.65rem;opacity:0.8">Pipeline · Routing · Session · StepRunner</span></div>
+      <div class="diag-box core">CORE<br><span style="font-size:0.65rem;opacity:0.8">Pipeline · Routing · Session · StepRunner</span></div>
     </div>
     <div class="diag-legend">
-      <div class="legend-item"><div class="legend-dot ld-adapter"></div>Adapter (casca externa)</div>
-      <div class="legend-item"><div class="legend-dot ld-port"></div>Port (interface em Abstractions)</div>
-      <div class="legend-item"><div class="legend-dot ld-core"></div>Core (núcleo do hexágono)</div>
-      <div class="legend-item"><div class="legend-dot ld-consumer"></div>Consumidor (implementa domínio)</div>
-      <div class="legend-item"><div class="legend-dot ld-ext"></div>Mundo externo</div>
+      <div class="legend-item"><div class="legend-dot ld-adapter"></div>Adapter (external shell)</div>
+      <div class="legend-item"><div class="legend-dot ld-port"></div>Port (interface in Abstractions)</div>
+      <div class="legend-item"><div class="legend-dot ld-core"></div>Core (core of the hexagon)</div>
+      <div class="legend-item"><div class="legend-dot ld-consumer"></div>Consumer (implements the domain)</div>
+      <div class="legend-item"><div class="legend-dot ld-ext"></div>Outside world</div>
     </div>
   </div>
 
@@ -262,7 +262,7 @@ pre{padding:var(--space-4);overflow-x:auto;font-family:var(--font-mono);font-siz
           <div class="port-name">ISessionStore</div>
           <span class="badge badge-orange">Driven Port</span>
         </div>
-        <div class="port-desc">Define onde e como a sessão de cada usuário é persistida entre mensagens.</div>
+        <div class="port-desc">Defines where and how each user's session is persisted between messages.</div>
       </div>
       <div class="port-body">
         <div class="code-block">
@@ -287,37 +287,37 @@ pre{padding:var(--space-4);overflow-x:auto;font-family:var(--font-mono);font-siz
         </div>
 
         <div class="impl-section">
-          <div class="impl-label">Implementações</div>
+          <div class="impl-label">Implementations</div>
           <div class="impl-grid">
             <div class="impl-card">
               <div class="impl-header" style="background:var(--color-surface-offset)">
                 <span class="impl-name">InMemorySessionStore</span>
                 <div style="display:flex;align-items:center;gap:var(--space-2)">
-                  <span class="impl-who">fornecida pela lib</span>
-                  <span class="badge badge-primary">padrão</span>
+                  <span class="impl-who">provided by the library</span>
+                  <span class="badge badge-primary">default</span>
                 </div>
               </div>
               <pre style="background:var(--color-bg);padding:var(--space-3);font-size:0.72rem"><span class="cm">// BotFoundry.Telegram/Adapters/</span>
-<span class="cm">// Registrada automaticamente no DI</span>
-<span class="cm">// se nenhuma outra for registrada (ADR-002)</span>
+<span class="cm">// Registered automatically in DI</span>
+<span class="cm">// if no other is registered (ADR-002)</span>
 <span class="kw">internal class</span> <span class="tp">InMemorySessionStore</span> : <span class="tp">ISessionStore</span> { ... }</pre>
             </div>
             <div class="impl-card">
               <div class="impl-header" style="background:var(--color-surface-offset)">
                 <span class="impl-name">RedisSessionStore</span>
                 <div style="display:flex;align-items:center;gap:var(--space-2)">
-                  <span class="impl-who">implementada pelo consumidor</span>
-                  <span class="badge badge-success">opcional</span>
+                  <span class="impl-who">implemented by the consumer</span>
+                  <span class="badge badge-success">optional</span>
                 </div>
               </div>
-              <pre style="background:var(--color-bg);padding:var(--space-3);font-size:0.72rem"><span class="cm">// No projeto do bot — registra antes do AddBotFoundry</span>
+              <pre style="background:var(--color-bg);padding:var(--space-3);font-size:0.72rem"><span class="cm">// In the bot project — register before AddBotFoundry</span>
 services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore</span>, <span class="tp">RedisSessionStore</span>&gt;();</pre>
             </div>
           </div>
         </div>
         <div class="concept-box orange">
-          <div class="cb-label" style="color:var(--color-orange)">Conceito — ADR-002</div>
-          <div class="cb-text">A lib registra <code>InMemorySessionStore</code> como fallback via convenção DI. Se o consumidor já registrou outro <code>ISessionStore</code>, o fallback é ignorado — sem sobrescrever a escolha do consumidor.</div>
+          <div class="cb-label" style="color:var(--color-orange)">Concept — ADR-002</div>
+          <div class="cb-text">The library registers <code>InMemorySessionStore</code> as a fallback through the DI convention. If the consumer has already registered another <code>ISessionStore</code>, the fallback is ignored — the consumer's choice is never overwritten.</div>
         </div>
       </div>
     </div>
@@ -329,7 +329,7 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
           <div class="port-name">IMessageSender</div>
           <span class="badge badge-orange">Driven Port</span>
         </div>
-        <div class="port-desc">Abstrai o envio de respostas ao usuário, isolando o SDK Telegram.Bot do núcleo.</div>
+        <div class="port-desc">Abstracts sending replies to the user, isolating the Telegram.Bot SDK from the core.</div>
       </div>
       <div class="port-body">
         <div class="code-block">
@@ -353,17 +353,17 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
         </div>
 
         <div class="impl-section">
-          <div class="impl-label">Implementações</div>
+          <div class="impl-label">Implementations</div>
           <div class="impl-grid">
             <div class="impl-card">
               <div class="impl-header" style="background:var(--color-surface-offset)">
                 <span class="impl-name">TelegramMessageSender</span>
                 <div style="display:flex;align-items:center;gap:var(--space-2)">
-                  <span class="impl-who">fornecida pela lib</span>
-                  <span class="badge badge-primary">produção</span>
+                  <span class="impl-who">provided by the library</span>
+                  <span class="badge badge-primary">production</span>
                 </div>
               </div>
-              <pre style="background:var(--color-bg);padding:var(--space-3);font-size:0.72rem"><span class="cm">// ÚNICO ponto que usa Telegram.Bot SDK</span>
+              <pre style="background:var(--color-bg);padding:var(--space-3);font-size:0.72rem"><span class="cm">// The ONLY place that uses the Telegram.Bot SDK</span>
 <span class="cm">// BotFoundry.Telegram/Adapters/ (ADR-003)</span>
 <span class="kw">internal class</span> <span class="tp">TelegramMessageSender</span> : <span class="tp">IMessageSender</span> { ... }</pre>
             </div>
@@ -371,11 +371,11 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
               <div class="impl-header" style="background:var(--color-surface-offset)">
                 <span class="impl-name">FakeMessageSender</span>
                 <div style="display:flex;align-items:center;gap:var(--space-2)">
-                  <span class="impl-who">criada nos testes</span>
-                  <span class="badge badge-blue">testes</span>
+                  <span class="impl-who">created in the tests</span>
+                  <span class="badge badge-blue">tests</span>
                 </div>
               </div>
-              <pre style="background:var(--color-bg);padding:var(--space-3);font-size:0.72rem"><span class="cm">// Core.Tests — sem Telegram, sem rede</span>
+              <pre style="background:var(--color-bg);padding:var(--space-3);font-size:0.72rem"><span class="cm">// Core.Tests — no Telegram, no network</span>
 <span class="kw">public class</span> <span class="tp">FakeMessageSender</span> : <span class="tp">IMessageSender</span>
 {
     <span class="kw">public</span> <span class="tp">List</span>&lt;<span class="kw">string</span>&gt; SentMessages { <span class="kw">get</span>; } = [];
@@ -384,8 +384,8 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
           </div>
         </div>
         <div class="concept-box primary">
-          <div class="cb-label" style="color:var(--color-primary)">Conceito — ADR-003</div>
-          <div class="cb-text">O SDK <code>Telegram.Bot</code> só é referenciado em <code>TelegramMessageSender</code>. O núcleo chama <code>IMessageSender</code> — não sabe que existe um Telegram. Em teste, <code>FakeMessageSender</code> coleta as mensagens sem abrir conexão.</div>
+          <div class="cb-label" style="color:var(--color-primary)">Concept — ADR-003</div>
+          <div class="cb-text">O SDK <code>Telegram.Bot</code> is referenced only in <code>TelegramMessageSender</code>. The core calls <code>IMessageSender</code> — it does not know Telegram exists. In tests, <code>FakeMessageSender</code> collects the messages without opening a connection.</div>
         </div>
       </div>
     </div>
@@ -395,9 +395,9 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
       <div class="port-header">
         <div class="port-header-top">
           <div class="port-name">ITopicHandler</div>
-          <span class="badge badge-success">Driven Port — Domínio</span>
+          <span class="badge badge-success">Driven Port — Domain</span>
         </div>
-        <div class="port-desc">Contrato que o consumidor implementa para responder a um comando específico (<code>/start</code>, <code>/help</code>…).</div>
+        <div class="port-desc">Contract the consumer implements to answer a specific command (<code>/start</code>, <code>/help</code>…).</div>
       </div>
       <div class="port-body">
         <div class="code-block">
@@ -407,7 +407,7 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
           </div>
           <pre><span class="kw">public interface</span> <span class="tp">ITopicHandler</span>
 {
-    <span class="cm">/// Comando que este handler atende, ex: "start"</span>
+    <span class="cm">/// Command this handler serves, e.g. "start"</span>
     <span class="kw">string</span> Command { <span class="kw">get</span>; }
 
     <span class="tp">Task</span>&lt;<span class="tp">FlowResult</span>&gt; <span class="fn">HandleAsync</span>(
@@ -417,12 +417,12 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
         </div>
 
         <div class="impl-section">
-          <div class="impl-label">Exemplo — implementação pelo consumidor</div>
+          <div class="impl-label">Example — implementation by the consumer</div>
           <div class="impl-grid">
             <div class="impl-card">
               <div class="impl-header" style="background:var(--color-surface-offset)">
                 <span class="impl-name">StartHandler</span>
-                <span class="impl-who">no projeto do bot</span>
+                <span class="impl-who">in the bot project</span>
               </div>
               <pre style="background:var(--color-bg);padding:var(--space-3);font-size:0.72rem"><span class="kw">public class</span> <span class="tp">StartHandler</span> : <span class="tp">ITopicHandler</span>
 {
@@ -431,7 +431,7 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
     <span class="kw">public async</span> <span class="tp">Task</span>&lt;<span class="tp">FlowResult</span>&gt; <span class="fn">HandleAsync</span>(
         <span class="tp">BotContext</span> ctx, <span class="tp">CancellationToken</span> ct)
     {
-        <span class="kw">await</span> ctx.<span class="fn">SendAsync</span>(<span class="st">"Olá! Qual é o seu nome?"</span>, ct);
+        <span class="kw">await</span> ctx.<span class="fn">SendAsync</span>(<span class="st">"Hello! What is your name?"</span>, ct);
         <span class="kw">return</span> <span class="tp">FlowResult</span>.<span class="fn">Continue</span>();
     }
 }</pre>
@@ -439,8 +439,8 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
           </div>
         </div>
         <div class="concept-box success">
-          <div class="cb-label" style="color:var(--color-success)">Conceito — Port de Domínio</div>
-          <div class="cb-text">A lib não conhece <code>StartHandler</code> — ela chama <code>ITopicHandler</code>. O consumidor registra os handlers via DI e o <code>Routing</code> os descobre em runtime. O núcleo nunca precisa ser modificado para suportar novos comandos.</div>
+          <div class="cb-label" style="color:var(--color-success)">Concept — Domain Port</div>
+          <div class="cb-text">The library does not know <code>StartHandler</code> — it calls <code>ITopicHandler</code>. The consumer registers the handlers through DI and the <code>Routing</code> discovers them at runtime. The core never needs to be modified to support new commands.</div>
         </div>
       </div>
     </div>
@@ -450,9 +450,9 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
       <div class="port-header">
         <div class="port-header-top">
           <div class="port-name">IConversationStep</div>
-          <span class="badge badge-success">Driven Port — Domínio</span>
+          <span class="badge badge-success">Driven Port — Domain</span>
         </div>
-        <div class="port-desc">Define uma etapa de um fluxo multi-step: o que perguntar, como validar e como processar a resposta.</div>
+        <div class="port-desc">Defines one step of a multi-step flow: what to ask, how to validate and how to process the reply.</div>
       </div>
       <div class="port-body">
         <div class="code-block">
@@ -464,25 +464,25 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
 {
     <span class="kw">string</span> StepId { <span class="kw">get</span>; }
 
-    <span class="cm">/// Envia a pergunta ao usuário</span>
+    <span class="cm">/// Sends the question to the user</span>
     <span class="tp">Task</span> <span class="fn">AskAsync</span>(
         <span class="tp">BotContext</span> context,
         <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
 
-    <span class="cm">/// Valida a resposta do usuário</span>
+    <span class="cm">/// Validates the user's reply</span>
     <span class="tp">Task</span>&lt;<span class="kw">bool</span>&gt; <span class="fn">ValidateAsync</span>(
         <span class="tp">BotContext</span> context,
         <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
 
-    <span class="cm">/// Processa e decide próximo passo</span>
+    <span class="cm">/// Processes and decides the next step</span>
     <span class="tp">Task</span>&lt;<span class="tp">StepResult</span>&gt; <span class="fn">ProcessAsync</span>(
         <span class="tp">BotContext</span> context,
         <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>);
 }</pre>
         </div>
         <div class="concept-box success">
-          <div class="cb-label" style="color:var(--color-success)">Conceito — StepRunner (Fluxo 2)</div>
-          <div class="cb-text">O <code>StepRunner</code> do núcleo invoca <code>ValidateAsync → ProcessAsync</code> em loop. <code>StepResult</code> pode ser <code>Continue</code>, <code>Complete</code> ou <code>JumpTo(stepId)</code> — o consumidor decide o fluxo; o núcleo executa a mecânica.</div>
+          <div class="cb-label" style="color:var(--color-success)">Concept — StepRunner (Fluxo 2)</div>
+          <div class="cb-text">The core's <code>StepRunner</code> invokes <code>ValidateAsync → ProcessAsync</code> in a loop. <code>StepResult</code> can be <code>Continue</code>, <code>Complete</code> or <code>JumpTo(stepId)</code> — the consumer decides the flow; the core runs the mechanics.</div>
         </div>
       </div>
     </div>
@@ -492,9 +492,9 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
       <div class="port-header">
         <div class="port-header-top">
           <div class="port-name">IAuthMiddleware</div>
-          <span class="badge badge-purple">Driven Port — Opcional</span>
+          <span class="badge badge-purple">Driven Port — Optional</span>
         </div>
-        <div class="port-desc">Decide se um usuário tem permissão para continuar no pipeline. Opcional — se não registrado, todos os usuários passam.</div>
+        <div class="port-desc">Decides whether a user is allowed to continue in the pipeline. Optional — if not registered, every user gets through.</div>
       </div>
       <div class="port-body">
         <div class="code-block">
@@ -511,12 +511,12 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
         </div>
 
         <div class="impl-section">
-          <div class="impl-label">Exemplo — admin list</div>
+          <div class="impl-label">Example — admin list</div>
           <div class="impl-grid">
             <div class="impl-card">
               <div class="impl-header" style="background:var(--color-surface-offset)">
                 <span class="impl-name">AdminOnlyMiddleware</span>
-                <span class="impl-who">no projeto do bot</span>
+                <span class="impl-who">in the bot project</span>
               </div>
               <pre style="background:var(--color-bg);padding:var(--space-3);font-size:0.72rem"><span class="kw">public class</span> <span class="tp">AdminOnlyMiddleware</span> : <span class="tp">IAuthMiddleware</span>
 {
@@ -530,8 +530,8 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
           </div>
         </div>
         <div class="concept-box purple">
-          <div class="cb-label" style="color:var(--color-purple)">Conceito — Port Opcional</div>
-          <div class="cb-text">O núcleo verifica <code>IAuthMiddleware</code> se ele foi registrado. Caso contrário, pula a verificação. A lib nunca força autenticação — expõe o gancho, o consumidor decide a regra.</div>
+          <div class="cb-label" style="color:var(--color-purple)">Concept — Optional Port</div>
+          <div class="cb-text">The core checks <code>IAuthMiddleware</code> whether it was registered. Otherwise, it skips the check. The library never forces authentication — it exposes the hook and the consumer decides the rule.</div>
         </div>
       </div>
     </div>
@@ -541,9 +541,9 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
       <div class="port-header">
         <div class="port-header-top">
           <div class="port-name">ILlmBridge</div>
-          <span class="badge badge-blue">Driven Port — Extensão</span>
+          <span class="badge badge-blue">Driven Port — Extension</span>
         </div>
-        <div class="port-desc">Repassa mensagens de texto livre (sem comando ativo) a um agente de linguagem externo.</div>
+        <div class="port-desc">Forwards free-text messages (with no active command) to an external language agent.</div>
       </div>
       <div class="port-body">
         <div class="code-block">
@@ -560,8 +560,8 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
 }</pre>
         </div>
         <div class="concept-box blue">
-          <div class="cb-label" style="color:var(--color-blue)">Conceito — Ponto de Extensão (Fluxo 3)</div>
-          <div class="cb-text">Quando o <code>Routing</code> não encontra comando nem fluxo ativo, verifica se <code>ILlmBridge</code> foi registrado. Se sim, repassa a mensagem. A integração real com OpenAI, Gemini ou outro agente é 100% responsabilidade do consumidor.</div>
+          <div class="cb-label" style="color:var(--color-blue)">Concept — Extension Point (Flow 3)</div>
+          <div class="cb-text">When the <code>Routing</code> finds no command and no active flow, it checks whether <code>ILlmBridge</code> was registered. If so, it forwards the message. The actual integration with OpenAI, Gemini or another agent is 100% the consumer's responsibility.</div>
         </div>
       </div>
     </div>
@@ -569,16 +569,16 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
   </div><!-- /ports-grid -->
 
   <!-- MODELOS -->
-  <div class="section-divider"><h2>Modelos de Suporte</h2></div>
+  <div class="section-divider"><h2>Supporting Models</h2></div>
 
   <div class="ports-grid">
     <div class="port-card">
       <div class="port-header">
         <div class="port-header-top">
           <div class="port-name">BotContext</div>
-          <span class="badge badge-primary">Modelo Agnóstico</span>
+          <span class="badge badge-primary">Agnostic Model</span>
         </div>
-        <div class="port-desc">Objeto que trafega pelo pipeline, carregando mensagem e sessão do usuário. Não contém tipos do SDK.</div>
+        <div class="port-desc">Object that travels through the pipeline, carrying the message and the user's session. It contains no SDK types.</div>
       </div>
       <div class="port-body">
         <div class="code-block">
@@ -593,14 +593,14 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
     <span class="kw">public</span> <span class="tp">UserSession</span> Session   { <span class="kw">get</span>; <span class="kw">init</span>; }
     <span class="kw">public</span> <span class="tp">IMessageSender</span> Sender { <span class="kw">get</span>; <span class="kw">init</span>; }
 
-    <span class="cm">// Atalho para o consumidor enviar respostas</span>
+    <span class="cm">// Shortcut for the consumer to send replies</span>
     <span class="kw">public</span> <span class="tp">Task</span> <span class="fn">SendAsync</span>(<span class="kw">string</span> text, <span class="tp">CancellationToken</span> ct = <span class="kw">default</span>)
         => Sender.<span class="fn">SendTextAsync</span>(ChatId, text, ct);
 }</pre>
         </div>
         <div class="concept-box primary">
-          <div class="cb-label" style="color:var(--color-primary)">Conceito — Modelo de Fronteira</div>
-          <div class="cb-text"><code>BotContext</code> é criado pelo <code>TelegramPollingAdapter</code> a partir do objeto do SDK, mas não carrega nenhum tipo do SDK. É a "tradução" do mundo externo para o vocabulário interno da lib.</div>
+          <div class="cb-label" style="color:var(--color-primary)">Concept — Boundary Model</div>
+          <div class="cb-text"><code>BotContext</code> is created by <code>TelegramPollingAdapter</code> from the SDK object, but carries no SDK type. It is the "translation" from the outside world to the library's internal vocabulary.</div>
         </div>
       </div>
     </div>
@@ -609,9 +609,9 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
       <div class="port-header">
         <div class="port-header-top">
           <div class="port-name">UserSession</div>
-          <span class="badge badge-orange">Modelo de Estado</span>
+          <span class="badge badge-orange">State Model</span>
         </div>
-        <div class="port-desc">Estado do usuário persistido entre mensagens — topic ativo, step atual e dados de conversa.</div>
+        <div class="port-desc">User state persisted between messages — active topic, current step and conversation data.</div>
       </div>
       <div class="port-body">
         <div class="code-block">
@@ -638,29 +638,29 @@ services.<span class="fn">AddSingleton</span>&lt;<span class="tp">ISessionStore<
   </div>
 
   <!-- REGRAS -->
-  <div class="section-divider"><h2>Regras de Dependência</h2></div>
-  <p style="color:var(--color-text-muted);font-size:var(--text-sm);margin-bottom:var(--space-2)">Violações dessas regras indicam um erro arquitetural — o núcleo nunca pode "olhar para fora".</p>
+  <div class="section-divider"><h2>Dependency Rules</h2></div>
+  <p style="color:var(--color-text-muted);font-size:var(--text-sm);margin-bottom:var(--space-2)">Violations of these rules indicate an architectural error — the core can never "look outside".</p>
 
   <div class="rules-grid">
     <div class="rule-card">
       <div class="rule-number">REGRA 01</div>
-      <div class="rule-title">Core só depende de Abstractions</div>
-      <div class="rule-desc"><code>BotFoundry.Telegram.Core</code> referencia apenas <code>BotFoundry.Telegram.Abstractions</code>. Nunca referencia <code>Telegram.Bot</code> nem o projeto de adapters.</div>
+      <div class="rule-title">Core depends only on Abstractions</div>
+      <div class="rule-desc"><code>BotFoundry.Telegram.Core</code> references only <code>BotFoundry.Telegram.Abstractions</code>. It never references <code>Telegram.Bot</code> nor the adapters project.</div>
     </div>
     <div class="rule-card">
       <div class="rule-number">REGRA 02</div>
-      <div class="rule-title">SDK fica em um único adaptador</div>
-      <div class="rule-desc">Apenas <code>TelegramMessageSender</code> e <code>TelegramPollingAdapter</code> podem usar <code>using Telegram.Bot</code>. Todo o resto da lib é agnóstico (ADR-003).</div>
+      <div class="rule-title">SDK stays in a single adapter</div>
+      <div class="rule-desc">Only <code>TelegramMessageSender</code> and <code>TelegramPollingAdapter</code> can use <code>using Telegram.Bot</code>. The rest of the library is agnostic (ADR-003).</div>
     </div>
     <div class="rule-card">
       <div class="rule-number">REGRA 03</div>
-      <div class="rule-title">Abstractions não tem dependências</div>
-      <div class="rule-desc">O projeto <code>Abstractions</code> não referencia nenhum outro projeto da lib. Ele é o núcleo do grafo de dependências — todos dependem dele, ele não depende de ninguém.</div>
+      <div class="rule-title">Abstractions has no dependencies</div>
+      <div class="rule-desc">The <code>Abstractions</code> project does not reference any other project in the library. It is the core of the dependency graph — everyone depends on it, it depends on no one.</div>
     </div>
     <div class="rule-card">
       <div class="rule-number">REGRA 04</div>
-      <div class="rule-title">Consumidor não acessa o Core</div>
-      <div class="rule-desc">O desenvolvedor do bot referencia apenas <code>Abstractions</code> para implementar seus handlers e steps. Nunca acessa tipos internos do <code>Core</code> diretamente.</div>
+      <div class="rule-title">The consumer does not access the Core</div>
+      <div class="rule-desc">The bot developer references only <code>Abstractions</code> to implement their handlers and steps. Never accesses internal types of the <code>Core</code> directly.</div>
     </div>
   </div>
 

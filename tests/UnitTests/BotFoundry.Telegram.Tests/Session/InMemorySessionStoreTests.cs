@@ -10,7 +10,7 @@ namespace BotFoundry.Telegram.Tests.Session
         public async Task SaveAndGet_ReturnsSameSession()
         {
             var store = new InMemorySessionStore();
-            var session = new UserSession { ChatId = 123 };
+            var session = new UserSession { ChatId = 123, ExpiresAt = DateTimeOffset.UtcNow.AddHours(1) };
             session.Data["key"] = "value";
 
             await store.SaveAsync(session);
@@ -26,7 +26,7 @@ namespace BotFoundry.Telegram.Tests.Session
         public async Task Delete_RemovesSession()
         {
             var store = new InMemorySessionStore();
-            var session = new UserSession { ChatId = 123 };
+            var session = new UserSession { ChatId = 123, ExpiresAt = DateTimeOffset.UtcNow.AddHours(1) };
 
             await store.SaveAsync(session);
             await store.DeleteAsync(123);
@@ -46,7 +46,7 @@ namespace BotFoundry.Telegram.Tests.Session
                 var index = i;
                 var task = Task.Run(async () =>
                 {
-                    var session = new UserSession { ChatId = index };
+                    var session = new UserSession { ChatId = index, ExpiresAt = DateTimeOffset.UtcNow.AddHours(1) };
                     session.Data["index"] = index.ToString();
                     await store.SaveAsync(session);
                 });
@@ -63,6 +63,31 @@ namespace BotFoundry.Telegram.Tests.Session
                 retrieved.Data.Should().ContainKey("index");
                 retrieved.Data["index"].Should().Be(i.ToString());
             }
+        }
+
+        [Fact]
+        public async Task Get_WhenSessionIsExpired_ReturnsNullAndRemovesIt()
+        {
+            var store = new InMemorySessionStore();
+            await store.SaveAsync(new UserSession { ChatId = 123, ExpiresAt = DateTimeOffset.UtcNow.AddSeconds(-1) });
+
+            var retrieved = await store.GetAsync(123);
+
+            retrieved.Should().BeNull();
+            (await store.GetAsync(123)).Should().BeNull();
+        }
+
+        [Fact]
+        public async Task RemoveExpired_RemovesOnlyExpiredSessions()
+        {
+            var store = new InMemorySessionStore();
+            await store.SaveAsync(new UserSession { ChatId = 1, ExpiresAt = DateTimeOffset.UtcNow.AddSeconds(-1) });
+            await store.SaveAsync(new UserSession { ChatId = 2, ExpiresAt = DateTimeOffset.UtcNow.AddHours(1) });
+
+            store.RemoveExpired();
+
+            store.Count.Should().Be(1);
+            (await store.GetAsync(2)).Should().NotBeNull();
         }
     }
 }

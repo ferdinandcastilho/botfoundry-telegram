@@ -1,0 +1,40 @@
+name: Notify
+
+# Sends the result of the pipeline workflows to the Telegram DevOps bot.
+# workflow_run workflows always run from the default branch, so this one only
+# starts after it reaches main. It never checks out or runs pull request code.
+
+on:
+  workflow_run:
+    workflows: [CI, Publish alpha, Publish stable, Delete merged branch]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    name: Send Telegram message
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Send message
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          WORKFLOW: ${{ github.event.workflow_run.name }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          ACTOR: ${{ github.event.workflow_run.actor.login }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          RUN_NUMBER: ${{ github.event.workflow_run.run_number }}
+          PR: ${{ github.event.workflow_run.pull_requests[0].number }}
+        run: bash .github/scripts/notify-telegram.sh
