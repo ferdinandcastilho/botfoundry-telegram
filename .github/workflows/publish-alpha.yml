@@ -12,6 +12,8 @@ on:
       - 'docs/**'
       - '.github/ISSUE_TEMPLATE/**'
       - '.github/instructions/**'
+      - '.github/workflows/notify.yml'
+      - '.github/scripts/notify-telegram.sh'
 
 permissions:
   contents: read
