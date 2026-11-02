@@ -4,7 +4,12 @@ Library for building Telegram bots in C# without reimplementing infrastructure f
 
 You write the handlers and steps. The library takes care of the pipeline, session, routing, and connection to Telegram.
 
-> **Contributing:** contributions come in through forks and pull requests; see [CONTRIBUTING.md](CONTRIBUTING.md). To report a vulnerability, see [SECURITY.md](SECURITY.md).
+Have you ever created bots and felt the pain of reusing old code, updating it, and then racking your brain over whether the new changes also fit the older bots?
+Well, I have. That's why this library was created.
+
+Every update, conversation dynamic and functionality shouldn't belong to one bot project only, but to all of them. Let's untangle bot evolution with ease, without leaving any working bot behind.
+
+> **Contributing:** external issues and pull requests are not being accepted for now; see [CONTRIBUTING.md](CONTRIBUTING.md) for the future workflow. To report a vulnerability, see [SECURITY.md](SECURITY.md).
 
 ---
 
