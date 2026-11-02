@@ -1,13 +1,8 @@
 # 🤖 BotFoundry.Telegram
 
-Library for building Telegram bots in C# without reimplementing infrastructure for every project.
+C# library for building Telegram bots. Write handlers and conversation flows once, reuse them across every bot, and keep the older ones up to date without the headache.
 
 You write the handlers and steps. The library takes care of the pipeline, session, routing, and connection to Telegram.
-
-Have you ever created bots and felt the pain of reusing old code, updating it, and then racking your brain over whether the new changes also fit the older bots?
-Well, I have. That's why this library was created.
-
-Every update, conversation dynamic and functionality shouldn't belong to one bot project only, but to all of them. Let's untangle bot evolution with ease, without leaving any working bot behind.
 
 > **Contributing:** external issues and pull requests are not being accepted for now; see [CONTRIBUTING.md](CONTRIBUTING.md) for the future workflow. To report a vulnerability, see [SECURITY.md](SECURITY.md).
 
@@ -66,6 +61,15 @@ builder.Services.AddBotFoundry(token, options =>
 |---|---|---|
 | `SessionExpiry` | 24 hours | How long a session lives without interaction. An expired session is discarded and replaced by a new one. |
 | `SessionCleanupIntervalSeconds` | 60 | How often expired sessions are removed from the default in-memory store. Ignored when you register your own `ISessionStore`. |
+
+---
+
+## 💡 Why this library exists
+
+Have you ever created bots and felt the pain of reusing old code, updating it, and then racking your brain over whether the new changes also fit the older bots?
+Well, I have. That's why this library was created.
+
+Every update, conversation dynamic and functionality shouldn't belong to one bot project only, but to all of them. Let's untangle bot evolution with ease, without leaving any working bot behind.
 
 ---
 
