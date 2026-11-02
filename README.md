@@ -2,8 +2,6 @@
 
 C# library for building Telegram bots. You write the handlers; the pipeline, sessions and routing come from the package and evolve for all your bots at once.
 
-You write the handlers and steps. The library takes care of the pipeline, session, routing, and connection to Telegram.
-
 > **Contributing:** external issues and pull requests are not being accepted for now; see [CONTRIBUTING.md](CONTRIBUTING.md) for the future workflow. To report a vulnerability, see [SECURITY.md](SECURITY.md).
 
 ## 💡 Why this library exists
