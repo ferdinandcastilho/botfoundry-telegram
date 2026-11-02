@@ -343,6 +343,14 @@ docs/
 
 ---
 
+## 💬 Feedback and contact
+
+Questions, feedback or suggestions: [hey@fernandocastilho.tech](mailto:hey@fernandocastilho.tech).
+
+To report a security problem, follow [SECURITY.md](SECURITY.md) instead of sending it by email.
+
+---
+
 ## 📄 License
 
 MIT
